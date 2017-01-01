@@ -1,12 +1,13 @@
 import genepy
 import pygame
 
+
 def make_sheet(ptrns, path):
     n = len(ptrns)
-    h = n/16
-    if n%16:
+    h = n / 16
+    if n % 16:
         h += 1
-    res = pygame.Surface((128, h*8), pygame.SRCALPHA)
+    res = pygame.Surface((128, h * 8), pygame.SRCALPHA)
     res.fill(0xFF00DCFF)
     x = y = 0
     for p in ptrns:
