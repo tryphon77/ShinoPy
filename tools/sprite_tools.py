@@ -1,4 +1,5 @@
 from tools.psdreader import *
+from tools.animsreader import load_animdefs
 from map_tools import make_sheet
 
 def read_split_file(path):
@@ -64,6 +65,27 @@ def get_subsurface(surf, rect):
 if __name__ == '__main__':
     base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/musashi2'
     
+    if True:
+        anims = load_animdefs('%s/animdefs.txt' % base_dir)
+
+        print anims
+
+        res = ''
+        res2 = 'animations_table = [\n'
+        res2_ = []
+        for name in anims.keys():
+            anim = anims[name]
+            if not 'hflip' in anim:
+                res += ('%s = %s\n' % (name, anim['steps'] + [(-1, 0)]))
+                res2_ += ['\t' + name]
+
+        print res
+        res2 += ',\n'.join(res2_) + '\n]\n'
+        print res2
+        exit()
+
+
+    print 'loading psd file'
     psd = load_psd('%s/sheet2.psd' % base_dir)
     print psd
     splits = read_split_file('%s/split.txt' % base_dir)
@@ -75,6 +97,7 @@ if __name__ == '__main__':
         res_ = []
         ptrn_blocks = []
         for i in splits.keys():
+            print 'frame:', i
             split = splits[i]
             print split
             res__ = []
@@ -82,19 +105,19 @@ if __name__ == '__main__':
             for j, (x, y, w, h) in enumerate(split):
                 x_ = x - 64
                 y_ = y - 64
-                bx_ = 0
-                sw, sh = w/8, h/8
+                bx_ = -x_ - w
+                sw, sh = w / 8, h / 8
                 flags = ((sw - 1) << 2) + sh - 1
-                dp += sw*sh
-                res__ += ['\t\t[%d, %d, 0x%04X, 0x%02X]' % (x_, y_, flags, dp)]
+                dp += sw * sh
+                res__ += ['\t\t[%d, %d, %d, 0x%04X, 0x%02X]' % (x_, bx_, y_, flags, dp)]
             res_ += ['\t[\t\t# frame %d\n%s\n\t]' % (i, ',\n'.join(res__))]
             
             ptrn_blocks += [(dp0, dp - dp0)]
-        
+
         res += '[\n%s\n]\n' % ',\n'.join(res_)
-        
+
         print res
-        
+
         print 'patterns_blocks = [\n%s\n]\n' % ',\n'.join(['\t[0x%04X, 0x%04X]' % (p, l)\
                                                            for (p, l) in ptrn_blocks])
         

@@ -11,18 +11,23 @@ def main():
     musashi_patterns = load_data_from_png('res/musashi_patterns.png')
 
     musashi_sprite = TSprite()
+    musashi_sprite.status = 1
     musashi_sprite.x = 160
     musashi_sprite.y = 144
-    musashi_sprite.frames_table = res.musashi_data.frames_table
     musashi_sprite.patterns = musashi_patterns
+    musashi_sprite.frames_table = res.musashi_data.frames_table
+    musashi_sprite.animations_table = res.musashi_data.animations_table
     musashi_sprite.frame = 76
     musashi_sprite.patterns_blocks = res.musashi_data.patterns_blocks
     Globs.base_id = 0
 
     update_patterns(musashi_sprite)
+    allocate_sprite(musashi_sprite)
 
     camera_x = camera_y = 0
     old_joy = joy_pressed = 0
+
+    animation = 0
 
     while True:
         joy = GP.read_joypad(0)
@@ -39,11 +44,11 @@ def main():
             camera_y += 1
 
         if joy_pressed & BUTTON_A:
-            musashi_sprite.frame += 1
-            update_patterns(musashi_sprite)
+            animation += 1
+            set_animation(musashi_sprite, animation)
         elif joy_pressed & BUTTON_B:
-            musashi_sprite.frame -= 1
-            update_patterns(musashi_sprite)
+            animation -= 1
+            set_animation(musashi_sprite, animation)
         elif joy_pressed & BUTTON_C:
             Globs.base_id ^= 0x8000
 
@@ -56,9 +61,7 @@ def main():
         GP.plane_A_offset = -camera_x, camera_y
         GP.plane_B_offset = -camera_x / 2, camera_y / 2
 
-        Globs.link = 0
-        update_sprite(musashi_sprite)
-        GP.sprite_cache[Globs.link - 1].link = 0
+        update_all_sprites()
 
         GP.wait_vblank()
 

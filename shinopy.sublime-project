@@ -12,7 +12,6 @@
 			"shell_cmd": "\"python\" -u \"$file\""
 		}
 	],
-
 	"folders":
 	[
 		{
