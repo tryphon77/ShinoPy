@@ -18,4 +18,8 @@ class Globs():
 
     link = 0
 
-    test = 4
+    joy = 0
+    joy_pressed = 0
+    forward = 0
+    backward = 0
+

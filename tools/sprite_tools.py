@@ -73,15 +73,24 @@ if __name__ == '__main__':
         res = ''
         res2 = 'animations_table = [\n'
         res2_ = []
+        name_id = 0
+        name_ids = ''
+
         for name in anims.keys():
             anim = anims[name]
             if not 'hflip' in anim:
+                name = name.replace('_right', '')
                 res += ('%s = %s\n' % (name, anim['steps'] + [(-1, 0)]))
                 res2_ += ['\t' + name]
+
+                name_ids += '%s = %s\n' % (name.upper(), name_id)
+                name_id += 1
 
         print res
         res2 += ',\n'.join(res2_) + '\n]\n'
         print res2
+
+        print name_ids
         exit()
 
 

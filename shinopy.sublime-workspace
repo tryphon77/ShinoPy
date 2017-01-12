@@ -4,6 +4,78 @@
 		"selected_items":
 		[
 			[
+				"po",
+				"poi_Af"
+			],
+			[
+				"musashi",
+				"musashi_states"
+			],
+			[
+				"allo",
+				"allocate_sprite\tfunction"
+			],
+			[
+				"p",
+				"patterns"
+			],
+			[
+				"sta",
+				"stand"
+			],
+			[
+				"collisio",
+				"collision_map"
+			],
+			[
+				"f",
+				"forward\tstatement"
+			],
+			[
+				"sp",
+				"sprite"
+			],
+			[
+				"spe",
+				"speed_y"
+			],
+			[
+				"se",
+				"self\tparam"
+			],
+			[
+				"u",
+				"update_function"
+			],
+			[
+				"all",
+				"all_objects"
+			],
+			[
+				"frmae",
+				"frame_id\tstatement"
+			],
+			[
+				"0x",
+				"0x800"
+			],
+			[
+				"t",
+				"t_id"
+			],
+			[
+				"is_",
+				"is_flipped\tstatement"
+			],
+			[
+				"a",
+				"animations_table\tstatement"
+			],
+			[
+				"musashi_",
+				"musashi_sprite\tstatement"
+			],
+			[
 				"i",
 				"is_flipped"
 			],
@@ -36,19 +108,10 @@
 	"buffers":
 	[
 		{
-			"file": "tools/sprite_tools.py",
-			"settings":
-			{
-				"buffer_size": 3665,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "tsprite.py",
 			"settings":
 			{
-				"buffer_size": 3654,
+				"buffer_size": 3652,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -57,7 +120,25 @@
 			"file": "run_stage.py",
 			"settings":
 			{
-				"buffer_size": 2119,
+				"buffer_size": 1827,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "tilemap.py",
+			"settings":
+			{
+				"buffer_size": 3071,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "globals.py",
+			"settings":
+			{
+				"buffer_size": 400,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -66,7 +147,8 @@
 			"file": "res/musashi_data.py",
 			"settings":
 			{
-				"buffer_size": 20162,
+				"buffer_size": 25136,
+				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
@@ -74,7 +156,8 @@
 			"file": "genepy.py",
 			"settings":
 			{
-				"buffer_size": 8652,
+				"buffer_size": 8791,
+				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
@@ -82,9 +165,57 @@
 			"file": "shinopy.sublime-project",
 			"settings":
 			{
-				"buffer_size": 313,
+				"buffer_size": 303,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "object.py",
+			"settings":
+			{
+				"buffer_size": 2812,
+				"encoding": "UTF-8",
+				"line_ending": "Windows",
+				"name": "typedef struct Object {"
+			}
+		},
+		{
+			"file": "res/level_1_1.py",
+			"settings":
+			{
+				"buffer_size": 49556,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "res/states/musashi_states.py",
+			"settings":
+			{
+				"buffer_size": 1623,
+				"encoding": "UTF-8",
+				"line_ending": "Windows",
+				"name": "def stand(self):"
+			}
+		},
+		{
+			"file": "tools/sprite_tools.py",
+			"settings":
+			{
+				"buffer_size": 4359,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "queue.py",
+			"settings":
+			{
+				"buffer_size": 350,
+				"encoding": "UTF-8",
+				"line_ending": "Windows",
+				"name": "class Queue():"
 			}
 		}
 	],
@@ -131,17 +262,21 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 380.0,
-		"last_filter": "pus",
+		"height": 392.0,
+		"last_filter": "",
 		"selected_items":
 		[
 			[
-				"pus",
+				"git pu",
 				"Git: Push"
 			],
 			[
 				"git q",
 				"Git: Quick Commit"
+			],
+			[
+				"pus",
+				"Git: Push"
 			],
 			[
 				"git p",
@@ -213,15 +348,20 @@
 	},
 	"expanded_folders":
 	[
-		"/C/Users/Tryphon/Documents/workspace/ShinoPy"
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy",
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res",
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/states",
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/tools"
 	],
 	"file_history":
 	[
-		"/C/Users/Tryphon/AppData/Roaming/Sublime Text 3/Packages/Anaconda/Anaconda.sublime-settings",
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/tools/sprite_tools.py",
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/states/__init__.py",
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/README.md",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/shinopy.sublime-project",
+		"/C/Users/Tryphon/AppData/Roaming/Sublime Text 3/Packages/Anaconda/Anaconda.sublime-settings",
 		"/C/Users/Tryphon/AppData/Roaming/Sublime Text 3/Packages/User/Python.sublime-settings",
 		"/C/Users/Tryphon/Documents/workspace/GenePy/genepy.sublime-project",
-		"/C/Users/Tryphon/Documents/workspace/ShinoPy/tools/sprite_tools.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/tools/map_tools.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/globals.py",
 		"/C/Users/Tryphon/AppData/Roaming/Sublime Text 3/Packages/User/Anaconda.sublime-settings",
@@ -245,6 +385,19 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"_right",
+			"_left",
+			"\\t",
+			"struct Object* ",
+			"u8 ",
+			"TSprite *",
+			"state_function *",
+			"void* ",
+			"se",
+			"u16 ",
+			"s16 ",
+			"fix32 ",
+			"print",
 			"indent",
 			"tab",
 			"path",
@@ -256,6 +409,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"",
+			"self."
 		],
 		"reverse": false,
 		"show_context": true,
@@ -266,65 +421,24 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 6,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "tools/sprite_tools.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3665,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1568,
-								1568
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": ".",
-									"selector": "source.python - string - comment - constant.numeric"
-								},
-								{
-									"characters": ".",
-									"selector": "source.python - string - constant.numeric"
-								}
-							],
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 890.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
 					"file": "tsprite.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3654,
+						"buffer_size": 3652,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1116,
-								1116
+								958,
+								958
 							]
 						],
 						"settings":
@@ -342,6 +456,18 @@
 								{
 									"characters": ".",
 									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
 								}
 							],
 							"syntax": "Packages/Python/Python.sublime-syntax",
@@ -349,7 +475,64 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 256.0,
+						"translation.y": 375.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "run_stage.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1827,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								235,
+								235
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
@@ -357,19 +540,302 @@
 				},
 				{
 					"buffer": 2,
-					"file": "run_stage.py",
+					"file": "tilemap.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2119,
+						"buffer_size": 3071,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1276,
-								1276
+								1556,
+								1556
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 483.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "globals.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 400,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								354,
+								354
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "res/musashi_data.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 25136,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								23228,
+								23228
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 11190.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "genepy.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8791,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								7877,
+								7877
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3638.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "shinopy.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 303,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								303,
+								303
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "object.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2812,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1388,
+								1388
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"auto_name": "typedef struct Object {",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 754.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "res/level_1_1.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 49556,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								33004,
+								33004
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4007.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "res/states/musashi_states.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1623,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								643,
+								643
 							]
 						],
 						"settings":
@@ -389,103 +855,97 @@
 									"selector": "source.python - string - constant.numeric"
 								}
 							],
+							"auto_name": "def stand(self):",
 							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 414.0,
+						"translation.y": 54.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "res/musashi_data.py",
+					"buffer": 10,
+					"file": "tools/sprite_tools.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 20162,
+						"buffer_size": 4359,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								318,
+								318
 							]
 						],
 						"settings":
 						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
 							"syntax": "Packages/Python/Python.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "genepy.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8652,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5043,
-								5043
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2286.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "shinopy.sublime-project",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 313,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								269,
-								269
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "queue.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 350,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								349,
+								349
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"auto_name": "class Queue():",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
 					"type": "text"
 				}
 			]
@@ -554,7 +1014,7 @@
 	"project": "shinopy.sublime-project",
 	"replace":
 	{
-		"height": 42.0
+		"height": 62.0
 	},
 	"save_all_on_build": true,
 	"select_file":

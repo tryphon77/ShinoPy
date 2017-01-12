@@ -13,6 +13,7 @@ class TSprite():
         self.is_flipped = False
         self.vpos = 0
         self.needs_refresh_patterns = False
+        self.new_frame = False
 
         self.x = 0
         self.y = 0
@@ -36,16 +37,15 @@ class TSprite():
 
 
 sprites_size = 16
-sprites = [TSprite()] * sprites_size
+sprites = [TSprite() for _ in range(sprites_size)]
 
 
-def allocate_sprite(sprite):
+def allocate_sprite():
     for i, s in enumerate(sprites):
         if s.status == 0:
-            print 'allocating sprite %s in slot %d' % (sprite, i)
-            sprites[i] = sprite
-            return 1
-    GP.exit_with_error('Overflow in TSprite.allocate_sprite')
+            print 'allocating sprite #%d' % i
+            return s
+    return None
 
 
 sizes = [1, 2, 3, 4, 2, 4, 6, 8, 3, 6, 9, 12, 4, 8, 12, 16]
@@ -57,6 +57,7 @@ def update_patterns(sprite):
 
 
 def update_frame(sprite):
+    print 'update_frame: %d at (%d, %d)' % (sprite.frame, sprite.x, sprite.y)
     x = sprite.x
     y = sprite.y
     t_id = 0x200
@@ -75,6 +76,7 @@ def update_frame(sprite):
             Globs.link += 1
     else:
         for (dx, _, dy, sz, dp) in sprite.frames_table[sprite.frame]:
+#            print (dx, _, dy, sz, dp)
             GP.set_sprite(Globs.link,
                           x + dx,
                           y + dy,
@@ -86,6 +88,7 @@ def update_frame(sprite):
 
 
 def set_animation(self, anim):
+#    print 'set_animation: %d' % anim
     self.total_ticks_in_animation = 0
     if self.animation_id != anim:
         self.animation_id = anim
@@ -99,13 +102,18 @@ def load_next_frame(self):
     # frame_id, ticks, x, y, clsn1_rect_id, clsn2_rect_id for all frames except last
     # -1, frame_id, X, X, X, X for last frame
 
+#    print 'load_next_frame: index = %d' % self.animation_index
     frame_id, ticks = self.animation[self.animation_index]
+#    self.bbox = self.bboxes_table[frame_id]
+#    print (frame_id, ticks)
 
     self.is_animation_over = False
     if frame_id < 0:
         self.is_animation_over = True
         self.animation_index = ticks
         frame_id, ticks = self.animation[self.animation_index]
+#        print 'loop'
+#        print (frame_id, ticks)
 
     if self.frame != frame_id:
         self.frame = frame_id
@@ -117,13 +125,17 @@ def load_next_frame(self):
 
 
 def update_animation(self):
+    self.new_frame = False
     self.total_ticks_in_animation += 1
-    self.tick -= 1
+#    print 'update_animation: ticks = %d' % self.tick
     if self.tick == 0:
+        self.new_frame = True
         load_next_frame(self)
+    self.tick -= 1
 
 
 def sprite_update(spr):
+#    print 'sprite_update:', spr
     if spr.status:
         update_animation(spr)
     if spr.needs_refresh_patterns:
@@ -132,8 +144,10 @@ def sprite_update(spr):
 
 
 def update_all_sprites():
+#    print "update_all_sprites"
     Globs.link = 0
-    for sprite in sprites:
+    for i, sprite in enumerate(sprites):
+        # print 'sprite #%d (status = %d)' % (i, sprite.status)
         if sprite.status == 0:
             break
         sprite_update(sprite)

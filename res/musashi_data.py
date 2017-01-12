@@ -717,101 +717,156 @@ patterns_blocks = [
     [0x0606, 0x0014]
 ]
 
-stand_right = [(5, 1), (-1, 0)]
-stand_with_gun_right = [(11, 1), (-1, 0)]
-walk_right = [(0, 4), (1, 4), (2, 4), (3, 4), (4, 4), (5, 4), (-1, 0)]
-walk_with_gun_right = [(6, 4), (7, 4), (8, 4), (9, 4), (10, 4), (11, 4), (-1, 0)]
-crouch_right_no_move = [(19, 1), (-1, 0)]
-crouch_no_move_with_gun_right = [(22, 1), (-1, 0)]
-crouch_right = [(17, 12), (18, 12), (19, 12), (-1, 0)]
-crouch_with_gun_right = [(20, 12), (21, 12), (22, 12), (-1, 0)]
-jump_right = [(41, 1), (-1, 0)]
-jump_right_fire = [(43, 1), (-1, 0)]
-jump_gun_right = [(45, 1), (-1, 0)]
-jump_shoot_right = [(47, 1), (-1, 0)]
-fall_right = [(42, 1), (-1, 0)]
-fall_right_fire = [(44, 1), (-1, 0)]
-fall_gun_right = [(46, 1), (-1, 0)]
-fall_shoot_right = [(48, 1), (-1, 0)]
-hit_right = [(57, 1), (-1, 0)]
-dead_right = [(58, 16), (59, 16), (60, 64), (60, 2), (-1, 0)]
-hijump_preparation_right = [(63, 1), (-1, 0)]
-hijump0_right = [(64, 4), (-1, 0)]
-hijump1_right = [(65, 255), (-1, 0)]
-hifall0_right = [(66, 4), (-1, 0)]
-hifall1_right = [(67, 255), (-1, 0)]
-walk_right_fire_1 = [(29, 2), (34, 6), (-1, 0)]
-walk_right_fire_2 = [(30, 2), (34, 6), (-1, 0)]
-walk_right_fire_3 = [(31, 2), (34, 6), (-1, 0)]
-walk_right_fire_4 = [(32, 2), (34, 6), (-1, 0)]
-walk_right_fire_5 = [(33, 2), (34, 6), (-1, 0)]
-walk_right_fire_6 = [(34, 8), (-1, 0)]
-walk_right_shoot_1 = [(35, 2), (40, 6), (-1, 0)]
-walk_right_shoot_2 = [(36, 2), (40, 6), (-1, 0)]
-walk_right_shoot_3 = [(37, 2), (40, 6), (-1, 0)]
-walk_right_shoot_4 = [(38, 2), (40, 6), (-1, 0)]
-walk_right_shoot_5 = [(39, 2), (40, 6), (-1, 0)]
-walk_right_shoot_6 = [(40, 8), (-1, 0)]
-punch_right = [(62, 12), (-1, 0)]
-slash_right = [(74, 2), (75, 2), (76, 2), (77, 2), (78, 4), (79, 2), (74, 2), (80, 2), (-1, 0)]
-crouch_right_fire_1 = [(23, 2), (25, 6), (-1, 0)]
-crouch_right_fire_2 = [(24, 2), (25, 6), (-1, 0)]
-crouch_right_fire_3 = [(25, 8), (-1, 0)]
-crouch_right_shoot_1 = [(26, 2), (28, 6), (-1, 0)]
-crouch_right_shoot_2 = [(27, 2), (28, 6), (-1, 0)]
-crouch_right_shoot_3 = [(28, 8), (-1, 0)]
-kick_right = [(50, 1), (61, 8), (50, 5), (-1, 0)]
-low_slash_right = [(68, 2), (69, 2), (70, 2), (71, 2), (72, 4), (68, 2), (73, 2), (-1, 0)]
-flying_kick_right = [(50, 2), (49, 8), (50, 5), (-1, 0)]
-flying_slash_right = [(51, 2), (52, 2), (53, 2), (54, 2), (55, 4), (51, 2), (56, 2), (-1, 0)]
+# POI for collisions with background
+poi_ga = (-6, -1)
+poi_gb = (10, -1)
+poi_b = (-6, 0)
+poi_f = (10, 0)
+
+stand = [(5, 1), (-1, 0)]
+stand_with_gun = [(11, 1), (-1, 0)]
+walk = [(0, 4), (1, 4), (2, 4), (3, 4), (4, 4), (5, 4), (-1, 0)]
+walk_with_gun = [(6, 4), (7, 4), (8, 4), (9, 4), (10, 4), (11, 4), (-1, 0)]
+crouch_no_move = [(19, 1), (-1, 0)]
+crouch_no_move_with_gun = [(22, 1), (-1, 0)]
+crouch = [(17, 12), (18, 12), (19, 12), (-1, 0)]
+crouch_with_gun = [(20, 12), (21, 12), (22, 12), (-1, 0)]
+jump = [(41, 1), (-1, 0)]
+jump_fire = [(43, 1), (-1, 0)]
+jump_gun = [(45, 1), (-1, 0)]
+jump_shoot = [(47, 1), (-1, 0)]
+fall = [(42, 1), (-1, 0)]
+fall_fire = [(44, 1), (-1, 0)]
+fall_gun = [(46, 1), (-1, 0)]
+fall_shoot = [(48, 1), (-1, 0)]
+hit = [(57, 1), (-1, 0)]
+dead = [(58, 16), (59, 16), (60, 64), (60, 2), (-1, 0)]
+hijump_preparation = [(63, 1), (-1, 0)]
+hijump0 = [(64, 4), (-1, 0)]
+hijump1 = [(65, 255), (-1, 0)]
+hifall0 = [(66, 4), (-1, 0)]
+hifall1 = [(67, 255), (-1, 0)]
+walk_fire_1 = [(29, 2), (34, 6), (-1, 0)]
+walk_fire_2 = [(30, 2), (34, 6), (-1, 0)]
+walk_fire_3 = [(31, 2), (34, 6), (-1, 0)]
+walk_fire_4 = [(32, 2), (34, 6), (-1, 0)]
+walk_fire_5 = [(33, 2), (34, 6), (-1, 0)]
+walk_fire_6 = [(34, 8), (-1, 0)]
+walk_shoot_1 = [(35, 2), (40, 6), (-1, 0)]
+walk_shoot_2 = [(36, 2), (40, 6), (-1, 0)]
+walk_shoot_3 = [(37, 2), (40, 6), (-1, 0)]
+walk_shoot_4 = [(38, 2), (40, 6), (-1, 0)]
+walk_shoot_5 = [(39, 2), (40, 6), (-1, 0)]
+walk_shoot_6 = [(40, 8), (-1, 0)]
+punch = [(62, 12), (-1, 0)]
+slash = [(74, 2), (75, 2), (76, 2), (77, 2), (78, 4), (79, 2), (74, 2), (80, 2), (-1, 0)]
+crouch_fire_1 = [(23, 2), (25, 6), (-1, 0)]
+crouch_fire_2 = [(24, 2), (25, 6), (-1, 0)]
+crouch_fire_3 = [(25, 8), (-1, 0)]
+crouch_shoot_1 = [(26, 2), (28, 6), (-1, 0)]
+crouch_shoot_2 = [(27, 2), (28, 6), (-1, 0)]
+crouch_shoot_3 = [(28, 8), (-1, 0)]
+kick = [(50, 1), (61, 8), (50, 5), (-1, 0)]
+low_slash = [(68, 2), (69, 2), (70, 2), (71, 2), (72, 4), (68, 2), (73, 2), (-1, 0)]
+flying_kick = [(50, 2), (49, 8), (50, 5), (-1, 0)]
+flying_slash = [(51, 2), (52, 2), (53, 2), (54, 2), (55, 4), (51, 2), (56, 2), (-1, 0)]
 
 animations_table = [
-    stand_right,
-    stand_with_gun_right,
-    walk_right,
-    walk_with_gun_right,
-    crouch_right_no_move,
-    crouch_no_move_with_gun_right,
-    crouch_right,
-    crouch_with_gun_right,
-    jump_right,
-    jump_right_fire,
-    jump_gun_right,
-    jump_shoot_right,
-    fall_right,
-    fall_right_fire,
-    fall_gun_right,
-    fall_shoot_right,
-    hit_right,
-    dead_right,
-    hijump_preparation_right,
-    hijump0_right,
-    hijump1_right,
-    hifall0_right,
-    hifall1_right,
-    walk_right_fire_1,
-    walk_right_fire_2,
-    walk_right_fire_3,
-    walk_right_fire_4,
-    walk_right_fire_5,
-    walk_right_fire_6,
-    walk_right_shoot_1,
-    walk_right_shoot_2,
-    walk_right_shoot_3,
-    walk_right_shoot_4,
-    walk_right_shoot_5,
-    walk_right_shoot_6,
-    punch_right,
-    slash_right,
-    crouch_right_fire_1,
-    crouch_right_fire_2,
-    crouch_right_fire_3,
-    crouch_right_shoot_1,
-    crouch_right_shoot_2,
-    crouch_right_shoot_3,
-    kick_right,
-    low_slash_right,
-    flying_kick_right,
-    flying_slash_right
+    stand,
+    stand_with_gun,
+    walk,
+    walk_with_gun,
+    crouch_no_move,
+    crouch_no_move_with_gun,
+    crouch,
+    crouch_with_gun,
+    jump,
+    jump_fire,
+    jump_gun,
+    jump_shoot,
+    fall,
+    fall_fire,
+    fall_gun,
+    fall_shoot,
+    hit,
+    dead,
+    hijump_preparation,
+    hijump0,
+    hijump1,
+    hifall0,
+    hifall1,
+    walk_fire_1,
+    walk_fire_2,
+    walk_fire_3,
+    walk_fire_4,
+    walk_fire_5,
+    walk_fire_6,
+    walk_shoot_1,
+    walk_shoot_2,
+    walk_shoot_3,
+    walk_shoot_4,
+    walk_shoot_5,
+    walk_shoot_6,
+    punch,
+    slash,
+    crouch_fire_1,
+    crouch_fire_2,
+    crouch_fire_3,
+    crouch_shoot_1,
+    crouch_shoot_2,
+    crouch_shoot_3,
+    kick,
+    low_slash,
+    flying_kick,
+    flying_slash
 ]
+
+STAND = 0
+STAND_WITH_GUN = 1
+WALK = 2
+WALK_WITH_GUN = 3
+CROUCH_NO_MOVE = 4
+CROUCH_NO_MOVE_WITH_GUN = 5
+CROUCH = 6
+CROUCH_WITH_GUN = 7
+JUMP = 8
+JUMP_FIRE = 9
+JUMP_GUN = 10
+JUMP_SHOOT = 11
+FALL = 12
+FALL_FIRE = 13
+FALL_GUN = 14
+FALL_SHOOT = 15
+HIT = 16
+DEAD = 17
+HIJUMP_PREPARATION = 18
+HIJUMP0 = 19
+HIJUMP1 = 20
+HIFALL0 = 21
+HIFALL1 = 22
+WALK_FIRE_1 = 23
+WALK_FIRE_2 = 24
+WALK_FIRE_3 = 25
+WALK_FIRE_4 = 26
+WALK_FIRE_5 = 27
+WALK_FIRE_6 = 28
+WALK_SHOOT_1 = 29
+WALK_SHOOT_2 = 30
+WALK_SHOOT_3 = 31
+WALK_SHOOT_4 = 32
+WALK_SHOOT_5 = 33
+WALK_SHOOT_6 = 34
+PUNCH = 35
+SLASH = 36
+CROUCH_FIRE_1 = 37
+CROUCH_FIRE_2 = 38
+CROUCH_FIRE_3 = 39
+CROUCH_SHOOT_1 = 40
+CROUCH_SHOOT_2 = 41
+CROUCH_SHOOT_3 = 42
+KICK = 43
+LOW_SLASH = 44
+FLYING_KICK = 45
+FLYING_SLASH = 46
+
 

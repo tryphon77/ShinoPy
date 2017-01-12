@@ -42,6 +42,7 @@ BUTTON_B = 32
 BUTTON_C = 64
 BUTTON_START = 128
 
+
 class GPSprite():
     def __init__(self):
         self.id_ = 0
@@ -52,7 +53,7 @@ class GPSprite():
         self.t_id = 0
         self.link = 0
         self.surface = None
-    
+
     def set(self, id_, x, y, sw, sh, t_id, link):
         self.id_ = id_
         self.x = x
@@ -61,7 +62,8 @@ class GPSprite():
         self.h = sh
         self.t_id = t_id
         self.link = link
-        
+
+
 class GP():
     display = pygame.display.set_mode((320, 224))
     clock = pygame.time.Clock()
@@ -79,18 +81,18 @@ class GP():
         pygame.init()
 #        self.display = pygame.display.set_mode((320, 224))
         pygame.display.set_caption('GenePy version 0.1')
-        
+
         print GP.clock
 #        self.clock = pygame.time.Clock()
-        
+
         GP.blank_tile = pygame.Surface((8, 8)).convert()
-        GP.blank_tile.fill(0xFF00DC)        
+        GP.blank_tile.fill(0xFF00DC)
 
         GP.tiles = [GP.blank_tile.copy() for _ in range(0x800)]
-        
+
 #        self.plane_A = pygame.Surface((512, 512))
-        GP.plane_A = [pygame.Surface((512, 512)).convert(), 
-                      pygame.Surface((512, 512)).convert()] 
+        GP.plane_A = [pygame.Surface((512, 512)).convert(),
+                      pygame.Surface((512, 512)).convert()]
         GP.plane_A[0].fill(0xFF00DC)
         GP.plane_A[0].set_colorkey(0xFF00DC)
         GP.plane_A[1].fill(0xFF00DC)
@@ -98,7 +100,7 @@ class GP():
 #        self.plane_A_offset = (0, 0)
 
 #        self.plane_B = pygame.Surface((512, 512))
-        GP.plane_B = [pygame.Surface((512, 512)).convert(), 
+        GP.plane_B = [pygame.Surface((512, 512)).convert(),
                       pygame.Surface((512, 512)).convert()]
         GP.plane_B[0].fill(0xFF00DC)
         GP.plane_B[0].set_colorkey(0xFF00DC)
@@ -109,24 +111,24 @@ class GP():
     @staticmethod
     def read_joypad(joy_id):
         return GP.joypad_state
-    
+
     @staticmethod
     def load_tile_data(data, start):
-        GP.tiles[start : start + len(data)] = data
-    
+        GP.tiles[start:start + len(data)] = data
+
     @staticmethod
     def set_tilemap(plane, tile_id, x, y):
         priority = (tile_id & 0x8000) != 0
         hflip = (tile_id & 0x800)
         vflip = (tile_id & 0x1000)
         t_id = tile_id & 0x7FF
-        
+
         tile = pygame.transform.flip(GP.tiles[t_id], hflip, vflip)
-        
+
         pos = ((x % 64) * 8, (y % 64) * 8)
         plane[priority].blit(tile, pos)
         plane[1 - priority].blit(GP.blank_tile, pos)
-    
+
     @staticmethod
     def draw_subplane(subplane, offset):
         x, y = offset
@@ -156,13 +158,13 @@ class GP():
     @staticmethod
     def set_sprite(id_, x, y, sz, t_id, link):
         sw, sh = (sz >> 2) + 1, (sz & 3) + 1
-#         print 'defining sprite #%d' % id_
-#         print 'pos: (%d, %d)' % (x, y)
-#         print 'size: %dx%d' % (sw, sh)
-#         print 'source at VRAM %X' % pos
-#         print 'link to sprite #%d' % link
+        # print 'defining sprite #%d' % id_
+        # print 'pos: (%d, %d)' % (x, y)
+        # print 'size: %dx%d' % (sw, sh)
+        # print 'from tile: %X' % t_id
+        # print 'link to sprite #%d' % link
         GP.sprite_cache[id_].set(id_, x, y, sw, sh, t_id, link)
-    
+
     @staticmethod
     def draw_sprites(l):
         for s in l:
@@ -171,9 +173,9 @@ class GP():
     @staticmethod
     def render_sprite(s):
         s.priority = 0
-        if s.w*s.h == 0:
+        if s.w * s.h == 0:
             return None
-        res = pygame.Surface((s.w*8, s.h*8))
+        res = pygame.Surface((s.w * 8, s.h * 8))
         res.fill(0xFF00DC)
         res.set_colorkey(0xFF00DC)
 
@@ -189,7 +191,10 @@ class GP():
                 y += 8
                 tid += 1
             x += 8
-        
+
+        hflip, vflip = s.t_id & 0x800, s.t_id & 0x1000
+        if hflip or vflip:
+            res = pygame.transform.flip(res, True, False)
         s.surface = res
         return res
 
@@ -209,10 +214,10 @@ class GP():
             id_ = spr.link
             if id_ == 0:
                 break
-            
+
     @staticmethod
     def wait_vblank():
-#        print 'VInt'
+        print 'VInt'
         # handle events
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -226,22 +231,22 @@ class GP():
                         GP.dump_sprites('tools/sprite')
                         GP.dump_planes('tools/plane')
                     exit()
-            
+
             key = pygame.key.get_pressed()
-            GP.joypad_state =   (key[pygame.K_UP]) \
-                              | (key[pygame.K_DOWN] << 1) \
-                              | (key[pygame.K_LEFT] << 2) \
-                              | (key[pygame.K_RIGHT] << 3) \
-                              | (key[pygame.K_a] << 4) \
-                              | (key[pygame.K_s] << 5) \
-                              | (key[pygame.K_d] << 6) \
-                              | (key[pygame.K_RETURN] << 7)
-        
+            GP.joypad_state = (key[pygame.K_UP]) \
+                | (key[pygame.K_DOWN] << 1) \
+                | (key[pygame.K_LEFT] << 2) \
+                | (key[pygame.K_RIGHT] << 3) \
+                | (key[pygame.K_a] << 4) \
+                | (key[pygame.K_s] << 5) \
+                | (key[pygame.K_d] << 6) \
+                | (key[pygame.K_RETURN] << 7)
+
         # draw planes
         GP.display.fill(0xFF808080)
         GP.draw_subplane(GP.plane_B[0], GP.plane_B_offset)
         GP.draw_subplane(GP.plane_A[0], GP.plane_A_offset)
-        
+
         # draw sprites
         GP.render_sprites()
         GP.draw_sprites(GP.low_sprites)
@@ -250,13 +255,13 @@ class GP():
         GP.draw_subplane(GP.plane_A[1], GP.plane_A_offset)
 
         GP.draw_sprites(GP.hi_sprites)
-        
+
         # flip buffers
         pygame.display.flip()
-        
+
         # wait clock
-        GP.clock.tick(60)
-    
+        GP.clock.tick(6)
+
     @staticmethod
     def dump_tiles(path):
         s = pygame.Surface((128, 1024))
@@ -267,9 +272,9 @@ class GP():
             if x >= 128:
                 x = 0
                 y += 8
-        
+
         pygame.image.save(s, '%s.png' % path)
-    
+
     @staticmethod
     def dump_sprites(path):
         for i in range(80):
@@ -277,7 +282,7 @@ class GP():
             if s.surface:
                 pygame.image.save(s.surface,
                                   '%s-%02d (%02d).png' % (path, i, s.link))
-            
+
     @staticmethod
     def dump_planes(path):
         surf = GP.plane_A[0].copy()

@@ -38,6 +38,9 @@ def init_stage(stage):
     
     # load tileset
     Globs.tileset = stage.tileset
+
+    # load collision map
+    Globs.collision_map = stage.collision_map
     
     # load tilemap
     layer_A.plane = GP.plane_A
