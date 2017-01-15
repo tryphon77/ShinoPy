@@ -21,14 +21,15 @@ def split_surf(surf, n = 1000000, w = 8, h = 8):
             y += h
             if y >= h_:
                 break
-    
+
     if w == 8 and h == 8:
         return res
-        
+
     res_ = []
     for t in res:
         res_ += split_surf(t)
     return res_
+
 
 # constants
 JOY_0 = 0
@@ -217,7 +218,7 @@ class GP():
 
     @staticmethod
     def wait_vblank():
-        print 'VInt'
+        # print 'VInt'
         # handle events
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
@@ -260,7 +261,7 @@ class GP():
         pygame.display.flip()
 
         # wait clock
-        GP.clock.tick(6)
+        GP.clock.tick(60)
 
     @staticmethod
     def dump_tiles(path):
@@ -292,6 +293,26 @@ class GP():
         surf = GP.plane_B[0].copy()
         surf.blit(GP.plane_B[1], (0, 0))
         pygame.image.save(surf, '%s-B.png' % path)
+
+    @staticmethod
+    def halt():
+        while True:
+            for e in pygame.event.get():
+                if e.type == pygame.QUIT:
+                    print 'Quit GenePy'
+                    exit()
+                elif e.type == pygame.KEYDOWN:
+                    if e.key == pygame.K_ESCAPE:
+                        print 'Escape GenePy'
+                        if True:
+                            GP.dump_tiles('tools/vram')
+                            GP.dump_sprites('tools/sprite')
+                            GP.dump_planes('tools/plane')
+                        exit()
+                    return
+            # wait clock
+            GP.clock.tick(60)
+
 
 
 # GP = GenePy()

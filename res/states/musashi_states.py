@@ -1,6 +1,6 @@
 from object import *
 from tsprite import *
-from genepy import load_data_from_png
+from genepy import *
 from res.musashi_data import *
 
 
@@ -10,14 +10,14 @@ def init_object():
     self.status = ACTIVE
 
     self.x = 160
-    self.y = 128
+    self.y = 127
+    self.floor = 2
 
-    self.poi_Gb = (-6, -1)
-    self.poi_Gf = (10, -1)
-    self.poi_Ab = (-6, 0)
-    self.poi_Af = (10, 0)
+    self.back = -10
+    self.front = 10
 
     self.sprite = sprite = allocate_sprite()
+    sprite.vpos = 0x200
     sprite.status = 1
     sprite.x = self.x
     sprite.y = self.y
@@ -32,51 +32,253 @@ def init_object():
 
 
 def init_stand(self):
-    print 'init_stand'
+    # print 'init_stand'
     set_animation(self.sprite, STAND)
     set_physics(self, 0, 0, 0, 0)
     self.update_function = update_stand
 
 
 def update_stand(self):
-    print 'update_stand'
-    if Globs.joy & Globs.forward:
+    # print 'update_stand'
+    if not (collides_background(self, self.front, 1) or
+            collides_background(self, self.back, 1)):
+        init_fall(self)
+    elif (Globs.joy_pressed & BUTTON_B):
+        init_fire(self)
+    elif (Globs.joy_pressed & BUTTON_C):
+        init_jump(self)
+    elif (Globs.joy & Globs.forward)\
+            and collides_background(self, self.front + 1, 0) == 0:
         init_walk(self)
     elif Globs.joy & Globs.backward:
         flip_controls()
         flip(self)
         init_walk(self)
-    elif not (collides_background(self, self.poi_Gf) or collides_background(self, self.poi_Gb)):
-        init_fall(self)
+    elif Globs.joy & BUTTON_UP:
+        init_prepare_hijump_up(self)
+    elif Globs.joy & BUTTON_DOWN:
+        init_crouch(self)
+
+
+def init_fire(self):
+    set_physics(self, 0, 0, 0, 0)
+    set_animation(self.sprite, WALK_FIRE_6)
+    throw_shuriken(self, 32, 48)
+    self.update_function = update_fire
+
+
+def update_fire(self):
+    if self.sprite.is_animation_over:
+        init_stand(self)
+
+
+def throw_shuriken(self, dx, dy):
+    pass
 
 
 def init_walk(self):
-    print 'init_walk'
+    # print 'init_walk'
     set_animation(self.sprite, WALK)
     set_physics(self, 2, 0, 0, 0)
     self.update_function = update_walk
 
 
 def update_walk(self):
-    print 'update_walk'
-    if Globs.joy & Globs.backward:
+    # print 'update_walk'
+    if not (Globs.joy & Globs.forward):
+        init_stand(self)
+    elif (Globs.joy_pressed & BUTTON_B):
+        init_fire(self)
+    elif (Globs.joy_pressed & BUTTON_C):
+        init_jump(self)
+    elif Globs.joy & Globs.backward:
         print 'backward'
         flip_controls()
         flip(self)
         init_walk(self)
-    elif not (Globs.joy & Globs.forward):
-        init_stand(self)
     else:
         self.x += self.speed_x
-        print 'moving: x = %d' % self.x
+        # print 'collision:', collides_background(self, self.front, 0)
+        # print 'moving: x = %d' % self.x
 
-        if not (collides_background(self, self.poi_Gf) or collides_background(self, self.poi_Gb)):
+        if not (collides_background(self, self.front, 1) or
+                collides_background(self, self.back, 1)):
             init_fall(self)
-        elif collides_background(self, self.poi_Af):
+        elif collides_background(self, self.front, 0):
             print 'collision'
             fix_hpos(self)
             init_stand(self)
 
 
+def init_prepare_hijump_up(self):
+    set_animation(self.sprite, HIJUMP_PREPARATION)
+    self.speed_y = 0
+    self.accel_y = 0
+    self.update_function = update_prepare_hijump_up
+
+
+def update_prepare_hijump_up(self):
+    if not (Globs.joy & BUTTON_UP):
+        init_stand(self)
+    elif Globs.joy_pressed & BUTTON_C:
+        if self.floor < 2:
+            init_hijump_up(self)
+
+
+def init_hijump_up(self):
+    self.floor += 1
+    self.speed_y = self.accel_y = 0
+    set_animation(self.sprite, HIJUMP0)
+    self.update_function = update_hijump_up
+
+
+def update_hijump_up(self):
+    if self.sprite.is_animation_over:
+        init_hijump1_up(self)
+
+
+def init_hijump1_up(self):
+    self.speed_y = get_hijump_impulsion(self)
+    self.accel_y = 0.5
+    set_animation(self.sprite, HIJUMP1)
+    self.update_function = update_hijump1_up
+
+
+def update_hijump1_up(self):
+    self.speed_y += self.accel_y
+    self.y += self.speed_y
+    if self.speed_y >= 0:
+        init_hifall(self)
+
+
+def init_crouch(self):
+    set_animation(self.sprite, CROUCH_NO_MOVE)
+    self.speed_y = 0
+    self.accel_y = 0
+    self.update_function = update_crouch
+
+
+def update_crouch(self):
+    if not (Globs.joy & BUTTON_DOWN):
+        init_stand(self)
+    elif Globs.joy_pressed & BUTTON_C:
+        if self.floor > 1:
+            init_hijump_down(self)
+
+
+def init_hijump_down(self):
+    set_animation(self.sprite, HIFALL0)
+    self.update_function = update_hijump_down
+
+
+def update_hijump_down(self):
+    if self.sprite.is_animation_over:
+        init_hijump1_down(self)
+
+
+def init_hijump1_down(self):
+    self.speed_y = -6
+    self.accel_y = 0.5
+    self.floor -= 1
+    set_animation(self.sprite, HIFALL1)
+    self.update_function = update_hijump1_down
+
+
+def update_hijump1_down(self):
+    self.speed_y += self.accel_y
+    self.y += self.speed_y
+    if self.speed_y >= 0:
+        init_hifall(self)
+
+
+def init_hifall(self):
+    self.sprite.vpos ^= 0x8000
+    self.update_function = update_hifall
+
+
+def update_hifall(self):
+    self.speed_y += self.accel_y
+    self.y += self.speed_y
+    if collides_background(self, self.front, 1) or\
+            collides_background(self, self.back, 1):
+        fix_vpos(self)
+        init_stand(self)
+
+
+def init_jump(self):
+    set_animation(self.sprite, JUMP)
+    self.speed_y = -8.5
+    self.accel_y = 0.5
+    self.update_function = update_jump
+
+
+def clamp(val, min_, max_):
+    return min_ if val < min_ else max_ if val > max_ else val
+
+
+def update_jump(self):
+    if self.speed_y >= 0:
+        init_fall(self)
+    else:
+        self.accel_x = 0
+        if Globs.joy & Globs.forward:
+            self.accel_x = signate(self, 0.125)
+        elif Globs.joy & Globs.backward:
+            self.accel_x = signate(self, -0.125)
+
+        self.speed_x += self.accel_x
+        self.speed_x = clamp(self.speed_x, -2, 2)
+        self.x += self.speed_x
+
+        if self.is_flipped:
+            if self.speed_x > 0:
+                flip_controls()
+                flip(self)
+        elif self.speed_x < 0:
+                flip_controls()
+                flip(self)
+
+        self.speed_y += self.accel_y
+        self.y += self.speed_y
+
+        if collides_background(self, self.front, 0):
+            fix_hpos(self)
+            self.speed_x = 0
+
+
 def init_fall(self):
-    pass
+    set_animation(self.sprite, FALL)
+    self.accel_y = 0.5
+    self.update_function = update_fall
+
+
+def update_fall(self):
+    self.accel_x = 0
+    if Globs.joy & Globs.forward:
+        self.accel_x = signate(self, 0.125)
+    elif Globs.joy & Globs.backward:
+        self.accel_x = signate(self, -0.125)
+
+    self.speed_x += self.accel_x
+    self.speed_x = clamp(self.speed_x, -2, 2)
+    self.x += self.speed_x
+
+    if self.is_flipped:
+        if self.speed_x > 0:
+            flip_controls()
+            flip(self)
+    elif self.speed_x < 0:
+            flip_controls()
+            flip(self)
+
+    if collides_background(self, self.front, 0):
+        fix_hpos(self)
+        self.speed_x = 0
+
+    self.speed_y += self.accel_y
+    self.y += self.speed_y
+
+    if collides_background(self, self.front, 0) or\
+            collides_background(self, self.back, 0):
+        fix_vpos(self)
+        init_stand(self)

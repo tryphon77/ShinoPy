@@ -57,31 +57,30 @@ def update_patterns(sprite):
 
 
 def update_frame(sprite):
-    print 'update_frame: %d at (%d, %d)' % (sprite.frame, sprite.x, sprite.y)
+    # print 'update_frame: %d at (%d, %d)' % (sprite.frame, sprite.x, sprite.y)
     x = sprite.x
     y = sprite.y
-    t_id = 0x200
+    t_id = sprite.vpos
 #    print sprite.frames_table[sprite.frame]
 
     if sprite.is_flipped:
+        t_id |= 0x800
         for (_, dx, dy, sz, dp) in sprite.frames_table[sprite.frame]:
-            t_id |= 0x800
             GP.set_sprite(Globs.link,
                           x + dx,
                           y + dy,
                           sz,
-                          Globs.base_id + t_id,
+                          t_id,
                           Globs.link + 1)
             t_id += sizes[sz]
             Globs.link += 1
     else:
         for (dx, _, dy, sz, dp) in sprite.frames_table[sprite.frame]:
-#            print (dx, _, dy, sz, dp)
             GP.set_sprite(Globs.link,
                           x + dx,
                           y + dy,
                           sz,
-                          Globs.base_id + t_id,
+                          t_id,
                           Globs.link + 1)
             t_id += sizes[sz]
             Globs.link += 1
@@ -142,13 +141,3 @@ def sprite_update(spr):
         update_patterns(spr)
     update_frame(spr)
 
-
-def update_all_sprites():
-#    print "update_all_sprites"
-    Globs.link = 0
-    for i, sprite in enumerate(sprites):
-        # print 'sprite #%d (status = %d)' % (i, sprite.status)
-        if sprite.status == 0:
-            break
-        sprite_update(sprite)
-    GP.sprite_cache[Globs.link - 1].link = 0

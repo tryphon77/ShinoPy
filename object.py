@@ -1,8 +1,11 @@
+from tilemap import layer_A
 from queue import Queue
 from tsprite import *
 
 INACTIVE = 0
 ACTIVE = 1
+
+impulsions_table = [-5.5, -6.5, -7.5, -8.5, -9.5, -10.5, -11.5, -12.5]
 
 
 class Object():
@@ -30,6 +33,9 @@ class Object():
         self.hy0 = 0
         self.hx1 = 0
         self.hy1 = 0
+
+        self.back = 0
+        self.front = 0
 
         self.is_flipped = False
         self.collision_flag = False
@@ -94,46 +100,54 @@ def set_physics(self, sx, ax, sy, ay):
     self.accel_y = ay
 
 
+def signate(self, value):
+    if self.is_flipped:
+        return -value
+    else:
+        return value
+
+
 def flip_controls():
     Globs.forward, Globs.backward = Globs.backward, Globs.forward
 
 
 def flip(self):
-    self.poi_Gb, self.poi_Gf = self.poi_Gf, self.poi_Gb
-    self.poi_Ab, self.poi_Af = self.poi_Af, self.poi_Ab
+    # self.back, self.front = self.front, self.back
     self.is_flipped = not self.is_flipped
 
 
-def collides_background(self, poi):
-    x, y = poi
-    x /= 32
-    y /= 32
-    return Globs.collision_map[y * Globs.layer_a_twidth + x]
+def collides_background(self, dx, dy):
+    x = int(self.x + signate(self, dx)) / 16
+    y = int(self.y + dy) / 16
+    # print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d' % (self.x, dx, self.y, dy, x, y, y * layer_A.twidth + x)
+    return Globs.collision_map[y * layer_A.twidth + x] & 7 == self.floor
+
+
+def get_hijump_impulsion(self):
+    x = int(self.x) / 16
+    y = int(self.y + 1) / 16
+    # print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d' % (self.x, dx, self.y, dy, x, y, y * layer_A.twidth + x)
+    return impulsions_table[(Globs.collision_map[y * layer_A.twidth + x] >> 3) & 7]
+
+
+def fix_hpos(self):
+    if self.is_flipped:
+        fixed = (int(self.x) & 0xFFF0) + self.front
+        # print 'fix_hpos: %d -> %d' % (self.x, fixed)
+        self.x = fixed
+    else:
+        fixed = (int(self.x + self.front) & 0xFFF0) - self.front - 1
+        # print 'fix_hpos: %d -> %d' % (self.x, fixed)
+        self.x = fixed
+
+
+def fix_vpos(self):
+    self.y = (int(self.y) & 0xFFF0) - 1
 
 
 def update_object(self):
-    print 'update_function:', self.update_function
     if self.update_function:
         self.update_function(self)
-
-        sprite = self.sprite
-        if sprite:
-            sprite.x = int(self.x)
-            sprite.y = int(self.y)
-            
-            sprite_update(sprite)
-            if sprite.new_frame:
-                x, y, w, h = sprite.bbox
-                if self.is_flipped:
-                    self.poi_Gb = x + w, -1
-                    self.poi_Gf = x, -1
-                    self.poi_Af = x, 0
-                    self.poi_Ab = x + w, 0
-                else:
-                    self.poi_Gf = x + w, -1
-                    self.poi_Gb = x, -1
-                    self.poi_Ab = x, 0
-                    self.poi_Af = x + w, 0
 
 
 def update_all_objects():
@@ -142,3 +156,18 @@ def update_all_objects():
             update_object(obj)
         else:
             break
+
+
+def update_all_sprites():
+    # print "update_all_sprites"
+    Globs.link = 0
+    for obj in objects:
+        sprite = obj.sprite
+        if sprite and sprite.status:
+            # print 'sprite #%d (status = %d)' % (i, sprite.status)
+            sprite.x = int(obj.x) - Globs.camera_x
+            sprite.y = int(obj.y) - Globs.camera_y
+            sprite.is_flipped = obj.is_flipped
+            sprite_update(sprite)
+
+    GP.sprite_cache[Globs.link - 1].link = 0
