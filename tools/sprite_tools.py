@@ -1,6 +1,16 @@
+import sys
+sys.path.append('..')
+sys.path.append('C:/Users/Tryphon/Documents/workspace/MDTools')
+
+import pygame
+import numpy
+import random
+import itertools
+
 from tools.psdreader import *
 from tools.animsreader import load_animdefs
 from map_tools import make_sheet
+
 
 def read_split_file(path):
     def read_rect(srect):
@@ -59,13 +69,15 @@ def get_subsurface(surf, rect):
     
     res.blit(surf, (rx, ry), (x, y, w, h))
     return res
-        
-    
+
 
 if __name__ == '__main__':
-    base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/musashi2'
-    
+    # base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/musashi2'
+    base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/shuriken'
+
     if True:
+        # generate anims
+
         anims = load_animdefs('%s/animdefs.txt' % base_dir)
 
         print anims
@@ -94,13 +106,29 @@ if __name__ == '__main__':
         exit()
 
 
-    print 'loading psd file'
-    psd = load_psd('%s/sheet2.psd' % base_dir)
-    print psd
-    splits = read_split_file('%s/split.txt' % base_dir)
-    
-    if True:
+    if False:
+        # extract frames (to speed up process)
+        print 'loading psd file'
+        psd = load_psd('%s/sheet2.psd' % base_dir)
+        print psd
+
+        frames = {}
+        for i, layer in enumerate(psd.get_layers()):
+            nm = layer.get_name()
+            if nm.startswith('frame'):
+                nm, j_ = nm.split(' ')
+                j = int(j_)
+                surf = layer.get_surface()
+                frames[j] = surf
+                pygame.image.save(frames[j], 'frames/frame%02d.png' % j)
+        exit()
+    else:
+        frames = [pygame.image.load('frames/frame%02d.png' % i) for i in range(82)]
+
+    if False:
         # generating frames_table and patterns_blocks
+        splits = read_split_file('%s/split.txt' % base_dir)
+
         res = 'frames_table = '
         dp = 0
         res_ = []
@@ -132,8 +160,38 @@ if __name__ == '__main__':
         
         exit()
 
-    if True:
+
+    if False:
+        # generate splits if not presents
+        from tools.plugins.basic_splitter import *
+
+        class Frame():
+            def __init__(self, surf):
+                self.data = pygame.surfarray.pixels2d(surf)
+                self.surface = surf
+
+            def get_size(self):
+                return self.surface.get_size()
+
+        psd = load_psd('%s/sheet.psd' % base_dir)
+
+        for i, layer in enumerate(psd.get_layers()):
+            nm = layer.get_name()
+            if nm.startswith('frame'):
+                nm, j_ = nm.split(' ')
+                j = int(j_)
+                surf = layer.get_surface()
+                frame = Frame(surf)
+
+                print splitter(frame)
+
+        exit()
+
+    if False:
         # generating patterns    
+        psd = load_psd('%s/sheet.psd' % base_dir)
+    
+        splits = read_split_file('%s/split.txt' % base_dir)
         patterns = []
         for i, layer in enumerate(psd.get_layers()):
             nm = layer.get_name()

@@ -1,17 +1,23 @@
 from genepy import *
 from tsprite import *
 from globals import Globs
-import res.level_1_1
-import res.musashi_data
 from tilemap import init_stage, set_camera
-from res.states.musashi_states import *
+from object import *
+
+# Organization needed
+from res import level_1_1
+from res import musashi_data
+from res.states import musashi_states
+from res import projectile_data 
 
 
 def main():
-    init_stage(res.level_1_1)
+    init_stage(level_1_1)
 
     Globs.base_id = 0
-    init_object()
+    musashi_states.init_object()
+
+    GP.load_tile_data(projectile_data.patterns, 0x300)
 
     camera_x = camera_y = 0
     old_joy = 0

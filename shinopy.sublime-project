@@ -13,5 +13,13 @@
 		{
 			"path": "."
 		}
-	]
+	],
+    "settings": 
+    {
+        "extra_paths":
+        [
+            "C:\\Users\\Tryphon\\Documents\\workspace\\MDTools",
+            ".."
+        ]
+    }
 }

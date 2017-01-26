@@ -68,6 +68,7 @@ class GPSprite():
 class GP():
     display = pygame.display.set_mode((320, 224))
     clock = pygame.time.Clock()
+    fps = 60
     tiles = []
     plane_A = None
     plane_A_offset = (0, 0)
@@ -83,7 +84,6 @@ class GP():
 #        self.display = pygame.display.set_mode((320, 224))
         pygame.display.set_caption('GenePy version 0.1')
 
-        print GP.clock
 #        self.clock = pygame.time.Clock()
 
         GP.blank_tile = pygame.Surface((8, 8)).convert()
@@ -261,7 +261,7 @@ class GP():
         pygame.display.flip()
 
         # wait clock
-        GP.clock.tick(60)
+        GP.clock.tick(GP.fps)
 
     @staticmethod
     def dump_tiles(path):
@@ -311,7 +311,7 @@ class GP():
                         exit()
                     return
             # wait clock
-            GP.clock.tick(60)
+            GP.clock.tick(GP.fps)
 
 
 

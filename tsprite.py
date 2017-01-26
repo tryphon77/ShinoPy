@@ -26,6 +26,7 @@ class TSprite():
         self.animations_table = None
         self.animation = None
         self.animation_id = -1
+        self.animation_tick = 0
         self.tick = 0
         self.total_ticks_in_animation = 0
         self.is_animation_over = False
@@ -87,32 +88,43 @@ def update_frame(sprite):
 
 
 def set_animation(self, anim):
-#    print 'set_animation: %d' % anim
+    # print 'set_animation: %d' % anim
     self.total_ticks_in_animation = 0
     if self.animation_id != anim:
         self.animation_id = anim
         self.animation = self.animations_table[anim]
+        self.animation_tick = len(self.animation)
         self.animation_index = 0
         load_next_frame(self)
 
+
+def change_animation(self, anim):
+    if self.animation_id != anim:
+        self.animation_id = anim
+        self.animation = self.animations_table[anim]
+        self.animation_index -= 1   # recode ?
+        print 'channge_animation: animation_index = %d' % (self.animation_index)
+        frame_id, _ = self.animation[self.animation_index]
+
+        if self.frame != frame_id:
+            self.frame = frame_id
+            self.needs_refresh_patterns = True
 
 def load_next_frame(self):
     # animation format :
     # frame_id, ticks, x, y, clsn1_rect_id, clsn2_rect_id for all frames except last
     # -1, frame_id, X, X, X, X for last frame
 
-#    print 'load_next_frame: index = %d' % self.animation_index
+    print 'load_next_frame: id = %d index = %d' % (self.animation_id, self.animation_index)
+    self.animation_tick -= 1
+    if self.animation_tick < 0:
+        self.animation_tick = len(self.animation) - 1
+        self.animation_index = 0
+
+    print self.animation_tick, self.animation_index
     frame_id, ticks = self.animation[self.animation_index]
 #    self.bbox = self.bboxes_table[frame_id]
 #    print (frame_id, ticks)
-
-    self.is_animation_over = False
-    if frame_id < 0:
-        self.is_animation_over = True
-        self.animation_index = ticks
-        frame_id, ticks = self.animation[self.animation_index]
-#        print 'loop'
-#        print (frame_id, ticks)
 
     if self.frame != frame_id:
         self.frame = frame_id
@@ -131,6 +143,7 @@ def update_animation(self):
         self.new_frame = True
         load_next_frame(self)
     self.tick -= 1
+    self.is_animation_over = (self.animation_tick == 0) and (self.tick == 0)
 
 
 def sprite_update(spr):

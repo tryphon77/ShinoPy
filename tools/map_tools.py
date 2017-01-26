@@ -67,10 +67,10 @@ def get_datas(path):
             'tiles': res}
 
 
+if __name__ == '__main__':
+    datas = get_datas('../res/test.png')
 
-datas = get_datas('../res/test.png')
+    for t in range(len(datas['tiles'])/4):
+        print '\t0x%X, 0x%X, 0x%X, 0x%X,' % tuple([i + 0 for i in datas['tiles'][4*t : 4*t + 4]])
 
-for t in range(len(datas['tiles'])/4):
-    print '\t0x%X, 0x%X, 0x%X, 0x%X,' % tuple([i + 0 for i in datas['tiles'][4*t : 4*t + 4]])
-
-make_sheet(datas['ptrns'], '../res/level_1_1.png')    
+    make_sheet(datas['ptrns'], '../res/level_1_1.png')    
