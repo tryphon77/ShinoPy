@@ -1,7 +1,7 @@
 from genepy import *
 from tsprite import *
 from globals import Globs
-from tilemap import init_stage, set_camera
+from tilemap import init_stage, set_camera_focus_to
 from object import *
 
 # Organization needed
@@ -19,7 +19,6 @@ def main():
 
     GP.load_tile_data(projectile_data.patterns, 0x300)
 
-    camera_x = camera_y = 0
     old_joy = 0
     Globs.forward = BUTTON_RIGHT
     Globs.backward = BUTTON_LEFT
@@ -32,17 +31,7 @@ def main():
 
         update_all_objects()
 
-        camera_x = int(objects[0].x) - 160
-
-        camera_x = max(0, camera_x)
-        camera_x = min(Globs.layer_a_pwidth - 320, camera_x)
-        camera_y = max(0, camera_y)
-        camera_y = min(Globs.layer_a_pheight - 224, camera_y)
-
-        set_camera(camera_x, camera_y)
-        # print 'camera = %d / musashi = %d' % (Globs.camera_x, objects[0].x)
-        GP.plane_A_offset = -camera_x, camera_y
-        GP.plane_B_offset = -camera_x / 2, camera_y / 2
+        set_camera_focus_to(objects[0])
 
         update_all_sprites()
 

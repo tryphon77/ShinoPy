@@ -86,6 +86,7 @@ def release_object(obj):
     obj.status = INACTIVE
     obj.update_function = None
 
+    print 'releasing object #%d' % all_objects.index(obj)
     all_objects.remove(obj)
 
 
@@ -151,11 +152,11 @@ def update_object(self):
 
 
 def update_all_objects():
-    for obj in objects:
+    for obj in all_objects.data[:all_objects.cursor]:
         if obj.status:
             update_object(obj)
-        else:
-            break
+#        else:
+#            break
 
 
 def update_all_sprites():

@@ -75,7 +75,7 @@ if __name__ == '__main__':
     # base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/musashi2'
     base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/shuriken'
 
-    if True:
+    if False:
         # generate anims
 
         anims = load_animdefs('%s/animdefs.txt' % base_dir)
@@ -125,9 +125,12 @@ if __name__ == '__main__':
     else:
         frames = [pygame.image.load('frames/frame%02d.png' % i) for i in range(82)]
 
-    if False:
+    if True:
         # generating frames_table and patterns_blocks
         splits = read_split_file('%s/split.txt' % base_dir)
+
+        hotspot_x = 32
+        hotspot_y = 32
 
         res = 'frames_table = '
         dp = 0
@@ -140,13 +143,13 @@ if __name__ == '__main__':
             res__ = []
             dp0 = dp
             for j, (x, y, w, h) in enumerate(split):
-                x_ = x - 64
-                y_ = y - 64
+                x_ = x - hotspot_x
+                y_ = y - hotspot_y
                 bx_ = -x_ - w
                 sw, sh = w / 8, h / 8
                 flags = ((sw - 1) << 2) + sh - 1
-                dp += sw * sh
                 res__ += ['\t\t[%d, %d, %d, 0x%04X, 0x%02X]' % (x_, bx_, y_, flags, dp)]
+                dp += sw * sh
             res_ += ['\t[\t\t# frame %d\n%s\n\t]' % (i, ',\n'.join(res__))]
             
             ptrn_blocks += [(dp0, dp - dp0)]

@@ -14,7 +14,7 @@ class Globs():
 
     camera_x = 0
     camera_y = 0
-    vscroll_mode = 0
+    vscroll_mode = True
 
     link = 0
 

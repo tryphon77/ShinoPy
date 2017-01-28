@@ -25,6 +25,7 @@ class TSprite():
 
         self.animations_table = None
         self.animation = None
+        self.animation_index = -1
         self.animation_id = -1
         self.animation_tick = 0
         self.tick = 0
@@ -49,6 +50,11 @@ def allocate_sprite():
     return None
 
 
+def disable_sprite(sprite):
+    print 'disabling sprite #%d' % sprites.index(sprite)
+    sprite.status = 0
+
+
 sizes = [1, 2, 3, 4, 2, 4, 6, 8, 3, 6, 9, 12, 4, 8, 12, 16]
 
 
@@ -58,6 +64,13 @@ def update_patterns(sprite):
 
 
 def update_frame(sprite):
+    if sprite.is_dynamic:
+        update_dynamic_frame(sprite)
+    else:
+        update_static_frame(sprite)
+
+
+def update_dynamic_frame(sprite):
     # print 'update_frame: %d at (%d, %d)' % (sprite.frame, sprite.x, sprite.y)
     x = sprite.x
     y = sprite.y
@@ -84,6 +97,34 @@ def update_frame(sprite):
                           t_id,
                           Globs.link + 1)
             t_id += sizes[sz]
+            Globs.link += 1
+
+
+def update_static_frame(sprite):
+    # print 'update_frame: %d at (%d, %d)' % (sprite.frame, sprite.x, sprite.y)
+    x = sprite.x
+    y = sprite.y
+    t_id = sprite.vpos
+#    print sprite.frames_table[sprite.frame]
+
+    if sprite.is_flipped:
+        t_id |= 0x800
+        for (_, dx, dy, sz, dp) in sprite.frames_table[sprite.frame]:
+            GP.set_sprite(Globs.link,
+                          x + dx,
+                          y + dy,
+                          sz,
+                          t_id + dp,
+                          Globs.link + 1)
+            Globs.link += 1
+    else:
+        for (dx, _, dy, sz, dp) in sprite.frames_table[sprite.frame]:
+            GP.set_sprite(Globs.link,
+                          x + dx,
+                          y + dy,
+                          sz,
+                          t_id + dp,
+                          Globs.link + 1)
             Globs.link += 1
 
 
@@ -115,20 +156,19 @@ def load_next_frame(self):
     # frame_id, ticks, x, y, clsn1_rect_id, clsn2_rect_id for all frames except last
     # -1, frame_id, X, X, X, X for last frame
 
-    print 'load_next_frame: id = %d index = %d' % (self.animation_id, self.animation_index)
+    # print 'load_next_frame: id = %d index = %d' % (self.animation_id, self.animation_index)
     self.animation_tick -= 1
     if self.animation_tick < 0:
         self.animation_tick = len(self.animation) - 1
         self.animation_index = 0
 
-    print self.animation_tick, self.animation_index
     frame_id, ticks = self.animation[self.animation_index]
 #    self.bbox = self.bboxes_table[frame_id]
 #    print (frame_id, ticks)
 
     if self.frame != frame_id:
         self.frame = frame_id
-        self.needs_refresh_patterns = True
+        self.needs_refresh_patterns = self.is_dynamic
 
     self.tick = ticks
 

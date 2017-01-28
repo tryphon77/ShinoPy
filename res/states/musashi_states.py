@@ -2,6 +2,7 @@ from object import *
 from tsprite import *
 from genepy import *
 from res.musashi_data import *
+from res import projectiles
 
 
 def init_object():
@@ -19,6 +20,7 @@ def init_object():
     self.sprite = sprite = allocate_sprite()
     sprite.vpos = 0x200
     sprite.status = 1
+    sprite.is_dynamic = True
     sprite.x = self.x
     sprite.y = self.y
     sprite.patterns = load_data_from_png('res/musashi_patterns.png')
@@ -64,7 +66,7 @@ def init_fire(self):
     set_physics(self, 0, 0, 0, 0)
     print 'fire %d' % self.sprite.frame
     set_animation(self.sprite, walk_fire_anims[self.sprite.frame])
-    throw_shuriken(self, 32, 48)
+    throw_shuriken(self, 32, -48)
     self.update_function = update_fire
 
 
@@ -74,7 +76,13 @@ def update_fire(self):
 
 
 def throw_shuriken(self, dx, dy):
-    pass
+    shuriken = projectiles.init_object()
+    shuriken.x = self.x + signate(self, dx)
+    shuriken.y = self.y + dy
+    shuriken.floor = self.floor
+    shuriken.speed_x = signate(self, 4)
+    shuriken.is_flipped = self.is_flipped
+    print 'throw .x = %d, .speed = %d, .front = %d' % (shuriken.x, shuriken.speed_x, shuriken.front)
 
 
 def init_walk(self):
@@ -213,7 +221,7 @@ def init_crouch_fire(self):
     set_physics(self, 0, 0, 0, 0)
     print 'fire %d' % self.sprite.frame
     set_animation(self.sprite, crouch_fire_anims[self.sprite.frame - 17])
-    throw_shuriken(self, 32, 24)
+    throw_shuriken(self, 32, -24)
     self.update_function = update_crouch_fire
 
 
@@ -328,6 +336,7 @@ def update_jump(self):
 
 def init_jump_fire(self):
     set_animation(self.sprite, JUMP_FIRE)
+    throw_shuriken(self, 32, -48)
     self.update_function = update_jump_fire
 
 
@@ -356,6 +365,7 @@ def update_fall(self):
 
 def init_fall_fire(self):
     set_animation(self.sprite, FALL_FIRE)
+    throw_shuriken(self, 32, -48)
     self.update_function = update_fall_fire
 
 
