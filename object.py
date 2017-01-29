@@ -56,6 +56,8 @@ class Object():
         self.ptr1 = None
         self.ptr2 = None
 
+        self.update_function = None
+
 
 objects_size = 32
 objects = [Object() for _ in range(objects_size)]
@@ -120,8 +122,9 @@ def flip(self):
 def collides_background(self, dx, dy):
     x = int(self.x + signate(self, dx)) / 16
     y = int(self.y + dy) / 16
-    # print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d' % (self.x, dx, self.y, dy, x, y, y * layer_A.twidth + x)
-    return Globs.collision_map[y * layer_A.twidth + x] & 7 == self.floor
+    res = Globs.collision_map[y * layer_A.twidth + x]
+    # print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d -> %d (%d/%d)' % (self.x, signate(self, dx), self.y, dy, x, y, y * layer_A.twidth + x, res, res & 7, self.floor)
+    return res & 7 == self.floor
 
 
 def get_hijump_impulsion(self):

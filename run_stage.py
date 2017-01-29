@@ -8,6 +8,8 @@ from object import *
 from res import level_1_1
 from res import musashi_data
 from res.states import musashi_states
+from res.states import punk_states
+from res.states import shooter_states
 from res import projectile_data 
 
 
@@ -16,6 +18,8 @@ def main():
 
     Globs.base_id = 0
     musashi_states.init_object()
+#    punk_states.init_object()
+#    shooter_states.init_object()
 
     GP.load_tile_data(projectile_data.patterns, 0x300)
 

@@ -270,6 +270,7 @@ def update_hifall(self):
 
 
 def init_jump(self):
+    # print 'init_jump:',
     set_animation(self.sprite, JUMP)
     self.speed_y = -8.5
     self.accel_y = 0.5
@@ -327,6 +328,7 @@ def update_fall_position(self):
 
 
 def update_jump(self):
+    # print 'update_jump:',
     if self.speed_y >= 0:
         init_fall(self)
     elif Globs.joy_pressed & BUTTON_B:
@@ -335,12 +337,14 @@ def update_jump(self):
 
 
 def init_jump_fire(self):
+    # print 'init_jump_fire:',
     set_animation(self.sprite, JUMP_FIRE)
     throw_shuriken(self, 32, -48)
     self.update_function = update_jump_fire
 
 
 def update_jump_fire(self):
+    # print 'update_jump_fire:',
     if self.sprite.is_animation_over:
         set_animation(self.sprite, JUMP)
         self.update_function = update_jump
@@ -351,12 +355,14 @@ def update_jump_fire(self):
 
 
 def init_fall(self):
+    # print 'init_fall:',
     set_animation(self.sprite, FALL)
     self.accel_y = 0.5
     self.update_function = update_fall
 
 
 def update_fall(self):
+    # print 'update_fall:',
     if Globs.joy_pressed & BUTTON_B:
         init_fall_fire(self)
     else:
@@ -364,14 +370,16 @@ def update_fall(self):
 
 
 def init_fall_fire(self):
+    # print 'init_fall_fire:',
     set_animation(self.sprite, FALL_FIRE)
     throw_shuriken(self, 32, -48)
     self.update_function = update_fall_fire
 
 
 def update_fall_fire(self):
+    # print 'update_fall_fire:',
     if self.sprite.is_animation_over:
         set_animation(self.sprite, FALL)
-        self.update_function = update_jump
+        self.update_function = update_fall
     update_fall_position(self)
 

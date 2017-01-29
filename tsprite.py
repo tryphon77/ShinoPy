@@ -60,7 +60,8 @@ sizes = [1, 2, 3, 4, 2, 4, 6, 8, 3, 6, 9, 12, 4, 8, 12, 16]
 
 def update_patterns(sprite):
     start, ln = sprite.patterns_blocks[sprite.frame]
-    GP.load_tile_data(sprite.patterns[start:start + ln], 0x200)
+    # print 'load %d, %d' % (start, ln)
+    GP.load_tile_data(sprite.patterns[start:start + ln], sprite.vpos & 0x7FF)
 
 
 def update_frame(sprite):

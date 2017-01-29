@@ -73,7 +73,7 @@ def get_subsurface(surf, rect):
 
 if __name__ == '__main__':
     # base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/musashi2'
-    base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/shuriken'
+    base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/shooter'
 
     if False:
         # generate anims
@@ -92,7 +92,7 @@ if __name__ == '__main__':
             anim = anims[name]
             if not 'hflip' in anim:
                 name = name.replace('_right', '')
-                res += ('%s = %s\n' % (name, anim['steps'] + [(-1, 0)]))
+                res += ('%s = %s\n' % (name, anim['steps']))
                 res2_ += ['\t' + name]
 
                 name_ids += '%s = %s\n' % (name.upper(), name_id)
@@ -130,7 +130,7 @@ if __name__ == '__main__':
         splits = read_split_file('%s/split.txt' % base_dir)
 
         hotspot_x = 32
-        hotspot_y = 32
+        hotspot_y = 95
 
         res = 'frames_table = '
         dp = 0
@@ -166,31 +166,44 @@ if __name__ == '__main__':
 
     if False:
         # generate splits if not presents
-        from tools.plugins.basic_splitter import *
+        from tools.surface import *
+        from tools.colors import *
+        import tools.plugins.basic_splitter
+        import tools.plugins.group_splitter
+        import tools.plugins.row_splitter
+        import tools.plugins.best_splitter
 
-        class Frame():
-            def __init__(self, surf):
-                self.data = pygame.surfarray.pixels2d(surf)
-                self.surface = surf
+        splitters = [(tools.plugins.basic_splitter.splitter, []),
+                     (tools.plugins.group_splitter.splitter, []),
+                     (tools.plugins.row_splitter.splitter, [])]
 
-            def get_size(self):
-                return self.surface.get_size()
+        ennemy_palette = Palette.from_rgb_values([0x4CFF00, 0x000000, 0xFF0000, 0x524252,
+                                                  0x4A4A4A, 0x6B5B6B, 0x847384, 0xAD7B00,
+                                                  0xAD7B42, 0x949400, 0x9C8C9C, 0xD6A400,
+                                                  0xD69C6B, 0xB5A4B5, 0xFFC594, 0xF7F7F7], 
+                                                 id_ = 1)
 
         psd = load_psd('%s/sheet.psd' % base_dir)
 
+        res = ''
         for i, layer in enumerate(psd.get_layers()):
             nm = layer.get_name()
             if nm.startswith('frame'):
                 nm, j_ = nm.split(' ')
                 j = int(j_)
+
+                res += 'frame: %d\n' % j
                 surf = layer.get_surface()
-                frame = Frame(surf)
+                frame = Surface4bpp.from_pygame_surface(surf, palette = ennemy_palette)
 
-                print splitter(frame)
+                rects = tools.plugins.best_splitter.splitter(frame, splitters)
+                print rects
+                res += 'split: [%s]\n\n' % (' ; '.join([str(x) for x in rects]))
 
+        print res
         exit()
 
-    if False:
+    if True:
         # generating patterns    
         psd = load_psd('%s/sheet.psd' % base_dir)
     
