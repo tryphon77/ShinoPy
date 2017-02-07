@@ -10,6 +10,10 @@ from res import musashi_data
 from res.states import musashi_states
 from res.states import punk_states
 from res.states import shooter_states
+from res.states import knife_states
+from res.states import sword_states
+from res.states import spidey_states
+from res.states import hostage_states
 from res import projectile_data 
 
 
@@ -18,10 +22,15 @@ def main():
 
     Globs.base_id = 0
     musashi_states.init_object()
-#    punk_states.init_object()
-#    shooter_states.init_object()
+    punk_states.init_object()
+    shooter_states.init_object()
+    knife_states.init_object()
+    sword_states.init_object()
+    spidey_states.init_object()
+    hostage_states.init_object()
 
     GP.load_tile_data(projectile_data.patterns, 0x300)
+    GP.load_tile_data(hostage_states.patterns, 0x400)
 
     old_joy = 0
     Globs.forward = BUTTON_RIGHT

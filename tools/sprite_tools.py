@@ -73,7 +73,10 @@ def get_subsurface(surf, rect):
 
 if __name__ == '__main__':
     # base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/musashi2'
-    base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/shooter'
+    base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/spidey'
+    hotspot_x = 64
+    hotspot_y = 84
+
 
     if False:
         # generate anims
@@ -128,9 +131,6 @@ if __name__ == '__main__':
     if True:
         # generating frames_table and patterns_blocks
         splits = read_split_file('%s/split.txt' % base_dir)
-
-        hotspot_x = 32
-        hotspot_y = 95
 
         res = 'frames_table = '
         dp = 0
