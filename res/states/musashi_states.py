@@ -6,26 +6,28 @@ from res import projectiles
 
 
 def init_object():
-    print 'init_object'
+    print 'init musashi'
     self = allocate_object()
+    friend_objects.add(self)
+
     self.status = ACTIVE
 
-    self.x = 160
+    self.x = 512
     self.y = 127
-    self.floor = 2
+    self.floor = 1
 
     self.back = -10
     self.front = 10
 
-    self.sprite = sprite = allocate_sprite()
-    sprite.vpos = 0x200
+    self.sprite = sprite = allocate_dynamic_sprite()
+    sprite.vpos ^= 0x8000
     sprite.status = 1
-    sprite.is_dynamic = True
     sprite.x = self.x
     sprite.y = self.y
     sprite.patterns = load_data_from_png('res/musashi_patterns.png')
     sprite.frames_table = frames_table
     sprite.animations_table = animations_table
+    sprite.bboxes_table = bounding_boxes
     sprite.frame = 76
     sprite.patterns_blocks = patterns_blocks
     sprite.bbox = (-6, 0, 16, 64)
@@ -37,7 +39,10 @@ def init_stand(self):
     # print 'init_stand'
     set_animation(self.sprite, STAND)
     set_physics(self, 0, 0, 0, 0)
+    self.moves_to_left = self.sprite.is_flipped
+
     self.update_function = update_stand
+    self.collision_function = init_collision
 
 
 def update_stand(self):
@@ -49,10 +54,13 @@ def update_stand(self):
         init_fire(self)
     elif (Globs.joy_pressed & BUTTON_C):
         init_jump(self)
+    # if FWD pressed, we have to check there's no wall 1 pixel forward
     elif (Globs.joy & Globs.forward)\
             and collides_background(self, self.front + 1, 0) == 0:
+        print "x = %s, dx = %s, x_ = %s : let's walk forward!" % (self.x, self.front + 1, self.x + signate(self, self.front + 1))
         init_walk(self)
     elif Globs.joy & Globs.backward:
+        print "x = %s, dx = %s : let's walk backward!" % (self.x, self.front)
         flip_controls()
         flip(self)
         init_walk(self)
@@ -81,7 +89,7 @@ def throw_shuriken(self, dx, dy):
     shuriken.y = self.y + dy
     shuriken.floor = self.floor
     shuriken.speed_x = signate(self, 4)
-    shuriken.is_flipped = self.is_flipped
+    shuriken.sprite.is_flipped = self.sprite.is_flipped
     print 'throw .x = %d, .speed = %d, .front = %d' % (shuriken.x, shuriken.speed_x, shuriken.front)
 
 
@@ -134,10 +142,10 @@ def update_prepare_hijump_up(self):
 
 
 def init_hijump_up(self):
-    self.floor += 1
     self.speed_y = self.accel_y = 0
     set_animation(self.sprite, HIJUMP0)
     self.update_function = update_hijump_up
+    self.collision_function = None
 
 
 def update_hijump_up(self):
@@ -156,6 +164,7 @@ def update_hijump1_up(self):
     self.speed_y += self.accel_y
     self.y += self.speed_y
     if self.speed_y >= 0:
+        self.floor += 1
         init_hifall(self)
 
 
@@ -243,7 +252,6 @@ def update_hijump_down(self):
 def init_hijump1_down(self):
     self.speed_y = -6
     self.accel_y = 0.5
-    self.floor -= 1
     set_animation(self.sprite, HIFALL1)
     self.update_function = update_hijump1_down
 
@@ -252,12 +260,14 @@ def update_hijump1_down(self):
     self.speed_y += self.accel_y
     self.y += self.speed_y
     if self.speed_y >= 0:
+        self.floor -= 1
         init_hifall(self)
 
 
 def init_hifall(self):
     self.sprite.vpos ^= 0x8000
     self.update_function = update_hifall
+    self.collision_function = init_collision
 
 
 def update_hifall(self):
@@ -292,7 +302,7 @@ def update_jump_action(self):
     self.speed_x = clamp(self.speed_x, -2, 2)
     self.x += self.speed_x
 
-    if self.is_flipped:
+    if self.moves_to_left:
         if self.speed_x > 0:
             flip_controls()
             flip(self)
@@ -382,4 +392,40 @@ def update_fall_fire(self):
         set_animation(self.sprite, FALL)
         self.update_function = update_fall
     update_fall_position(self)
+
+
+def init_collision(self):
+    print 'musashi collided'
+    other = self.collided_object
+
+    if self.x < other.x:
+        self.speed_x = -2
+        self.moves_to_left = True
+    else:
+        self.speed_x = 2
+        self.moves_to_left = False
+    self.speed_y = -4
+    self.accel_y = 0.5
+
+    set_animation(self.sprite, HIT)
+    self.update_function = update_collision
+
+
+def update_collision(self):
+    self.x += self.speed_x
+
+    if collides_background(self, self.front, 0):
+        print 'before:', (self.x, self.back, self.front)
+        fix_hpos(self)
+        print 'after:', (self.x, self.back, self.front), '\n'
+        self.speed_x = 0
+
+    self.speed_y += self.accel_y
+    self.y += self.speed_y
+
+    if collides_background(self, self.front, 0):
+        fix_vpos(self)
+        init_stand(self)
+
+
 

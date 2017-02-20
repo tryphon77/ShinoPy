@@ -1,3 +1,8 @@
+import sys
+sys.path.append('..')
+sys.path.append('C:/Users/Tryphon/Documents/workspace/MDTools')
+sys.path.append('C:/Users/Tryphon/Documents/workspace/ShinoPy')
+
 import genepy
 import pygame
 
@@ -68,9 +73,46 @@ def get_datas(path):
 
 
 if __name__ == '__main__':
-    datas = get_datas('../res/test.png')
+    if False:
+        datas = get_datas('../res/test.png')
 
-    for t in range(len(datas['tiles'])/4):
-        print '\t0x%X, 0x%X, 0x%X, 0x%X,' % tuple([i + 0 for i in datas['tiles'][4*t : 4*t + 4]])
+        for t in range(len(datas['tiles'])/4):
+            print '\t0x%X, 0x%X, 0x%X, 0x%X,' % tuple([i + 0 for i in datas['tiles'][4*t : 4*t + 4]])
 
-    make_sheet(datas['ptrns'], '../res/level_1_1.png')    
+        make_sheet(datas['ptrns'], '../res/level_1_1.png')    
+    
+    if True:
+        OBJECT_PUNK = 1
+        OBJECT_SHOOTER = 2
+        objects = [
+            (OBJECT_PUNK, 0, 25, 14),
+            (OBJECT_SHOOTER, 0, 29, 14),
+            (OBJECT_SHOOTER, 1, 37, 7),
+            (OBJECT_PUNK, 0, 41, 14),
+            (OBJECT_PUNK, 1, 45, 7),
+            (OBJECT_SHOOTER, 0, 47, 14),
+            (OBJECT_SHOOTER, 0, 49, 14),
+            (OBJECT_SHOOTER, 0, 57, 14),
+            (OBJECT_PUNK, 1, 59, 7),
+            (OBJECT_SHOOTER, 1, 66, 7),
+            (OBJECT_SHOOTER, 0, 76, 14),
+            (OBJECT_PUNK, 0, 81, 14),
+            (OBJECT_PUNK, 0, 82, 14),
+            (OBJECT_PUNK, 0, 83, 14),
+            (OBJECT_SHOOTER, 0, 91, 12),
+            (OBJECT_SHOOTER, 1, 94, 7),
+            (OBJECT_SHOOTER, 0, 95, 14),
+            (OBJECT_PUNK, 1, 105, 7),
+            (OBJECT_PUNK, 0, 109, 14),
+            (OBJECT_SHOOTER, 1, 117, 7),
+            (OBJECT_SHOOTER, 0, 118, 14),
+            (OBJECT_SHOOTER, 0, 120, 14),
+            (OBJECT_SHOOTER, 0, 122, 14),
+            (OBJECT_SHOOTER, 0, 124, 14)
+    ]
+
+    objects_ = []
+    for obj, floor, x, y in objects:
+        objects_ += ['\t(%s, %d, %d, %d)' % (obj, floor, x*16, y*16 + 15)]
+    print ',\n'.join(objects_)
+

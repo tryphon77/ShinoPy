@@ -1,6 +1,8 @@
-from tilemap import layer_A
+from layer import layer_A
 from queue import Queue
 from tsprite import *
+
+from camera import camera
 
 INACTIVE = 0
 ACTIVE = 1
@@ -9,7 +11,11 @@ impulsions_table = [-5.5, -6.5, -7.5, -8.5, -9.5, -10.5, -11.5, -12.5]
 
 
 class Object():
+    # debug purposes
+    current_id_ = 1
+
     def __init__(self):
+        # debug purposes
         self.id_ = 0
         self.status = INACTIVE
 
@@ -24,10 +30,7 @@ class Object():
 
         self.sprite = None
 
-        self.bx0 = 0
-        self.by0 = 0
-        self.bx1 = 0
-        self.by1 = 0
+        self.bbox = None
 
         self.hx0 = 0
         self.hy0 = 0
@@ -37,7 +40,8 @@ class Object():
         self.back = 0
         self.front = 0
 
-        self.is_flipped = False
+#        self.is_flipped = False
+        self.moves_to_left = False
         self.collision_flag = False
         self.is_collidable = False
         self.is_hittable = False
@@ -57,20 +61,23 @@ class Object():
         self.ptr2 = None
 
         self.update_function = None
+        self.collision_function = None
 
 
 objects_size = 32
 objects = [Object() for _ in range(objects_size)]
 
 all_objects = Queue()
-friends_objects = Queue()
+friend_objects = Queue()
 ennemy_objects = Queue()
 
 
 def allocate_object():
     for i, o in enumerate(objects):
         if o.status == INACTIVE:
-            print 'allocating object #%d' % i
+            o.id_ = Object.current_id_
+            Object.current_id_ += 1
+            print 'init object #%d at pos: %d' % (o.id_, i)
             break
     else:
         return None
@@ -87,13 +94,14 @@ def release_object(obj):
     obj.id_ = 0
     obj.status = INACTIVE
     obj.update_function = None
+    obj.moves_to_left = False
 
-    print 'releasing object #%d' % all_objects.index(obj)
+    print 'releasing object #%d at pos: %d' % (obj.id_, all_objects.index(obj))
     all_objects.remove(obj)
 
 
 def set_physics(self, sx, ax, sy, ay):
-    if self.is_flipped:
+    if self.moves_to_left:
         self.speed_x = -sx
         self.accel_x = -ax
     else:
@@ -104,7 +112,8 @@ def set_physics(self, sx, ax, sy, ay):
 
 
 def signate(self, value):
-    if self.is_flipped:
+    if self.moves_to_left:
+#    if self.is_flipped:
         return -value
     else:
         return value
@@ -116,11 +125,13 @@ def flip_controls():
 
 def flip(self):
     # self.back, self.front = self.front, self.back
-    self.is_flipped = not self.is_flipped
+    self.sprite.is_flipped = not self.sprite.is_flipped
+    self.moves_to_left = not self.moves_to_left
 
 
 def collides_background(self, dx, dy):
     x = int(self.x + signate(self, dx)) / 16
+    # x = int(self.x + dx) / 16
     y = int(self.y + dy) / 16
     res = Globs.collision_map[y * layer_A.twidth + x]
     # print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d -> %d (%d/%d)' % (self.x, signate(self, dx), self.y, dy, x, y, y * layer_A.twidth + x, res, res & 7, self.floor)
@@ -134,18 +145,24 @@ def get_hijump_impulsion(self):
     return impulsions_table[(Globs.collision_map[y * layer_A.twidth + x] >> 3) & 7]
 
 
+# def fix_pos(x, dx):
+    # if dx > 0:
+        # return ((int(x) + dx) & 0xFFF0) - dx
+    # return (int(x) & 0xFFF0) + dx
+
 def fix_hpos(self):
-    if self.is_flipped:
+    if self.moves_to_left:
         fixed = (int(self.x) & 0xFFF0) + self.front
-        # print 'fix_hpos: %d -> %d' % (self.x, fixed)
+        print 'fix_hpos: %d -> %d' % (self.x, fixed)
         self.x = fixed
     else:
         fixed = (int(self.x + self.front) & 0xFFF0) - self.front - 1
-        # print 'fix_hpos: %d -> %d' % (self.x, fixed)
+        print 'fix_hpos: %d -> %d' % (self.x, fixed)
         self.x = fixed
 
 
 def fix_vpos(self):
+    print 'fix_vpos: %d -> %d' % (self.y, (int(self.y) & 0xFFF0) - 1)
     self.y = (int(self.y) & 0xFFF0) - 1
 
 
@@ -154,12 +171,104 @@ def update_object(self):
         self.update_function(self)
 
 
+def compute_boxes(self):
+    sprite = self.sprite
+    box = sprite.bbox
+
+    if box:
+        x_, y_, w_, h_ = box
+        bx0 = int(self.x) + x_
+        bx1 = bx0 + w_
+        by0 = int(self.y) + y_
+        by1 = by0 + h_
+        self.bbox = (bx0, bx1, by0, by1)
+    else:
+        self.bbox = None
+
+
+def collision_between_boxes(box1, box2):
+    l1, r1, t1, b1 = box1
+    l2, r2, t2, b2 = box2
+
+    if r1 < l2:
+        return False
+    if l1 > r2:
+        return False
+    if b1 < t2:
+        return False
+    if t1 > b2:
+        return False
+
+    return True
+
+
 def update_all_objects():
-    for obj in all_objects.data[:all_objects.cursor]:
+    if camera.moves_left:
+        # pass
+        i = Globs.objects_hindex
+        while i > 0:
+            i -= 1
+            entry = Globs.objects_hlist[i]
+            is_active, sx, sy, init_function = entry[:4]
+            print 'moves left and considering #%d at (%d, %d)' % (i, sx, sy)
+            if is_active:
+                print 'already active'
+            elif sx > camera.left:
+                break
+            elif camera.top - 32 <= sy <= camera.bottom + 32:
+                init_function(entry)
+        Globs.objects_hindex = i
+    elif camera.moves_right:
+        i = Globs.objects_hindex
+        while i < Globs.n_objects:
+            entry = Globs.objects_hlist[i]
+            is_active, sx, sy, init_function = entry[:4]
+            print 'moves right and considering #%d at (%d, %d)' % (i, sx, sy)
+            if is_active:
+                print 'already active'
+            elif sx > camera.left:
+                break
+            elif camera.top - 32 <= sy <= camera.bottom + 32:
+                init_function(entry)
+            i += 1
+        Globs.objects_hindex = i
+    
+    for obj in all_objects:
+        # print 'object %d' % obj.id_
         if obj.status:
-            update_object(obj)
-#        else:
-#            break
+            if camera.left - 64 < obj.x < camera.right + 64\
+                    and camera.top - 64 < obj.y < camera.bottom + 64:
+                # print 'update object %d' % obj.id_
+                update_object(obj)
+
+                if obj.status:
+                    # print 'compute boxes on object %d' % obj.id_
+                    compute_boxes(obj)
+                    
+            else:
+                release_object(obj)
+                obj.object_entry[0] = False
+                # debug
+                ennemy_objects.remove(obj)
+
+                    
+    for friend in friend_objects:
+        friend_bbox = friend.bbox
+        # print 'testing friend object #%s (%s, %s)' % (friend.id_, friend.x, friend.y)
+        if friend_bbox:
+            for ennemy in ennemy_objects:
+                # print 'against ennemy object #%d' % ennemy.id_
+                if ennemy.floor == friend.floor:
+                    ennemy_bbox = ennemy.bbox
+                    if ennemy_bbox:
+                        if collision_between_boxes(friend_bbox, ennemy_bbox):
+                            # print 'collision'
+                            friend.collided_object = ennemy
+                            ennemy.collided_object = friend
+                            if friend.collision_function:
+                                friend.collision_function(friend)
+                            if ennemy.collision_function:
+                                ennemy.collision_function(ennemy)
 
 
 def update_all_sprites():
@@ -171,7 +280,7 @@ def update_all_sprites():
             # print 'sprite #%d (status = %d)' % (i, sprite.status)
             sprite.x = int(obj.x) - Globs.camera_x
             sprite.y = int(obj.y) - Globs.camera_y
-            sprite.is_flipped = obj.is_flipped
+#            sprite.is_flipped = obj.is_flipped
             sprite_update(sprite)
 
     GP.sprite_cache[Globs.link - 1].link = 0

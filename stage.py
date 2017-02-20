@@ -1,0 +1,52 @@
+from globals import Globs
+from genepy import *
+from layer import *
+from camera import *
+
+def init_stage(stage):
+    # load background
+    GP.load_tile_data(stage.patterns, 0) 
+    
+    # load tileset
+    Globs.tileset = stage.tileset
+
+    # load collision map
+    Globs.collision_map = stage.collision_map
+    
+    # load tilemap
+    layer_A.plane = GP.plane_A
+    layer_A.data = stage.tilemap_A
+    layer_A.twidth = stage.twidth
+    layer_A.theight = stage.theight
+
+#    Globs.layer_a_twidth = stage.twidth;
+#    Globs.layer_a_theight = stage.theight;
+    Globs.layer_a_pwidth = stage.twidth * 16;
+    Globs.layer_a_pheight = stage.theight * 16;
+
+    layer_B.plane = GP.plane_B
+    layer_B.data = stage.tilemap_B    
+    layer_B.twidth = stage.twidth/2 + 10;
+    layer_B.theight = stage.theight/2 + 7;
+    
+    Globs.layer_b_pwidth = stage.twidth * 16;
+    Globs.layer_b_pheight = stage.theight * 16;
+
+    Globs.camera_x = 0
+    Globs.camera_y = 0
+    
+    camera.left = 0
+    camera.right = 319
+    camera.top = 0
+    camera.bottom = 223
+        
+    draw_rect(layer_A, 0, 0, 32, 15)
+    draw_rect(layer_B, 0, 0, 21, 15)
+    
+    Globs.vscroll_mode = 0
+    
+    Globs.n_objects = len(stage.objects_hlist)
+    Globs.objects_hlist = stage.objects_hlist
+    Globs.objects_hindex = 0
+    
+    

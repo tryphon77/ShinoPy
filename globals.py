@@ -23,3 +23,9 @@ class Globs():
     forward = 0
     backward = 0
 
+    musashi = None
+
+    n_objects = 0
+    objects_hlist = []
+    objects_hindex = 0
+

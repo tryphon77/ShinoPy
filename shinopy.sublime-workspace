@@ -4,12 +4,68 @@
 		"selected_items":
 		[
 			[
-				"T",
-				"True"
+				"ba",
+				"back"
+			],
+			[
+				"sp",
+				"sprite"
+			],
+			[
+				"obje",
+				"objects\tstatement"
+			],
+			[
+				"upda",
+				"update_function"
+			],
+			[
+				"is",
+				"is_animation_over"
+			],
+			[
+				"spt",
+				"sprite"
+			],
+			[
+				"s",
+				"sprite"
+			],
+			[
+				"fix_",
+				"fix_vpos\tfunction"
+			],
+			[
+				"se",
+				"self\tparam"
 			],
 			[
 				"ini",
-				"init_object"
+				"init_walk\tfunction"
+			],
+			[
+				"upa",
+				"update_function"
+			],
+			[
+				"i",
+				"is_dead"
+			],
+			[
+				"a",
+				"accel_y"
+			],
+			[
+				"bx",
+				"bx0"
+			],
+			[
+				"b",
+				"bboxes_table"
+			],
+			[
+				"T",
+				"True"
 			],
 			[
 				"Tr",
@@ -24,20 +80,12 @@
 				"punk_data"
 			],
 			[
-				"sp",
-				"sprite"
-			],
-			[
 				"in",
 				"index\tfunction"
 			],
 			[
 				"all_",
 				"all_objects\tstatement"
-			],
-			[
-				"is",
-				"is_dynamic"
 			],
 			[
 				"set",
@@ -50,10 +98,6 @@
 			[
 				"n",
 				"needs_refresh_patterns"
-			],
-			[
-				"se",
-				"set_animation\tfunction"
 			],
 			[
 				"BUTT",
@@ -82,10 +126,6 @@
 			[
 				"BUTTON",
 				"BUTTON_DOWN"
-			],
-			[
-				"ba",
-				"backward"
 			],
 			[
 				"fo",
@@ -128,10 +168,6 @@
 				"Surface"
 			],
 			[
-				"i",
-				"image"
-			],
-			[
 				"pixe",
 				"pixels2d"
 			],
@@ -158,10 +194,6 @@
 			[
 				"fra",
 				"frames"
-			],
-			[
-				"s",
-				"surfarray"
 			],
 			[
 				"j",
@@ -200,10 +232,6 @@
 				"speed_y"
 			],
 			[
-				"a",
-				"accel_y"
-			],
-			[
 				"non",
 				"None\tinstance"
 			],
@@ -218,10 +246,6 @@
 			[
 				"coll",
 				"collides_background\tfunction"
-			],
-			[
-				"b",
-				"back"
 			],
 			[
 				"up",
@@ -316,29 +340,31 @@
 	"buffers":
 	[
 		{
-			"file": "res/knife_data.py",
-			"settings":
-			{
-				"buffer_size": 3711,
-				"encoding": "UTF-8",
-				"line_ending": "Windows",
-				"name": "frames_table = ["
-			}
-		},
-		{
 			"file": "run_stage.py",
 			"settings":
 			{
-				"buffer_size": 1311,
+				"buffer_size": 1763,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "res/states/hostage_states.py",
+			"contents": "from tilemap import layer_A\nfrom queue import Queue\nfrom tsprite import *\n\nINACTIVE = 0\nACTIVE = 1\n\nimpulsions_table = [-5.5, -6.5, -7.5, -8.5, -9.5, -10.5, -11.5, -12.5]\n\n\nclass Object():\n    def __init__(self):\n        self.id_ = 0\n        self.status = INACTIVE\n\n        self.x = 0.0\n        self.y = 0.0\n        self.speed_x = 0.0\n        self.speed_y = 0.0\n        self.max_speed_x = 0.0\n        self.max_speed_y = 0.0\n        self.accel_x = 0.0\n        self.accel_y = 0.0\n\n        self.sprite = None\n\n        self.bbox = None\n\n        self.hx0 = 0\n        self.hy0 = 0\n        self.hx1 = 0\n        self.hy1 = 0\n\n        self.back = 0\n        self.front = 0\n\n        self.is_flipped = False\n        self.collision_flag = False\n        self.is_collidable = False\n        self.is_hittable = False\n        self.is_dead = False\n        self.is_collided = False\n        self.is_hit = False\n        self.has_hit = False\n        self.collided_object = None\n        self.hit_object = None\n        self.hitting_object = None\n\n        self.param1 = 0\n        self.param2 = 0\n        self.param3 = 0\n        self.param4 = 0\n        self.ptr1 = None\n        self.ptr2 = None\n\n        self.update_function = None\n        self.collision_function = None\n\n\nobjects_size = 32\nobjects = [Object() for _ in range(objects_size)]\n\nall_objects = Queue()\nfriends_objects = Queue()\nennemy_objects = Queue()\n\n\ndef allocate_object():\n    for i, o in enumerate(objects):\n        if o.status == INACTIVE:\n            print 'allocating object #%d' % i\n            break\n    else:\n        return None\n\n    all_objects.add(o)\n    return o\n\n\ndef release_object(obj):\n    if obj.sprite:\n        disable_sprite(obj.sprite)\n        obj.sprite = None\n\n    obj.id_ = 0\n    obj.status = INACTIVE\n    obj.update_function = None\n\n    print 'releasing object #%d' % all_objects.index(obj)\n    all_objects.remove(obj)\n\n\ndef set_physics(self, sx, ax, sy, ay):\n    if self.is_flipped:\n        self.speed_x = -sx\n        self.accel_x = -ax\n    else:\n        self.speed_x = sx\n        self.accel_x = ax\n    self.speed_y = sy\n    self.accel_y = ay\n\n\ndef signate(self, value):\n    if self.is_flipped:\n        return -value\n    else:\n        return value\n\n\ndef flip_controls():\n    Globs.forward, Globs.backward = Globs.backward, Globs.forward\n\n\ndef flip(self):\n    # self.back, self.front = self.front, self.back\n    self.is_flipped = not self.is_flipped\n\n\ndef collides_background(self, dx, dy):\n    x = int(self.x + signate(self, dx)) / 16\n    y = int(self.y + dy) / 16\n    res = Globs.collision_map[y * layer_A.twidth + x]\n    # print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d -> %d (%d/%d)' % (self.x, signate(self, dx), self.y, dy, x, y, y * layer_A.twidth + x, res, res & 7, self.floor)\n    return res & 7 == self.floor\n\n\ndef get_hijump_impulsion(self):\n    x = int(self.x) / 16\n    y = int(self.y + 1) / 16\n    # print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d' % (self.x, dx, self.y, dy, x, y, y * layer_A.twidth + x)\n    return impulsions_table[(Globs.collision_map[y * layer_A.twidth + x] >> 3) & 7]\n\n\ndef fix_pos(x, dx):\n    if dx > 0:\n        return ((int(x) + dx) & 0xFFF0) - dx\n    return (int(x) & 0xFFF0) + dx\n\ndef fix_hpos(self):\n    if self.is_flipped:\n        fixed = (int(self.x) & 0xFFF0) + self.front\n        print 'fix_hpos: %d -> %d' % (self.x, fixed)\n        self.x = fixed\n    else:\n        fixed = (int(self.x + self.front) & 0xFFF0) - self.front - 1\n        # print 'fix_hpos: %d -> %d' % (self.x, fixed)\n        self.x = fixed\n\n\ndef fix_vpos(self):\n    self.y = (int(self.y) & 0xFFF0) - 1\n\n\ndef update_object(self):\n    if self.update_function:\n        self.update_function(self)\n\n\ndef compute_boxes(self):\n    sprite = self.sprite\n    box = sprite.bbox\n\n    if box:\n        x_, y_, w_, h_ = box\n        bx0 = int(self.x) + x_\n        bx1 = bx0 + w_\n        by0 = int(self.y) + y_\n        by1 = by0 + h_\n        self.bbox = (bx0, bx1, by0, by1)\n    else:\n        self.bbox = None\n\n\ndef collision_between_boxes(box1, box2):\n    l1, r1, t1, b1 = box1\n    l2, r2, t2, b2 = box2\n\n    if r1 < l2:\n        return False\n    if l1 > r2:\n        return False\n    if b1 < t2:\n        return False\n    if t1 > b2:\n        return False\n\n    return True\n\n\ndef update_all_objects():\n    for obj in all_objects.data[:all_objects.cursor]:\n        if obj.status:\n            update_object(obj)\n            compute_boxes(obj)\n#        else:\n#            break\n\n\ndef update_all_sprites():\n    # print \"update_all_sprites\"\n    Globs.link = 0\n    for obj in objects:\n        sprite = obj.sprite\n        if sprite and sprite.status:\n            # print 'sprite #%d (status = %d)' % (i, sprite.status)\n            sprite.x = int(obj.x) - Globs.camera_x\n            sprite.y = int(obj.y) - Globs.camera_y\n            sprite.is_flipped = obj.is_flipped\n            sprite_update(sprite)\n\n    GP.sprite_cache[Globs.link - 1].link = 0\n",
+			"file": "object.py",
+			"file_size": 5169,
+			"file_write_time": 131310431306009249,
 			"settings":
 			{
-				"buffer_size": 736,
+				"buffer_size": 4955,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "res/musashi_data.py",
+			"settings":
+			{
+				"buffer_size": 32371,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -347,7 +373,43 @@
 			"file": "res/punk_data.py",
 			"settings":
 			{
-				"buffer_size": 4644,
+				"buffer_size": 5985,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "res/states/punk_states.py",
+			"settings":
+			{
+				"buffer_size": 3680,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "globals.py",
+			"settings":
+			{
+				"buffer_size": 443,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "res/states/musashi_states.py",
+			"settings":
+			{
+				"buffer_size": 10972,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "tsprite.py",
+			"settings":
+			{
+				"buffer_size": 5614,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -359,44 +421,6 @@
 				"buffer_size": 6926,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "res/sword_data.py",
-			"settings":
-			{
-				"buffer_size": 5211,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "res/shooter_data.py",
-			"settings":
-			{
-				"buffer_size": 5151,
-				"encoding": "UTF-8",
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "res/spidey_data.py",
-			"settings":
-			{
-				"buffer_size": 4433,
-				"encoding": "UTF-8",
-				"line_ending": "Windows",
-				"name": "frames_table = ["
-			}
-		},
-		{
-			"file": "res/hostage_data.py",
-			"settings":
-			{
-				"buffer_size": 2150,
-				"encoding": "UTF-8",
-				"line_ending": "Windows",
-				"name": "from genepy import load_data_from_png"
 			}
 		}
 	],
@@ -468,7 +492,7 @@
 	"command_palette":
 	{
 		"height": 392.0,
-		"last_filter": "",
+		"last_filter": "git p",
 		"selected_items":
 		[
 			[
@@ -476,11 +500,11 @@
 				"Git: Push"
 			],
 			[
-				"git q",
+				"git qui",
 				"Git: Quick Commit"
 			],
 			[
-				"git qui",
+				"git q",
 				"Git: Quick Commit"
 			],
 			[
@@ -565,17 +589,18 @@
 	},
 	"expanded_folders":
 	[
-		"/C/Users/Tryphon/Documents/workspace/ShinoPy",
-		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res",
-		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/states",
-		"/C/Users/Tryphon/Documents/workspace/ShinoPy/tools"
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy"
 	],
 	"file_history":
 	[
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/knife_data.py",
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/hostage_data.py",
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/spidey_data.py",
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/shooter_data.py",
+		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/sword_data.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/states/hostage_states.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/states/spidey_states.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/states/knife_states.py",
-		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/sword_data.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/states/sword_states.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/tools/sprite_tools.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/punk_data.py",
@@ -587,7 +612,6 @@
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/run_stage.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/level_1_1.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/object.py",
-		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/shooter_data.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/projectiles.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/res/projectile_data.py",
 		"/C/Users/Tryphon/Documents/workspace/ShinoPy/queue.py",
@@ -626,6 +650,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"(0, 0, 0, 0)",
+			"(-6, -58, 16, 59)",
 			", (-1, 0)",
 			"#        self.x = (int(self.x) & 0xFFF0) + 9\n",
 			"_right",
@@ -652,6 +678,9 @@
 		"regex": false,
 		"replace_history":
 		[
+			"None",
+			"rect1",
+			"rest1",
 			"",
 			"self."
 		],
@@ -669,19 +698,19 @@
 			[
 				{
 					"buffer": 0,
-					"file": "res/knife_data.py",
+					"file": "run_stage.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3711,
+						"buffer_size": 1763,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2829,
-								2829
+								1080,
+								1080
 							]
 						],
 						"settings":
@@ -695,43 +724,6 @@
 								{
 									"characters": ".",
 									"selector": "source.python - string - constant.numeric"
-								}
-							],
-							"auto_name": "frames_table = [",
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1196.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "run_stage.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1311,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								512,
-								512
-							]
-						],
-						"settings":
-						{
-							"auto_complete_triggers":
-							[
-								{
-									"characters": ".",
-									"selector": "source.python - string - comment - constant.numeric"
 								},
 								{
 									"characters": ".",
@@ -751,7 +743,48 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 98.0,
+						"translation.y": 229.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "object.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4955,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3349,
+								3349
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1585.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -759,19 +792,19 @@
 				},
 				{
 					"buffer": 2,
-					"file": "res/states/hostage_states.py",
+					"file": "res/musashi_data.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 736,
+						"buffer_size": 32371,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								391,
-								391
+								27303,
+								27303
 							]
 						],
 						"settings":
@@ -792,7 +825,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 11721.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -804,15 +837,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4644,
+						"buffer_size": 5985,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								97,
-								97
+								5544,
+								5544
 							]
 						],
 						"settings":
@@ -822,14 +855,182 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
+						"translation.y": 1772.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "res/states/punk_states.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3680,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								714,
+								714
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 342.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "globals.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 443,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								441,
+								441
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
 						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "res/states/musashi_states.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10972,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								924,
+								924
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 359.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "tsprite.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5614,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3567,
+								3567
+							]
+						],
+						"settings":
+						{
+							"auto_complete_triggers":
+							[
+								{
+									"characters": ".",
+									"selector": "source.python - string - comment - constant.numeric"
+								},
+								{
+									"characters": ".",
+									"selector": "source.python - string - constant.numeric"
+								}
+							],
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1478.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 8,
 					"file": "tools/sprite_tools.py",
 					"semi_transient": false,
 					"settings":
@@ -870,127 +1071,7 @@
 						"translation.y": 715.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "res/sword_data.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5211,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3922,
-								3922
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1638.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "res/shooter_data.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5151,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4052,
-								4052
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1690.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "res/spidey_data.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4433,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3556,
-								3556
-							]
-						],
-						"settings":
-						{
-							"auto_name": "frames_table = [",
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 1573.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 8,
-					"file": "res/hostage_data.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2150,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2047,
-								2047
-							]
-						],
-						"settings":
-						{
-							"auto_name": "from genepy import load_data_from_png",
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 796.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
+					"stack_index": 8,
 					"type": "text"
 				}
 			]

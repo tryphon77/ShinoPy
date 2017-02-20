@@ -7,11 +7,11 @@ ACTIVE = 1
 
 
 class TSprite():
-    def __init__(self):
+    def __init__(self, vpos):
         self.status = NONE
         self.is_dynamic = False
         self.is_flipped = False
-        self.vpos = 0
+        self.vpos = vpos
         self.needs_refresh_patterns = False
         self.new_frame = False
 
@@ -38,21 +38,33 @@ class TSprite():
         self.hitbox = None
 
 
-sprites_size = 16
-sprites = [TSprite() for _ in range(sprites_size)]
+dynamic_sprites_size = 8
+dynamic_sprites = [TSprite(0x200 + i*0x20) for i in range(dynamic_sprites_size)]
 
+static_sprites_size = 16
+static_sprites = [TSprite(0) for _ in range(static_sprites_size)]
 
-def allocate_sprite():
-    for i, s in enumerate(sprites):
+def allocate_dynamic_sprite():
+    for i, s in enumerate(dynamic_sprites):
         if s.status == 0:
-            print 'allocating sprite #%d' % i
+            print 'allocating dynamic sprite #%d' % i
+            s.is_dynamic = True
+            return s
+    return None
+
+def allocate_static_sprite():
+    for i, s in enumerate(static_sprites):
+        if s.status == 0:
+            print 'allocating static sprite #%d' % i
+            s.is_dynamic = False
             return s
     return None
 
 
 def disable_sprite(sprite):
-    print 'disabling sprite #%d' % sprites.index(sprite)
+    print 'disabling sprite'
     sprite.status = 0
+    sprite.is_flipped = False
 
 
 sizes = [1, 2, 3, 4, 2, 4, 6, 8, 3, 6, 9, 12, 4, 8, 12, 16]
@@ -145,11 +157,12 @@ def change_animation(self, anim):
         self.animation_id = anim
         self.animation = self.animations_table[anim]
         self.animation_index -= 1   # recode ?
-        print 'channge_animation: animation_index = %d' % (self.animation_index)
+        print 'change_animation: animation_index = %d' % (self.animation_index)
         frame_id, _ = self.animation[self.animation_index]
 
         if self.frame != frame_id:
             self.frame = frame_id
+            self.bbox = self.bboxes_table[frame_id]
             self.needs_refresh_patterns = True
 
 def load_next_frame(self):
@@ -169,6 +182,7 @@ def load_next_frame(self):
 
     if self.frame != frame_id:
         self.frame = frame_id
+        self.bbox = self.bboxes_table[frame_id]
         self.needs_refresh_patterns = self.is_dynamic
 
     self.tick = ticks

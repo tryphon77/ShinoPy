@@ -5,25 +5,31 @@ from res.projectile_data import *
 
 
 def init_object():
-    print 'init_object'
+    print 'init shuriken'
     self = allocate_object()
+    print 'shuriken id = %d' % self.id_
+    friend_objects.add(self)
+    
     self.status = ACTIVE
 
     self.back = -4
     self.front = 4
 
-    self.sprite = sprite = allocate_sprite()
+    self.sprite = sprite = allocate_static_sprite()
     sprite.vpos = 0x300
-    sprite.is_dynamic = False
     sprite.status = 1
     sprite.x = self.x
     sprite.y = self.y
     sprite.frames_table = frames_table
     sprite.animations_table = animations_table
+    sprite.bboxes_table = bounding_boxes
+    sprite.hitboxes = hitboxes
+
     sprite.frame = -1
 
     set_animation(sprite, SHURIKEN)
     self.update_function = update
+    self.collision_function = init_vanish
 
     return self
 
@@ -31,6 +37,7 @@ def init_object():
 def update(self):
     if self.sprite.x <-16 or self.sprite.x > 336:
         release_object(self)
+        friend_objects.remove(self)
     else:
         self.x += self.speed_x
         if collides_background(self, self.front, 0):
@@ -45,5 +52,6 @@ def init_vanish(self):
 def update_vanish(self):
     if self.sprite.is_animation_over:
         release_object(self)
+        friend_objects.remove(self)
 
 
