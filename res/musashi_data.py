@@ -1033,6 +1033,7 @@ bounding_boxes = [
     (-10, -58, 16, 59)    # bounding box 157
 ]
 
+hitboxes = [None]*80
 
 walk_fire_anims = [WALK_FIRE_1, WALK_FIRE_2, WALK_FIRE_3, WALK_FIRE_4, WALK_FIRE_5, WALK_FIRE_6]
 crouch_fire_anims = [CROUCH_FIRE_1, CROUCH_FIRE_2, CROUCH_FIRE_3]

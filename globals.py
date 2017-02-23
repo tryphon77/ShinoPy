@@ -12,6 +12,8 @@ class Globs():
     layer_b_pwidth = 0
     layer_b_pheight = 0
 
+    is_refresh_available = 0
+    
     camera_x = 0
     camera_y = 0
     vscroll_mode = True

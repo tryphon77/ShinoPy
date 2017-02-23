@@ -5,9 +5,9 @@ from res.projectile_data import *
 
 
 def init_object():
-    print 'init shuriken'
+    # print 'init shuriken'
     self = allocate_object()
-    print 'shuriken id = %d' % self.id_
+    # print 'shuriken id = %d' % self.id_
     friend_objects.add(self)
     
     self.status = ACTIVE
@@ -41,7 +41,7 @@ def update(self):
     else:
         self.x += self.speed_x
         if collides_background(self, self.front, 0):
-            print 'projectile .x = %d, .speed_x = %d, .front = %d' % (self.x, self.speed_x, self.front)
+            # print 'projectile .x = %d, .speed_x = %d, .front = %d' % (self.x, self.speed_x, self.front)
             init_vanish(self)
 
 def init_vanish(self):

@@ -7,12 +7,13 @@ from res.punk_data import *
 
 def init_object(entry):
     floor, x, y, _ = entry[4:]
-    print 'init punk'
+    # print 'init punk at (%d, %d)' % (x, y)
     self = allocate_object()
     
     entry[0] = True
     self.object_entry = entry
 
+    self.list = ennemy_objects
     ennemy_objects.add(self)
     
     self.status = ACTIVE
@@ -32,6 +33,7 @@ def init_object(entry):
     sprite.frames_table = frames_table
     sprite.animations_table = animations_table
     sprite.bboxes_table = bounding_boxes
+    sprite.hitboxes = hitboxes
 
     sprite.frame = -1
     sprite.patterns_blocks = patterns_blocks
@@ -39,7 +41,40 @@ def init_object(entry):
 
     if self.x > Globs.musashi.x:
         flip(self)
+
+    # if self.sprite.is_flipped:
+        # res = 'flipped, '
+    # else:
+        # res = 'not flipped, '
+    # if self.moves_to_left:
+        # res += 'moves to left'
+    # else:
+        # res += 'moves to right'
+    # print res
+    
     init_walk(self)
+
+    
+def init_hit(self):
+    # print 'punk init_hit'
+    self.is_dead = True
+    other = self.hit_object
+    # print 'other.speed = %f' % other.speed_x
+
+    if self.x < other.x:
+        self.speed_x = -2
+        self.moves_to_left = True
+    else:
+        self.speed_x = 2
+        self.moves_to_left = False
+
+    self.speed_y = -4
+    self.accel_y = 0.5
+
+    set_animation(self.sprite, HIT)
+    self.update_function = update_collision
+    self.collision_function = None
+    self.hit_function = None
 
 
 def init_walk(self):
@@ -49,6 +84,7 @@ def init_walk(self):
     set_animation(self.sprite, WALK)
     self.update_function = update_walk
     self.collision_function = init_collision
+    self.hit_function = init_hit
 
 
 def update_walk(self):
@@ -88,10 +124,10 @@ def update_walk(self):
 
 
 def init_collision(self):
-    print 'punk init_collision'
+    # print 'punk init_collision'
     self.is_dead = False # self.is_hit
     other = self.collided_object
-    print 'other.speed = %f' % other.speed_x
+    # print 'other.speed = %f' % other.speed_x
 
     if self.x < other.x:
         self.speed_x = -2
@@ -180,7 +216,11 @@ def init_death(self):
 
 def update_death(self):
     if self.sprite.is_animation_over:
-        exit()
+        # print 'dead'
+        release_object(self)
+        self.object_entry[0] = False
+        # debug
+        ennemy_objects.remove(self)        
 
 
 def init_punch(self):

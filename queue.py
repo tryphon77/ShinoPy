@@ -9,7 +9,7 @@ class Queue():
 
 
     def add(self, elt):
-        print 'add at pos %d' % self.cursor
+        # print 'add at pos %d' % self.cursor
         self.data[self.cursor] = elt
         self.cursor += 1
 

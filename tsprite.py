@@ -47,7 +47,7 @@ static_sprites = [TSprite(0) for _ in range(static_sprites_size)]
 def allocate_dynamic_sprite():
     for i, s in enumerate(dynamic_sprites):
         if s.status == 0:
-            print 'allocating dynamic sprite #%d' % i
+            # print 'allocating dynamic sprite #%d' % i
             s.is_dynamic = True
             return s
     return None
@@ -55,14 +55,14 @@ def allocate_dynamic_sprite():
 def allocate_static_sprite():
     for i, s in enumerate(static_sprites):
         if s.status == 0:
-            print 'allocating static sprite #%d' % i
+            # print 'allocating static sprite #%d' % i
             s.is_dynamic = False
             return s
     return None
 
 
 def disable_sprite(sprite):
-    print 'disabling sprite'
+    # print 'disabling sprite at (%d, %d)' % (sprite.x, sprite.y)
     sprite.status = 0
     sprite.is_flipped = False
 
@@ -74,6 +74,7 @@ def update_patterns(sprite):
     start, ln = sprite.patterns_blocks[sprite.frame]
     # print 'load %d, %d' % (start, ln)
     GP.load_tile_data(sprite.patterns[start:start + ln], sprite.vpos & 0x7FF)
+    sprite.needs_refresh_patterns = False
 
 
 def update_frame(sprite):
@@ -163,6 +164,7 @@ def change_animation(self, anim):
         if self.frame != frame_id:
             self.frame = frame_id
             self.bbox = self.bboxes_table[frame_id]
+            self.hitbox = self.hitboxes[frame_id]
             self.needs_refresh_patterns = True
 
 def load_next_frame(self):
@@ -183,6 +185,7 @@ def load_next_frame(self):
     if self.frame != frame_id:
         self.frame = frame_id
         self.bbox = self.bboxes_table[frame_id]
+        self.hitbox = self.hitboxes[frame_id]
         self.needs_refresh_patterns = self.is_dynamic
 
     self.tick = ticks
@@ -203,9 +206,14 @@ def update_animation(self):
 
 def sprite_update(spr):
 #    print 'sprite_update:', spr
-    if spr.status:
-        update_animation(spr)
-    if spr.needs_refresh_patterns:
-        update_patterns(spr)
+    if (not spr.is_dynamic) or Globs.is_refresh_available > 0:
+        if spr.status:
+            update_animation(spr)
+        if spr.needs_refresh_patterns:
+            print 'frame %d: refresh sprite %s' % (GP.frame_counter, spr)
+            update_patterns(spr)
+            Globs.is_refresh_available -= 1
+    else:
+        print 'sprite %s delayed' % spr
     update_frame(spr)
 

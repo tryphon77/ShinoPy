@@ -31,11 +31,7 @@ class Object():
         self.sprite = None
 
         self.bbox = None
-
-        self.hx0 = 0
-        self.hy0 = 0
-        self.hx1 = 0
-        self.hy1 = 0
+        self.hitbox = None
 
         self.back = 0
         self.front = 0
@@ -62,6 +58,7 @@ class Object():
 
         self.update_function = None
         self.collision_function = None
+        self.hit_function = None
 
 
 objects_size = 32
@@ -77,7 +74,7 @@ def allocate_object():
         if o.status == INACTIVE:
             o.id_ = Object.current_id_
             Object.current_id_ += 1
-            print 'init object #%d at pos: %d' % (o.id_, i)
+            # print 'init object #%d at pos: %d' % (o.id_, i)
             break
     else:
         return None
@@ -96,7 +93,7 @@ def release_object(obj):
     obj.update_function = None
     obj.moves_to_left = False
 
-    print 'releasing object #%d at pos: %d' % (obj.id_, all_objects.index(obj))
+    # print 'releasing object #%d at pos: %d' % (obj.id_, all_objects.index(obj))
     all_objects.remove(obj)
 
 
@@ -153,16 +150,16 @@ def get_hijump_impulsion(self):
 def fix_hpos(self):
     if self.moves_to_left:
         fixed = (int(self.x) & 0xFFF0) + self.front
-        print 'fix_hpos: %d -> %d' % (self.x, fixed)
+        # print 'fix_hpos: %d -> %d' % (self.x, fixed)
         self.x = fixed
     else:
         fixed = (int(self.x + self.front) & 0xFFF0) - self.front - 1
-        print 'fix_hpos: %d -> %d' % (self.x, fixed)
+        # print 'fix_hpos: %d -> %d' % (self.x, fixed)
         self.x = fixed
 
 
 def fix_vpos(self):
-    print 'fix_vpos: %d -> %d' % (self.y, (int(self.y) & 0xFFF0) - 1)
+    # print 'fix_vpos: %d -> %d' % (self.y, (int(self.y) & 0xFFF0) - 1)
     self.y = (int(self.y) & 0xFFF0) - 1
 
 
@@ -171,19 +168,21 @@ def update_object(self):
         self.update_function(self)
 
 
-def compute_boxes(self):
-    sprite = self.sprite
-    box = sprite.bbox
-
+def compute_box(self, box):
     if box:
         x_, y_, w_, h_ = box
         bx0 = int(self.x) + x_
         bx1 = bx0 + w_
         by0 = int(self.y) + y_
         by1 = by0 + h_
-        self.bbox = (bx0, bx1, by0, by1)
+        return (bx0, bx1, by0, by1)
     else:
-        self.bbox = None
+        return None
+        
+def compute_boxes(self):
+    sprite = self.sprite
+    self.bbox = compute_box(self, sprite.bbox)
+    self.hitbox = compute_box(self, sprite.hitbox)
 
 
 def collision_between_boxes(box1, box2):
@@ -210,34 +209,49 @@ def update_all_objects():
             i -= 1
             entry = Globs.objects_hlist[i]
             is_active, sx, sy, init_function = entry[:4]
-            print 'moves left and considering #%d at (%d, %d)' % (i, sx, sy)
-            if is_active:
-                print 'already active'
-            elif sx > camera.left:
+            # print 'moves left and considering #%d at (%d, %d) / camera.left = %d' % (i, sx, sy, camera.left)
+            if sx < camera.virtual_left:
                 break
-            elif camera.top - 32 <= sy <= camera.bottom + 32:
+            elif sx > camera.left:
+                pass
+                # print 'ignoring %d' % i
+            elif is_active:
+                pass
+                # print '%d already active' % i
+            elif camera.virtual_top <= sy <= camera.virtual_bottom:
+                # print 'sx = %d, camera.left = %d' % (sx, camera.left)
                 init_function(entry)
-        Globs.objects_hindex = i
+        # if Globs.objects_hindex != i + 1:
+            # print 'hindex : %d -> %d' % (Globs.objects_hindex, i + 1)
+        Globs.objects_hindex = i + 1
     elif camera.moves_right:
         i = Globs.objects_hindex
         while i < Globs.n_objects:
             entry = Globs.objects_hlist[i]
             is_active, sx, sy, init_function = entry[:4]
-            print 'moves right and considering #%d at (%d, %d)' % (i, sx, sy)
-            if is_active:
-                print 'already active'
-            elif sx > camera.left:
+            # print 'moves right and considering #%d at (%d, %d) / camera.left = %d' % (i, sx, sy, camera.left)
+            if sx > camera.virtual_right:
                 break
-            elif camera.top - 32 <= sy <= camera.bottom + 32:
+            elif sx < camera.right:
+                pass
+                # print 'ignoring %d' % i
+            elif is_active:
+                pass
+                # print '%d already active' % i
+            elif camera.virtual_top <= sy <= camera.virtual_bottom:
+                # print 'sx = %d, camera.right = %d' % (sx, camera.right)
                 init_function(entry)
             i += 1
+        # if Globs.objects_hindex != i:
+            # print 'hindex : %d -> %d' % (Globs.objects_hindex, i)
         Globs.objects_hindex = i
     
+    # print 'camera: (%d, %d, %d, %d)' % (camera.virtual_left, camera.virtual_right, camera.virtual_top, camera.virtual_bottom)
     for obj in all_objects:
         # print 'object %d' % obj.id_
         if obj.status:
-            if camera.left - 64 < obj.x < camera.right + 64\
-                    and camera.top - 64 < obj.y < camera.bottom + 64:
+            if camera.virtual_left <= obj.x <= camera.virtual_right\
+                    and camera.virtual_top < obj.y < camera.virtual_bottom:
                 # print 'update object %d' % obj.id_
                 update_object(obj)
 
@@ -246,6 +260,7 @@ def update_all_objects():
                     compute_boxes(obj)
                     
             else:
+                # print 'out of screen'
                 release_object(obj)
                 obj.object_entry[0] = False
                 # debug
@@ -254,10 +269,29 @@ def update_all_objects():
                     
     for friend in friend_objects:
         friend_bbox = friend.bbox
+        friend_hitbox = friend.hitbox
         # print 'testing friend object #%s (%s, %s)' % (friend.id_, friend.x, friend.y)
-        if friend_bbox:
+
+        # test friend hitbox against ennemy bbox
+        if friend_hitbox:
+            # print 'against'
             for ennemy in ennemy_objects:
-                # print 'against ennemy object #%d' % ennemy.id_
+                # print 'ennemy object #%d' % ennemy.id_
+                if ennemy.floor == friend.floor:
+                    ennemy_bbox = ennemy.bbox
+                    if ennemy_bbox:
+                        if collision_between_boxes(friend_hitbox, ennemy_bbox):
+                            # print 'collision'
+                            friend.hitting_object = ennemy
+                            ennemy.hit_object = friend
+                            if ennemy.hit_function:
+                                ennemy.hit_function(ennemy)
+
+        # test friend bbox against ennemy bbox
+        if friend_bbox:
+            # print 'against'
+            for ennemy in ennemy_objects:
+                # print 'ennemy object #%d' % ennemy.id_
                 if ennemy.floor == friend.floor:
                     ennemy_bbox = ennemy.bbox
                     if ennemy_bbox:

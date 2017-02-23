@@ -25,6 +25,7 @@ def main():
     musashi_states.init_object()
     Globs.musashi = objects[0]
     Globs.musashi.x, Globs.musashi.y = level_1_1.musashi_pos
+    set_camera_focus_to(Globs.musashi)
 
     Globs.base_id = 0
 
@@ -36,6 +37,7 @@ def main():
     Globs.backward = BUTTON_LEFT
 
     while True:
+        Globs.is_refresh_available = 3
         joy = GP.read_joypad(0)
         Globs.joy_pressed = (~old_joy) & joy
         old_joy = joy

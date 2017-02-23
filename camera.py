@@ -8,6 +8,11 @@ class Camera():
         self.right = 0
         self.top = 0
         self.bottom = 0
+
+        self.virtual_left = 0
+        self.virtual_right = 0
+        self.virtual_top = 0
+        self.virtual_bottom = 0
         
         self.moves_left = False
         self.moves_right = False
@@ -59,9 +64,13 @@ def set_camera(camera_new_x, camera_new_y):
     Globs.camera_y = camera_new_y
 
     camera.left = camera_new_x
+    camera.virtual_left = camera_new_x - 64
     camera.right = camera_new_x + 319
+    camera.virtual_right = camera_new_x + 383
     camera.top = camera_new_y
+    camera.virtual_top = camera_new_y - 64
     camera.bottom = camera_new_y + 223
+    camera.virtual_bottom = camera_new_y + 287
 
 
 def set_camera_focus_to(obj):

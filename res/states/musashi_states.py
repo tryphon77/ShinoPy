@@ -28,6 +28,8 @@ def init_object():
     sprite.frames_table = frames_table
     sprite.animations_table = animations_table
     sprite.bboxes_table = bounding_boxes
+    sprite.hitboxes = hitboxes
+
     sprite.frame = 76
     sprite.patterns_blocks = patterns_blocks
     sprite.bbox = (-6, 0, 16, 64)
@@ -57,10 +59,10 @@ def update_stand(self):
     # if FWD pressed, we have to check there's no wall 1 pixel forward
     elif (Globs.joy & Globs.forward)\
             and collides_background(self, self.front + 1, 0) == 0:
-        print "x = %s, dx = %s, x_ = %s : let's walk forward!" % (self.x, self.front + 1, self.x + signate(self, self.front + 1))
+        # print "x = %s, dx = %s, x_ = %s : let's walk forward!" % (self.x, self.front + 1, self.x + signate(self, self.front + 1))
         init_walk(self)
     elif Globs.joy & Globs.backward:
-        print "x = %s, dx = %s : let's walk backward!" % (self.x, self.front)
+        # print "x = %s, dx = %s : let's walk backward!" % (self.x, self.front)
         flip_controls()
         flip(self)
         init_walk(self)
@@ -72,7 +74,7 @@ def update_stand(self):
 
 def init_fire(self):
     set_physics(self, 0, 0, 0, 0)
-    print 'fire %d' % self.sprite.frame
+    # print 'fire %d' % self.sprite.frame
     set_animation(self.sprite, walk_fire_anims[self.sprite.frame])
     throw_shuriken(self, 32, -48)
     self.update_function = update_fire
@@ -90,7 +92,7 @@ def throw_shuriken(self, dx, dy):
     shuriken.floor = self.floor
     shuriken.speed_x = signate(self, 4)
     shuriken.sprite.is_flipped = self.sprite.is_flipped
-    print 'throw .x = %d, .speed = %d, .front = %d' % (shuriken.x, shuriken.speed_x, shuriken.front)
+    # print 'throw .x = %d, .speed = %d, .front = %d' % (shuriken.x, shuriken.speed_x, shuriken.front)
 
 
 def init_walk(self):
@@ -119,7 +121,7 @@ def update_walk(self):
                 collides_background(self, self.back, 1)):
             init_fall(self)
         elif collides_background(self, self.front, 0):
-            print 'collision'
+            # print 'collision'
             fix_hpos(self)
             init_stand(self)
 
@@ -395,7 +397,7 @@ def update_fall_fire(self):
 
 
 def init_collision(self):
-    print 'musashi collided'
+    # print 'musashi collided'
     other = self.collided_object
 
     if self.x < other.x:

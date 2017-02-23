@@ -170,7 +170,6 @@ PUNCH = 5
 HIT = 6
 DEAD = 7
 
-
 bounding_boxes = [
     (-7, -61, 16, 62),    # bounding box 0,
     (-7, -61, 16, 62),    # bounding box 1,
@@ -184,22 +183,24 @@ bounding_boxes = [
     (-7, -61, 16, 62),    # bounding box 9,
     (-7, -61, 16, 62),    # bounding box 10,
     (-7, -61, 16, 62),    # bounding box 11,
-    (-7, -51, 16, 52),    # bounding box 12,
-    (0, 0, 0, 0),    # bounding box 13,
-    (0, 0, 0, 0),    # bounding box 14,
-    (-9, -61, 16, 62),    # bounding box 15,
-    (-9, -61, 16, 62),    # bounding box 16,
-    (-9, -61, 16, 62),    # bounding box 17,
-    (-9, -51, 16, 52),    # bounding box 18,
-    (-9, -61, 16, 62),    # bounding box 19,
-    (-9, -41, 16, 42),    # bounding box 20,
-    (-9, -61, 16, 62),    # bounding box 21,
-    (-9, -61, 16, 62),    # bounding box 22,
-    (-9, -61, 16, 62),    # bounding box 23,
-    (-9, -61, 16, 62),    # bounding box 24,
-    (-9, -61, 16, 62),    # bounding box 25,
-    (-9, -61, 16, 62),    # bounding box 26,
-    (-9, -51, 16, 52),    # bounding box 27,
-    (0, 0, 0, 0),    # bounding box 28,
-    (0, 0, 0, 0)    # bounding box 29
+    None, # (-7, -51, 16, 52),    # bounding box 12,
+    None,    # bounding box 13,
+    None,    # bounding box 14,
+    # (-9, -61, 16, 62),    # bounding box 15,
+    # (-9, -61, 16, 62),    # bounding box 16,
+    # (-9, -61, 16, 62),    # bounding box 17,
+    # (-9, -51, 16, 52),    # bounding box 18,
+    # (-9, -61, 16, 62),    # bounding box 19,
+    # (-9, -41, 16, 42),    # bounding box 20,
+    # (-9, -61, 16, 62),    # bounding box 21,
+    # (-9, -61, 16, 62),    # bounding box 22,
+    # (-9, -61, 16, 62),    # bounding box 23,
+    # (-9, -61, 16, 62),    # bounding box 24,
+    # (-9, -61, 16, 62),    # bounding box 25,
+    # (-9, -61, 16, 62),    # bounding box 26,
+    # (-9, -51, 16, 52),    # bounding box 27,
+    # None,    # bounding box 28,
+    # None    # bounding box 29
 ]
+
+hitboxes = [None]*30

@@ -76,6 +76,9 @@ class GP():
     plane_B_offset = (0, 0)
     joypad_state = 0
     sprite_cache = [GPSprite() for _ in range(80)]
+    frame_counter = 0
+    is_recording = False
+    record_path = 'record'
 
     @staticmethod
     def init():
@@ -256,6 +259,11 @@ class GP():
         GP.draw_subplane(GP.plane_A[1], GP.plane_A_offset)
 
         GP.draw_sprites(GP.hi_sprites)
+
+        GP.frame_counter += 1
+        
+        if GP.is_recording:
+            pygame.image.save(GP.display, '%s/%06d.png' % (GP.record_path, GP.frame_counter))
 
         # flip buffers
         pygame.display.flip()
