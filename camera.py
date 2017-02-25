@@ -64,13 +64,13 @@ def set_camera(camera_new_x, camera_new_y):
     Globs.camera_y = camera_new_y
 
     camera.left = camera_new_x
-    camera.virtual_left = camera_new_x - 64
+    camera.virtual_left = camera_new_x - 32
     camera.right = camera_new_x + 319
-    camera.virtual_right = camera_new_x + 383
+    camera.virtual_right = camera_new_x + 351
     camera.top = camera_new_y
-    camera.virtual_top = camera_new_y - 64
+    camera.virtual_top = camera_new_y - 32
     camera.bottom = camera_new_y + 223
-    camera.virtual_bottom = camera_new_y + 287
+    camera.virtual_bottom = camera_new_y + 271
 
 
 def set_camera_focus_to(obj):

@@ -155,7 +155,9 @@ walk = [(0, 7), (1, 8), (0, 7), (2, 8)]
 impulse = [(3, 3), (4, 3), (3, 3)]
 jump = [(5, 1)]
 fall = [(5, 1)]
-recharge = [(6, 8), (7, 8), (6, 8), (7, 8), (6, 8), (7, 8)]
+reload = [(6, 8), (7, 8), (6, 8), (7, 8), (6, 8), (7, 8),
+          (6, 8), (7, 8), (6, 8), (7, 8), (6, 8), (7, 8),
+          (6, 8), (7, 8), (6, 8), (7, 8), (6, 8), (7, 8)]
 preparation_shoot_stand = [(8, 10)]
 shoot_stand = [(9, 6), (10, 8), (9, 50)]
 shoot_sit = [(11, 6), (12, 8), (11, 50)]
@@ -168,7 +170,7 @@ animations_table = [
     impulse,
     jump,
     fall,
-    recharge,
+    reload,
     preparation_shoot_stand,
     shoot_stand,
     shoot_sit,
@@ -181,7 +183,7 @@ WALK = 0
 IMPULSE = 1
 JUMP = 2
 FALL = 3
-RECHARGE = 4
+RELOAD = 4
 PREPARATION_SHOOT_STAND = 5
 SHOOT_STAND = 6
 SHOOT_SIT = 7
@@ -189,4 +191,31 @@ SHOOT_LYING = 8
 HIT = 9
 DEAD = 10
 
+
+rect1 = (-4, -58, 16, 59)
+rect2 = (-4, -50, 16, 51)
+rect3 = (-4, -65, 16, 66)
+rect4 = (-4, -56, 16, 57)
+
+bounding_boxes = [
+    rect1,        # bounding box 0,
+    rect1,        # bounding box 1,
+    rect1,        # bounding box 2,
+    rect2,        # bounding box 3,
+    rect2,        # bounding box 4,
+    rect3,        # bounding box 5,
+    rect4,        # bounding box 6,
+    rect4,        # bounding box 7,
+    rect4,        # bounding box 8,
+    rect4,        # bounding box 9,
+    rect4,        # bounding box 10,
+    None,        # bounding box 11,
+    None,        # bounding box 12,
+    None,        # bounding box 13,
+    None,        # bounding box 14,
+    None,        # bounding box 15,
+    None,        # bounding box 16,
+]
+
+hitboxes = [None] * 17
 

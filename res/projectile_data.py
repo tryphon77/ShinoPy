@@ -91,15 +91,15 @@ nb_ptrns = 0x13E
 box1 = (-6, -4, 12, 9)
 
 bounding_boxes = [
-    box1,	# bounding box 0,
-	box1,	# bounding box 1,
-	box1,	# bounding box 2,
 	None,	# bounding box 3,
 	None,	# bounding box 4,
 	None,	# bounding box 5,
-	box1,	# bounding box 6,
-	box1,	# bounding box 7,
-	box1,	# bounding box 8,
+	None,	# bounding box 3,
+	None,	# bounding box 4,
+	None,	# bounding box 5,
+	None,	# bounding box 9,
+	None,	# bounding box 10,
+	None,	# bounding box 11,
 	None,	# bounding box 9,
 	None,	# bounding box 10,
 	None,	# bounding box 11,
@@ -108,13 +108,13 @@ bounding_boxes = [
 	None,	# bounding box 14,
 	None,	# bounding box 15,
 	None,	# bounding box 16,
-	box1,	# bounding box 17,
-	box1,	# bounding box 18,
-	box1,	# bounding box 19,
-	box1,	# bounding box 20,
-	box1,	# bounding box 21,
-	box1,	# bounding box 22,
-	box1	# bounding box 23
+	None,	# bounding box 9,
+	None,	# bounding box 10,
+	None,	# bounding box 11,
+	None,	# bounding box 12,
+	None,	# bounding box 13,
+	None,	# bounding box 14,
+	None,	# bounding box 15,
 ]
 
 hitboxes = [

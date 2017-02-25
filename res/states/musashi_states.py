@@ -45,6 +45,7 @@ def init_stand(self):
 
     self.update_function = update_stand
     self.collision_function = init_collision
+    self.hit_function = init_death
 
 
 def update_stand(self):
@@ -413,6 +414,23 @@ def init_collision(self):
     self.update_function = update_collision
 
 
+def init_death(self):
+    # print 'musashi collided'
+    other = self.hit_object
+
+    if self.x < other.x:
+        self.speed_x = -2
+        self.moves_to_left = True
+    else:
+        self.speed_x = 2
+        self.moves_to_left = False
+    self.speed_y = -4
+    self.accel_y = 0.5
+
+    set_animation(self.sprite, HIT)
+    self.update_function = update_collision
+
+    
 def update_collision(self):
     self.x += self.speed_x
 

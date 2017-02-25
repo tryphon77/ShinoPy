@@ -12,9 +12,8 @@ def init_object(entry):
     
     entry[0] = True
     self.object_entry = entry
-
-    self.list = ennemy_objects
     ennemy_objects.add(self)
+    self.release_function = release
     
     self.status = ACTIVE
 
@@ -54,7 +53,13 @@ def init_object(entry):
     
     init_walk(self)
 
-    
+
+def release(self):
+    release_object(self)
+    self.object_entry[0] = False
+    ennemy_objects.remove(self)
+
+
 def init_hit(self):
     # print 'punk init_hit'
     self.is_dead = True
@@ -217,10 +222,7 @@ def init_death(self):
 def update_death(self):
     if self.sprite.is_animation_over:
         # print 'dead'
-        release_object(self)
-        self.object_entry[0] = False
-        # debug
-        ennemy_objects.remove(self)        
+        release(self)
 
 
 def init_punch(self):

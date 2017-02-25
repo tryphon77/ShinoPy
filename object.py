@@ -18,6 +18,7 @@ class Object():
         # debug purposes
         self.id_ = 0
         self.status = INACTIVE
+        self.list = None
 
         self.x = 0.0
         self.y = 0.0
@@ -59,6 +60,7 @@ class Object():
         self.update_function = None
         self.collision_function = None
         self.hit_function = None
+        self.release_function = None
 
 
 objects_size = 32
@@ -67,6 +69,8 @@ objects = [Object() for _ in range(objects_size)]
 all_objects = Queue()
 friend_objects = Queue()
 ennemy_objects = Queue()
+friend_projectiles = Queue()
+ennemy_projectiles = Queue()
 
 
 def allocate_object():
@@ -78,6 +82,11 @@ def allocate_object():
             break
     else:
         return None
+
+    # clear fields
+    o.collided_object = None
+    o.hit_object = None
+    o.hitting_object = None
 
     all_objects.add(o)
     return o
@@ -126,6 +135,10 @@ def flip(self):
     self.moves_to_left = not self.moves_to_left
 
 
+def head_towards(self, other):
+    self.moves_to_left = self.sprite.is_flipped = (self.x >= other.x)
+
+    
 def collides_background(self, dx, dy):
     x = int(self.x + signate(self, dx)) / 16
     # x = int(self.x + dx) / 16
@@ -202,8 +215,8 @@ def collision_between_boxes(box1, box2):
 
 
 def update_all_objects():
+    # 1) Introduces new objects according to camera movement
     if camera.moves_left:
-        # pass
         i = Globs.objects_hindex
         while i > 0:
             i -= 1
@@ -246,6 +259,8 @@ def update_all_objects():
             # print 'hindex : %d -> %d' % (Globs.objects_hindex, i)
         Globs.objects_hindex = i
     
+    # 2) Updates visible objects, releases invisibles
+
     # print 'camera: (%d, %d, %d, %d)' % (camera.virtual_left, camera.virtual_right, camera.virtual_top, camera.virtual_bottom)
     for obj in all_objects:
         # print 'object %d' % obj.id_
@@ -261,12 +276,33 @@ def update_all_objects():
                     
             else:
                 # print 'out of screen'
-                release_object(obj)
-                obj.object_entry[0] = False
+                obj.release_function(obj)
+                # release_object(obj)
+                # obj.object_entry[0] = False
                 # debug
-                ennemy_objects.remove(obj)
+                # ennemy_objects.remove(obj)
 
-                    
+
+    # 3) collisions between objects
+    
+    # 3a) friend_projectiles against ennemy_objects
+    # for shuriken in friends_projectiles:
+        # shuriken_hitbox = shuriken.hitbox
+
+        # if shuriken_hitbox:
+            # for ennemy in ennemy_objects:
+                # # print 'ennemy object #%d' % ennemy.id_
+                # if ennemy.floor == shuriken.floor:
+                    # ennemy_bbox = ennemy.bbox
+                    # if ennemy_bbox:
+                        # if collision_between_boxes(shuriken_hitbox, ennemy_bbox):
+                            # # print 'collision'
+                            # shuriken.hitting_object = ennemy
+                            # ennemy.hit_object = shuriken
+                            # if ennemy.hit_function:
+                                # ennemy.hit_function(ennemy)
+    
+    # 3b) friends 
     for friend in friend_objects:
         friend_bbox = friend.bbox
         friend_hitbox = friend.hitbox
@@ -281,28 +317,41 @@ def update_all_objects():
                     ennemy_bbox = ennemy.bbox
                     if ennemy_bbox:
                         if collision_between_boxes(friend_hitbox, ennemy_bbox):
-                            # print 'collision'
+                            print 'musashi hits ennemy'
                             friend.hitting_object = ennemy
                             ennemy.hit_object = friend
                             if ennemy.hit_function:
                                 ennemy.hit_function(ennemy)
-
+        
         # test friend bbox against ennemy bbox
         if friend_bbox:
             # print 'against'
             for ennemy in ennemy_objects:
                 # print 'ennemy object #%d' % ennemy.id_
+                
                 if ennemy.floor == friend.floor:
+                
+                    ennemy_hitbox = ennemy.hitbox
+                    if ennemy_hitbox:
+                        if collision_between_boxes(friend_bbox, ennemy_hitbox):
+                            print 'ennemy hits musashi'
+                            friend.hit_object = ennemy
+                            ennemy.hitting_object = friend
+                            if friend.hit_function:
+                                friend.hit_function(friend)
+
                     ennemy_bbox = ennemy.bbox
                     if ennemy_bbox:
                         if collision_between_boxes(friend_bbox, ennemy_bbox):
-                            # print 'collision'
+                            print 'collision'
                             friend.collided_object = ennemy
                             ennemy.collided_object = friend
                             if friend.collision_function:
                                 friend.collision_function(friend)
                             if ennemy.collision_function:
                                 ennemy.collision_function(ennemy)
+        
+        
 
 
 def update_all_sprites():

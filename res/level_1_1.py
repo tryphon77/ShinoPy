@@ -1,5 +1,6 @@
 from genepy import load_data_from_png
 from res.states import punk_states
+from res.states import shooter_states
 
 tileset = [\
     0x0, 0x0, 0x0, 0x0,
@@ -341,29 +342,29 @@ musashi_pos = (64, 239)
 objects = [
     [False, 400, 0, punk_states.init_object, 1, 400, 239, None],
     [False, 400, 0, punk_states.init_object, 1, 64, 239, None],
-    # (2, 1, 464, 239),
-    # (2, 2, 592, 127),
+    [False, 496, 0, shooter_states.init_object, 1, 496, 239, None],
+    [False, 592, 0, shooter_states.init_object, 2, 592, 127, None],
     [False, 656, 0, punk_states.init_object, 1, 656, 239, None],
     [False, 720, 0, punk_states.init_object, 2, 720, 127, None],
-    # (2, 1, 752, 239),
-    # (2, 1, 784, 239),
-    # (2, 1, 912, 239),
+    [False, 752, 0, shooter_states.init_object, 1, 752, 239, None],
+    [False, 784, 0, shooter_states.init_object, 1, 784, 239, None],
+    [False, 912, 0, shooter_states.init_object, 1, 912, 239, None],
     [False, 944, 0, punk_states.init_object, 2, 944, 127, None],
-    # (2, 2, 1056, 127),
-    # (2, 1, 1216, 239),
+    [False, 1056, 0, shooter_states.init_object, 2, 1056, 127, None],
+    [False, 1216, 0, shooter_states.init_object, 1, 1216, 239, None],
     [False, 1296, 0, punk_states.init_object, 1, 1296, 239, None],
     [False, 1312, 0, punk_states.init_object, 1, 1312, 239, None],
     [False, 1328, 0, punk_states.init_object, 1, 1328, 239, None],
-    # (2, 1, 1456, 207),
-    # (2, 2, 1504, 127),
-    # (2, 1, 1520, 239),
+    [False, 1456, 0, shooter_states.init_object, 1, 1456, 207, None],
+    [False, 1504, 0, shooter_states.init_object, 2, 1504, 127, None],
+    [False, 1520, 0, shooter_states.init_object, 1, 1520, 239, None],
     [False, 1680, 0, punk_states.init_object, 2, 1680, 127, None],
     [False, 1744, 0, punk_states.init_object, 1, 1744, 239, None],
-    # (2, 2, 1872, 127),
-    # (2, 1, 1888, 239),
-    # (2, 1, 1920, 239),
-    # (2, 1, 1952, 239),
-    # (2, 1, 1984, 239)
+    [False, 1872, 0, shooter_states.init_object, 2, 1872, 127, None],
+    [False, 1888, 0, shooter_states.init_object, 1, 1888, 239, None],
+    [False, 1920, 0, shooter_states.init_object, 1, 1920, 239, None],
+    [False, 1952, 0, shooter_states.init_object, 1, 1952, 239, None],
+    [False, 1984, 0, shooter_states.init_object, 1, 1984, 239, None]
 ]
 
 objects_hlist = objects

@@ -210,10 +210,10 @@ def sprite_update(spr):
         if spr.status:
             update_animation(spr)
         if spr.needs_refresh_patterns:
-            print 'frame %d: refresh sprite %s' % (GP.frame_counter, spr)
+            # print 'frame %d: refresh sprite %s' % (GP.frame_counter, spr)
             update_patterns(spr)
             Globs.is_refresh_available -= 1
-    else:
-        print 'sprite %s delayed' % spr
+    # else:
+        # print 'sprite %s delayed' % spr
     update_frame(spr)
 
