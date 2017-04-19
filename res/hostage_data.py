@@ -74,7 +74,8 @@ patterns_blocks = [
 ]
 
 wait = [(0, 8), (1, 8), (2, 8), (3, 8), (2, 8), (3, 8), (0, 8), (1, 8), (0, 8), (1, 8), (0, 8), (1, 8)]
-free = [(4, 8), (5, 8), (6, 4), (7, 4)]
+free = [(4, 8)]
+free_2 = [(5, 8), (6, 4), (7, 4)]
 bonus200 = [(8, 1)]
 bonus500 = [(9, 1)]
 bonus1000 = [(10, 1)]
@@ -83,6 +84,7 @@ bonuspow = [(11, 1)]
 animations_table = [
     wait,
     free,
+	free_2,
     bonus200,
     bonus500,
     bonus1000,
@@ -91,7 +93,28 @@ animations_table = [
 
 WAIT = 0
 FREE = 1
-BONUS200 = 2
-BONUS500 = 3
-BONUS1000 = 4
-BONUSPOW = 5
+FREE_2 = 2
+BONUS200 = 3
+BONUS500 = 4
+BONUS1000 = 5
+BONUSPOW = 6
+
+
+rect1 = (-12, -28, 24, 29)
+
+bounding_boxes = [
+    rect1,        # bounding box 0,
+    rect1,        # bounding box 1,
+    rect1,        # bounding box 2,
+    None,        # bounding box 3,
+    None,        # bounding box 4,
+    None,        # bounding box 5,
+    None,        # bounding box 6,
+    None,        # bounding box 8,
+    None,        # bounding box 7,
+    None,        # bounding box 9,
+    None,        # bounding box 10,
+    None,        # bounding box 11
+]
+
+hitboxes = [None] * 12

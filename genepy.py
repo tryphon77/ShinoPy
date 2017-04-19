@@ -225,15 +225,15 @@ class GP():
         # handle events
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
-                print 'Quit GenePy'
+                print('Quit GenePy')
                 exit()
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_ESCAPE:
-                    print 'Escape GenePy'
+                    print('Escape GenePy')
                     if True:
-                        GP.dump_tiles('tools/vram')
-                        GP.dump_sprites('tools/sprite')
-                        GP.dump_planes('tools/plane')
+                        GP.dump_tiles('debug/vram')
+                        GP.dump_sprites('debug/sprite')
+                        GP.dump_planes('debug/plane')
                     exit()
 
             key = pygame.key.get_pressed()
@@ -247,7 +247,7 @@ class GP():
                 | (key[pygame.K_RETURN] << 7)
 
         # draw planes
-        GP.display.fill(0xFF808080)
+        # GP.display.fill(0xFF808080)
         GP.draw_subplane(GP.plane_B[0], GP.plane_B_offset)
         GP.draw_subplane(GP.plane_A[0], GP.plane_A_offset)
 
@@ -307,15 +307,15 @@ class GP():
         while True:
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
-                    print 'Quit GenePy'
+                    print('Quit GenePy')
                     exit()
                 elif e.type == pygame.KEYDOWN:
                     if e.key == pygame.K_ESCAPE:
-                        print 'Escape GenePy'
+                        print('Escape GenePy')
                         if True:
-                            GP.dump_tiles('tools/vram')
-                            GP.dump_sprites('tools/sprite')
-                            GP.dump_planes('tools/plane')
+                            GP.dump_tiles('debug/vram')
+                            GP.dump_sprites('debug/sprite')
+                            GP.dump_planes('debug/plane')
                         exit()
                     return
             # wait clock

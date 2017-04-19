@@ -31,32 +31,32 @@ def set_camera(camera_new_x, camera_new_y):
     camera.moves_up = (dy < 0)
     camera.moves_down = (dy > 0)
 
-    dx = camera_new_x/16 - Globs.camera_x/16
-    dy = camera_new_y/16 - Globs.camera_y/16
+    dx = camera_new_x//16 - Globs.camera_x//16
+    dy = camera_new_y//16 - Globs.camera_y//16
 
     if dx > 0:
-        draw_rect(layer_A, Globs.camera_x/16 + 21, Globs.camera_y/16 - 1, dx, 16)
+        draw_rect(layer_A, Globs.camera_x//16 + 21, Globs.camera_y//16 - 1, dx, 16)
     elif dx < 0:
-        draw_rect(layer_A, camera_new_x/16 - 1, Globs.camera_y/16 - 1, -dx, 16)
+        draw_rect(layer_A, camera_new_x//16 - 1, Globs.camera_y//16 - 1, -dx, 16)
 
     if dy > 0:
-        draw_rect(layer_A, Globs.camera_x/16 - 1, Globs.camera_y/16 + 15, 22, dy)
+        draw_rect(layer_A, Globs.camera_x//16 - 1, Globs.camera_y//16 + 15, 22, dy)
     elif dy < 0:
-        draw_rect(layer_A, camera_new_x/16 - 1, Globs.camera_y/16 - 1, 22, -dy)
+        draw_rect(layer_A, camera_new_x//16 - 1, Globs.camera_y//16 - 1, 22, -dy)
 
 
-    dx = camera_new_x/32 - Globs.camera_x/32
-    dy = camera_new_y/32 - Globs.camera_y/32
+    dx = camera_new_x//32 - Globs.camera_x//32
+    dy = camera_new_y//32 - Globs.camera_y//32
 
     if dx > 0:
-        draw_rect(layer_B, Globs.camera_x/32 + 21, Globs.camera_y/32 - 1, dx, 16)
+        draw_rect(layer_B, Globs.camera_x//32 + 21, Globs.camera_y//32 - 1, dx, 16)
     elif dx < 0:
-        draw_rect(layer_B, camera_new_x/32 - 1, Globs.camera_y/32 - 1, -dx, 16)
+        draw_rect(layer_B, camera_new_x//32 - 1, Globs.camera_y//32 - 1, -dx, 16)
 
     if dy > 0:
-        draw_rect(layer_B, Globs.camera_x/32 - 1, Globs.camera_y/32 + 15, 22, dy)
+        draw_rect(layer_B, Globs.camera_x//32 - 1, Globs.camera_y//32 + 15, 22, dy)
     elif dy < 0:
-        draw_rect(layer_B, camera_new_x/32 - 1, Globs.camera_y/32 - 1, 22, -dy)
+        draw_rect(layer_B, camera_new_x//32 - 1, Globs.camera_y//32 - 1, 22, -dy)
 
     Globs.old_camera_x = Globs.camera_x
     Globs.old_camera_y = Globs.camera_y
@@ -111,6 +111,6 @@ def set_camera_focus_to(obj):
     camera_y = min(Globs.layer_a_pheight - 224, camera_y)
 
     set_camera(camera_x, camera_y)
-    # print 'camera = %d / musashi = %d' % (Globs.camera_x, objects[0].x)
+    # print 'camera = %d // musashi = %d' % (Globs.camera_x, objects[0].x)
     GP.plane_A_offset = -camera_x, camera_y
-    GP.plane_B_offset = -camera_x / 2, camera_y / 2
+    GP.plane_B_offset = -camera_x // 2, camera_y // 2

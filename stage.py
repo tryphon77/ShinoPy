@@ -26,8 +26,8 @@ def init_stage(stage):
 
     layer_B.plane = GP.plane_B
     layer_B.data = stage.tilemap_B    
-    layer_B.twidth = stage.twidth/2 + 10;
-    layer_B.theight = stage.theight/2 + 7;
+    layer_B.twidth = stage.twidth//2 + 10;
+    layer_B.theight = stage.theight//2 + 7;
     
     Globs.layer_b_pwidth = stage.twidth * 16;
     Globs.layer_b_pheight = stage.theight * 16;

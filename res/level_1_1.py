@@ -1,6 +1,14 @@
 from genepy import load_data_from_png
+from tsprite import allocate_tiles
+
 from res.states import punk_states
 from res.states import shooter_states
+from res.states import sword_states
+from res.states import hostage_states
+from res.states import knife_states
+
+from res import hostage_data
+
 
 tileset = [\
     0x0, 0x0, 0x0, 0x0,
@@ -339,32 +347,47 @@ musashi_pos = (64, 239)
     # # (2, 1, 1984, 239)
 # ]
 
+
+ON_SCREEN = 1
+RESPAWNABLE = 2 
+
+
+hostages = [
+    [RESPAWNABLE, 400, 0, hostage_states.init_object, 1, 400, 239, None],
+    [RESPAWNABLE, 1680, 0, hostage_states.init_object, 2, 1680, 127, None]	
+]
+
+
 objects = [
-    [False, 400, 0, punk_states.init_object, 1, 400, 239, None],
-    [False, 400, 0, punk_states.init_object, 1, 64, 239, None],
-    [False, 496, 0, shooter_states.init_object, 1, 496, 239, None],
-    [False, 592, 0, shooter_states.init_object, 2, 592, 127, None],
-    [False, 656, 0, punk_states.init_object, 1, 656, 239, None],
-    [False, 720, 0, punk_states.init_object, 2, 720, 127, None],
-    [False, 752, 0, shooter_states.init_object, 1, 752, 239, None],
-    [False, 784, 0, shooter_states.init_object, 1, 784, 239, None],
-    [False, 912, 0, shooter_states.init_object, 1, 912, 239, None],
-    [False, 944, 0, punk_states.init_object, 2, 944, 127, None],
-    [False, 1056, 0, shooter_states.init_object, 2, 1056, 127, None],
-    [False, 1216, 0, shooter_states.init_object, 1, 1216, 239, None],
-    [False, 1296, 0, punk_states.init_object, 1, 1296, 239, None],
-    [False, 1312, 0, punk_states.init_object, 1, 1312, 239, None],
-    [False, 1328, 0, punk_states.init_object, 1, 1328, 239, None],
-    [False, 1456, 0, shooter_states.init_object, 1, 1456, 207, None],
-    [False, 1504, 0, shooter_states.init_object, 2, 1504, 127, None],
-    [False, 1520, 0, shooter_states.init_object, 1, 1520, 239, None],
-    [False, 1680, 0, punk_states.init_object, 2, 1680, 127, None],
-    [False, 1744, 0, punk_states.init_object, 1, 1744, 239, None],
-    [False, 1872, 0, shooter_states.init_object, 2, 1872, 127, None],
-    [False, 1888, 0, shooter_states.init_object, 1, 1888, 239, None],
-    [False, 1920, 0, shooter_states.init_object, 1, 1920, 239, None],
-    [False, 1952, 0, shooter_states.init_object, 1, 1952, 239, None],
-    [False, 1984, 0, shooter_states.init_object, 1, 1984, 239, None]
+    [RESPAWNABLE, 400, 0, knife_states.init_object, 1, 64, 239, None],
+    [RESPAWNABLE, 400, 0, sword_states.init_object, 1, 400, 239, hostages[0]],
+	hostages[0],
+    [RESPAWNABLE, 496, 0, shooter_states.init_object, 1, 496, 239, None],
+    [RESPAWNABLE, 592, 0, sword_states.init_object, 2, 592, 127, None],
+    [RESPAWNABLE, 656, 0, punk_states.init_object, 1, 656, 239, None],
+    [RESPAWNABLE, 720, 0, punk_states.init_object, 2, 720, 127, None],
+    [RESPAWNABLE, 752, 0, shooter_states.init_object, 1, 752, 239, None],
+    [RESPAWNABLE, 784, 0, punk_states.init_object, 1, 784, 239, None],
+    [RESPAWNABLE, 912, 0, shooter_states.init_object, 1, 912, 239, None],
+    [RESPAWNABLE, 944, 0, punk_states.init_object, 2, 944, 127, None],
+    [RESPAWNABLE, 1056, 0, punk_states.init_object, 2, 1056, 127, None],
+    [RESPAWNABLE, 1216, 0, shooter_states.init_object, 1, 1216, 239, None],
+    [RESPAWNABLE, 1296, 0, knife_states.init_object, 1, 1296, 239, None],
+    [RESPAWNABLE, 1312, 0, knife_states.init_object, 1, 1312, 239, None],
+    [RESPAWNABLE, 1328, 0, knife_states.init_object, 1, 1328, 239, None],
+    [RESPAWNABLE, 1456, 0, shooter_states.init_object, 1, 1456, 207, None],
+    [RESPAWNABLE, 1504, 0, shooter_states.init_object, 2, 1504, 127, None],
+    [RESPAWNABLE, 1520, 0, shooter_states.init_object, 1, 1520, 239, None],
+    [RESPAWNABLE, 1680, 0, sword_states.init_object, 2, 1680, 127, None],
+    hostages[1], 
+	[RESPAWNABLE, 1744, 0, punk_states.init_object, 1, 1744, 239, None],
+    [RESPAWNABLE, 1872, 0, knife_states.init_object, 2, 1872, 127, None],
+    [RESPAWNABLE, 1888, 0, knife_states.init_object, 1, 1888, 239, None],
+    [RESPAWNABLE, 1920, 0, knife_states.init_object, 1, 1920, 239, None],
+    [RESPAWNABLE, 1952, 0, shooter_states.init_object, 1, 1952, 239, None],
+    [RESPAWNABLE, 1984, 0, knife_states.init_object, 1, 1984, 239, None]
 ]
 
 objects_hlist = objects
+
+hostage_states.allocate_tiles()

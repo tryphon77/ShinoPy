@@ -9,11 +9,11 @@ import pygame
 
 def make_sheet(ptrns, path):
     n = len(ptrns)
-    h = n / 16
+    h = n // 16
     if n % 16:
         h += 1
     res = pygame.Surface((128, h * 8), pygame.SRCALPHA)
-    res.fill(0xFF00DCFF)
+    res.fill(pygame.Color(0xFF, 0, 0xDC, 0xFF))
     x = y = 0
     for p in ptrns:
         res.blit(p, (x, y))
@@ -55,7 +55,7 @@ def get_datas(path):
             s_ = cuts[t_]
             cmp =  compare(s, s_, hash_[t], hash_[t_])
             if cmp:
-                print '%d and %d matched : %d' % (t, t_, cmp)
+                print ('%d and %d matched : %d' % (t, t_, cmp))
                 t_id = res[t_]
                 if cmp == 2:
                     t_id += 0x800
@@ -77,7 +77,7 @@ if __name__ == '__main__':
         datas = get_datas('../res/test.png')
 
         for t in range(len(datas['tiles'])/4):
-            print '\t0x%X, 0x%X, 0x%X, 0x%X,' % tuple([i + 0 for i in datas['tiles'][4*t : 4*t + 4]])
+            print ('\t0x%X, 0x%X, 0x%X, 0x%X,' % tuple([i + 0 for i in datas['tiles'][4*t : 4*t + 4]]))
 
         make_sheet(datas['ptrns'], '../res/level_1_1.png')    
     
@@ -114,5 +114,5 @@ if __name__ == '__main__':
     objects_ = []
     for obj, floor, x, y in objects:
         objects_ += ['\t(%s, %d, %d, %d)' % (obj, floor, x*16, y*16 + 15)]
-    print ',\n'.join(objects_)
+    print (',\n'.join(objects_))
 

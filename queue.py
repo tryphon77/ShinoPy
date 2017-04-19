@@ -45,17 +45,17 @@ if __name__ == '__main__':
     for i in range(10):
         test.add(i)
     
-    print test.data
+    print(test.data)
     
     for x in test:
-        print x
+        print(x)
         if 3 <= x <= 5:
             test.remove(x)
     
     for x in test:
-        print x
+        print(x)
     
-    print test.data
+    print(test.data)
     
     # test.add(42)
     

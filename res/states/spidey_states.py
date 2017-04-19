@@ -5,7 +5,7 @@ from res.spidey_data import *
 
 
 def init_object():
-    print 'init spidey'
+    print('init spidey')
     self = allocate_object()
     self.status = ACTIVE
 

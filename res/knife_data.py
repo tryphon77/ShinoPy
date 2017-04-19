@@ -112,34 +112,54 @@ patterns_blocks = [
 walk = [(0, 7), (1, 7), (2, 7)]
 stab_stand = [(7, 4), (8, 10), (7, 5), (1, 7)]
 hit = [(6, 1)]
-turn = [(5, 7), (3, 7)]
-ready_to_jump = [(6, 6)]
-jump = [(7, 1)]
-end_of_jump = [(6, 6), (3, 8)]
+turn = [(5, 7)]
+jump_begin = [(6, 6)]
+jump_main = [(7, 1)]
+jump_end = [(6, 6), (3, 8)]
 stab_jump = [(9, 10)]
-waiting = [(3, 16), (4, 16)]
-death = [(6, 7), (10, 8), (11, 16)]
+wait = [(3, 16), (4, 16)]
+dead = [(6, 7), (10, 8), (11, 16)]
 
 animations_table = [
     walk,
     stab_stand,
     hit,
     turn,
-    ready_to_jump,
-    jump,
-    end_of_jump,
+    jump_begin,
+    jump_main,
+    jump_end,
     stab_jump,
-    waiting,
-    death
+    wait,
+    dead
 ]
 
 WALK = 0
 STAB_STAND = 1
 HIT = 2
 TURN = 3
-READY_TO_JUMP = 4
-JUMP = 5
-END_OF_JUMP = 6
+JUMP_BEGIN = 4
+JUMP_MAIN = 5
+JUMP_END = 6
 STAB_JUMP = 7
-WAITING = 8
-DEATH = 9
+WAIT = 8
+DEAD = 9
+
+rect1 = (-8, -60, 16, 60)
+rect2 = (-8, -30, 16, 30)
+
+bounding_boxes = [
+	rect1,
+	rect1,
+	rect1,
+	rect2,
+	rect2,
+	rect2,
+	rect2,
+	rect1,
+	rect1,
+	rect1,
+	None,
+	None
+]
+
+hitboxes = [None] * 12

@@ -8,7 +8,7 @@ def init_object():
     # print 'init shuriken'
     self = allocate_object()
     # print 'shuriken id = %d' % self.id_
-    friend_objects.add(self)
+    friend_projectiles.add(self)
     
     self.status = ACTIVE
 
@@ -38,7 +38,7 @@ def init_object():
 
 def release_shuriken(self):
     release_object(self)
-    friend_objects.remove(self)
+    friend_projectiles.remove(self)
 
 
 def update(self):
@@ -63,7 +63,7 @@ def init_bullet():
     # print 'init bullet'
     self = allocate_object()
     # print 'shuriken id = %d' % self.id_
-    ennemy_objects.add(self)
+    ennemy_projectiles.add(self)
     
     self.status = ACTIVE
 
@@ -92,7 +92,7 @@ def init_bullet():
 
 def release_bullet(self):
     release_object(self)
-    ennemy_objects.remove(self)
+    ennemy_projectiles.remove(self)
 
 
 def update_bullet(self):
@@ -111,3 +111,4 @@ def init_bullet_vanish(self):
 def update_bullet_vanish(self):
     if self.sprite.is_animation_over:
         release_bullet(self)
+
