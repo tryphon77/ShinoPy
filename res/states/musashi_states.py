@@ -26,7 +26,7 @@ def init_object():
 	self.sprite = sprite = allocate_dynamic_sprite()
 	sprite.name = "sprite %s" % self.name
 
-	sprite.vpos ^= 0x8000
+	sprite.vpos |= 0x8000
 	sprite.status = 1
 	sprite.x = self.x
 	sprite.y = self.y
@@ -193,8 +193,7 @@ def update_hijump1_up(self):
 
 def init_crouch(self):
 	set_animation(self.sprite, CROUCH_NO_MOVE)
-	self.speed_y = 0
-	self.accel_y = 0
+	set_physics(self, 0, 0, 0, 0)
 	self.update_function = update_crouch
 
 
@@ -208,7 +207,7 @@ def update_crouch(self):
 	elif Globs.joy_pressed & BUTTON_B:
 		init_crouch_fire(self)
 	elif Globs.joy_pressed & BUTTON_C:
-		if self.floor > 1:
+		if get_hijump_down_impulsion(self):
 			init_hijump_down(self)
 		else:
 			init_jump(self)
@@ -231,7 +230,7 @@ def update_crawl(self):
 	elif Globs.joy_pressed & BUTTON_B:
 		init_crouch_fire(self)
 	elif Globs.joy_pressed & BUTTON_C:
-		if self.floor > 1:
+		if get_hijump_down_impulsion(self):
 			init_hijump_down(self)
 		else:
 			init_jump(self)
@@ -276,7 +275,7 @@ def update_hijump_down(self):
 
 
 def init_hijump1_down(self):
-	self.speed_y = -6
+	self.speed_y = get_hijump_down_impulsion(self)
 	self.accel_y = 0.5
 	set_animation(self.sprite, HIFALL1)
 	self.update_function = update_hijump1_down
@@ -299,7 +298,7 @@ def init_hifall(self):
 
 
 def update_hifall(self):
-	print (self.param1, self.floor)
+	# print (self.param1, self.floor)
 	if self.param1 > 0:
 		self.param1 -= 1
 		if self.param1 == 0:

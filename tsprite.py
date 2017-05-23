@@ -68,10 +68,25 @@ def allocate_static_sprite():
 	return None
 
 
-def disable_sprite(sprite):
+def release_sprite(self):
 	# print 'disabling sprite at (%d, %d)' % (sprite.x, sprite.y)
-	sprite.status = 0
-	sprite.is_flipped = False
+	self.status = 0
+	self.is_flipped = False
+	self.animation_index = -1
+	self.animation_id = -1
+	self.animation_tick = 0
+	self.tick = 0
+	self.total_ticks_in_animation = 0
+
+
+def clear_all_sprites():
+	for s in dynamic_sprites:
+		release_sprite(s)
+	
+	for s in static_sprites:
+		release_sprite(s)
+
+	GP.set_sprite(0, -128, -128, 0, 0, 0)
 
 
 sizes = [1, 2, 3, 4, 2, 4, 6, 8, 3, 6, 9, 12, 4, 8, 12, 16]

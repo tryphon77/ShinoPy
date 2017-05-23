@@ -14,7 +14,6 @@ def init_object(entry):
 	
 	entry[0] |= ON_SCREEN
 	self.object_entry = entry
-	ennemy_objects.add(self)
 	self.release_function = release
 
 	self.status = ACTIVE
@@ -48,6 +47,7 @@ def update_spawn(self):
 		
 			self.sprite = sprite = allocate_dynamic_sprite()
 			if sprite:
+				ennemy_objects.add(self)
 				sprite.name = "sprite %s" % self.name
 
 				sprite.status = 1
@@ -236,11 +236,12 @@ def init_death(self):
 	self.update_function = update_death
 	self.collision_function = None
 	self.hit_function = None
+	ennemy_objects.remove(self)
 
 
 def update_death(self):
 	if self.sprite.is_animation_over:
-		disable_sprite(self.sprite)
+		release_sprite(self.sprite)
 		self.sprite = None
 		self.tick = 80
 		self.update_function = update_spawn

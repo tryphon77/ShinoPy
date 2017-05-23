@@ -17,7 +17,7 @@ def draw_tile(plane, tile, x, y):
 	y_ = (2*y) & 0x3E
 	tile *= 4
 
-#	 print 'draw_tile', (plane, tile, x_, y_)
+	# print ('[draw_tile] plane: %s, tile: %X/%X, x: %d, y:%d' % (plane, tile, len(Globs.tileset), x_, y_))
 	GP.set_tilemap(plane, Globs.tileset[tile], x_, y_)
 	GP.set_tilemap(plane, Globs.tileset[tile + 1], x_ + 1, y_)
 	GP.set_tilemap(plane, Globs.tileset[tile + 2], x_, y_ + 1)

@@ -22,6 +22,7 @@ class Globs():
 
 	link = 0
 
+	old_joy = 0
 	joy = 0
 	joy_pressed = 0
 	forward = 0
@@ -34,5 +35,12 @@ class Globs():
 	objects_hindex = 0
 	
 	static_tiles = STATIC_TILES_START
+	
+	next_state = None
+	
+	level = 0
+	mission = 0
+	stage = 0
+	show_mission_text = True
 
 

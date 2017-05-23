@@ -11,7 +11,9 @@ DISABLED = 2	# object is missing for some frames, but will reappear
 ON_SCREEN = 1
 RESPAWNABLE = 2
 
-impulsions_table = [0, -6.5, -7.5, -8.5, -9.5, -10.5, -11.5, -12.5]
+# impulsions_table = [0, -6.5, -7.5, -8.5, -9.5, -10.5, -11.5, -12.5]
+# impulsions_table = [0, -5.5, -7, -8, -9, -11.5, -12.5, -13.5]
+impulsions_table = [0, -4, -5.5, -7, -8, -9, -10, -10.5, -11.5, -12, -12.5, -13.5, -14, -14.5, -15]
 
 
 class Object():
@@ -80,12 +82,37 @@ friend_projectiles = Queue()
 ennemy_projectiles = Queue()
 
 
+def clear_all_objects():
+	all_objects.clear()
+	friend_objects.clear()
+	ennemy_objects.clear()
+	hostage_objects.clear()
+	friend_projectiles.clear()
+	ennemy_projectiles.clear()
+	
+	for o in objects:
+		clear_object(o)
+
+
+def clear_object(obj):
+	obj.id_ = 0
+	obj.status = INACTIVE
+	obj.update_function = None
+	obj.moves_to_left = False
+	obj.is_collidable = False
+	obj.is_collided = False
+	obj.is_dead = False
+
+	obj.collided_object = None
+	obj.hit_object = None
+	obj.hitting_object = None
+	
 def allocate_object():
 	for i, o in enumerate(objects):
 		if o.status == INACTIVE:
 			o.id_ = Object.current_id_
 			Object.current_id_ += 1
-			# print 'init object #%d at pos: %d' % (o.id_, i)
+			print('init object #%d at pos: %d' % (o.id_, i))
 			break
 	else:
 		return None
@@ -101,21 +128,11 @@ def allocate_object():
 
 def release_object(obj):
 	if obj.sprite:
-		disable_sprite(obj.sprite)
+		release_sprite(obj.sprite)
 		obj.sprite = None
 
-	obj.id_ = 0
-	obj.status = INACTIVE
-	obj.update_function = None
-	obj.moves_to_left = False
-	obj.is_collidable = False
-	obj.is_collided = False
-	obj.is_dead = False
-
-	obj.collided_object = None
-	obj.hit_object = None
-	obj.hitting_object = None
-
+	clear_object(obj)
+	
 	# print 'releasing object #%d at pos: %d' % (obj.id_, all_objects.index(obj))
 	all_objects.remove(obj)
 
@@ -157,9 +174,10 @@ def collides_background(self, dx, dy):
 	x = int(self.x + signate(self, dx)) // 16
 	# x = int(self.x + dx) // 16
 	y = int(self.y + dy) // 16
-	print (x, y)
+	# print (x, y)
 	res = Globs.collision_map[y * layer_A.twidth + x]
 	# print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d -> %d (%d//%d)' % (self.x, signate(self, dx), self.y, dy, x, y, y * layer_A.twidth + x, res, res & 7, self.floor)
+	# print ('collides_background (%d, %d) : %s' % (x, y, res & 7))
 	return res & 7 == self.floor & 7
 
 
@@ -169,9 +187,25 @@ def get_hijump_impulsion(self):
 	y = int(self.y + 1) // 16
 	# print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d' % (self.x, dx, self.y, dy, x, y, y * layer_A.twidth + x)
 	i = y * layer_A.twidth + x1
-	v = impulsions_table[(Globs.collision_map[i] >> 3) & 7]
+	# v = impulsions_table[(Globs.collision_map[i] >> 3) & 7]
+	v = impulsions_table[(Globs.collision_map[i] >> 4) & 15]
 	if v and (x1 != x2):
-		v = max(v, impulsions_table[(Globs.collision_map[i + 1] >> 3) & 7])
+		v = max(v, impulsions_table[(Globs.collision_map[i + 1] >> 4) & 15])
+		print('impulsion: %s' % v)
+	return v
+
+
+def get_hijump_down_impulsion(self):
+	x1 = int(self.x + self.back) // 16
+	x2 = int(self.x + self.front) // 16
+	y = int(self.y + 1) // 16
+	# print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d' % (self.x, dx, self.y, dy, x, y, y * layer_A.twidth + x)
+	i = y * layer_A.twidth + x1
+	# v = impulsions_table[(Globs.collision_map[i] >> 6) & 7]
+	v = impulsions_table[(Globs.collision_map[i] >> 8) & 15]
+	if v and (x1 != x2):
+		v = max(v, impulsions_table[(Globs.collision_map[i + 1] >> 8) & 15])
+		print('impulsion: %s' % v)
 	return v
 
 
@@ -193,7 +227,7 @@ def fix_hpos(self):
 
 def fix_vpos(self):
 	# print 'fix_vpos: %d -> %d' % (self.y, (int(self.y) & 0xFFF0) - 1)
-	self.y = (int(self.y) & 0xFFF0) - 1
+	self.y = ((int(self.y) + 1) & 0xFFF0) - 1
 
 
 def update_object(self):
