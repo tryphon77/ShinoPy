@@ -1,0 +1,147 @@
+import random
+from chars import common
+
+from object import *
+from tsprite import *
+from chars import projectiles
+
+from res.chars.shooter_data import *
+
+
+# param1 = counter for stopping walk
+# param2 = number of bullets
+	
+
+def init(entry):
+	print('init shooter')
+
+	self = common.init(entry)
+	self.name = "shooter at (%d, %d)" % (self.x, self.y)
+
+	self.activate_function = activate
+	self.release_function = release
+	
+	self.param2 = 3
+
+
+def activate(self):
+	common.activate(self, None)
+	common.appear(self, init_walk)	
+
+
+def release(self):
+	print ('shooter release: %s' % self.name)
+	common.release(self)
+
+	
+def shoot(self, dx, dy):
+	bullet = projectiles.init_bullet()
+	bullet.x = self.x + signate(self, dx)
+	bullet.y = self.y + dy
+	bullet.floor = self.floor
+	bullet.speed_x = signate(self, 2)
+	bullet.sprite.is_flipped = self.sprite.is_flipped
+	# print 'throw .x = %d, .speed = %d, .front = %d' % (bullet.x, bullet.speed_x, bullet.front)
+
+
+def init_walk(self):
+	set_animation(self.sprite, WALK)
+	set_physics(self, 1, 0, 0, 0)
+	self.param1 = 1 << (random.randint(0, 7))
+	self.update_function = update_walk
+	self.collision_function = init_collision
+	self.hit_function = init_hit
+
+# walk
+def walk_same_level_action(self):
+	head_towards(self, Globs.musashi)
+	init_shoot(self)
+
+def walk_different_level_action(self):
+	if self.sprite.is_animation_over:
+		self.param1 -= 1
+		if self.param1 <= 0:
+			init_reload(self)
+
+def update_walk(self):
+	common.update_walk(self, walk_same_level_action, walk_different_level_action, init_jump, common.half_turn, init_fall)
+
+
+def init_reload(self):
+	set_physics(self, 0, 0, 0, 0)
+	set_animation(self.sprite, RELOAD)
+	self.param2 = 3
+	self.update_function = update_reload
+
+def update_reload(self):
+	if self.sprite.is_animation_over:
+		init_walk(self)
+
+
+def init_shoot(self):
+	set_physics(self, 0, 0, 0, 0)
+	set_animation(self.sprite, PREPARATION_SHOOT_STAND)
+	self.update_function = update_shoot
+
+def update_shoot(self):
+	if self.sprite.is_animation_over:
+		init_shoot1(self)
+		
+
+def init_shoot1(self):
+	set_physics(self, 0, 0, 0, 0)
+	set_animation(self.sprite, SHOOT_STAND)
+	self.update_function = update_shoot1
+
+def update_shoot1(self):
+	if self.sprite.total_ticks_in_animation == 4:
+		shoot(self, 40, -40)
+	elif self.sprite.is_animation_over:
+		init_shoot1(self)
+		self.param2 -= 1
+		print('bullets left: %d' % self.param2)
+		if self.param2 == 0:
+			init_reload(self)
+
+
+def init_collision(self):
+	common.init_collision(self, HIT, update_collision)
+
+def init_hit(self):
+	common.init_hit(self, HIT, update_collision, init_death)
+
+def update_collision(self):
+	common.update_collision(self, init_death, init_walk)
+
+
+def init_jump(self):
+	set_physics(self, 0, 0, 0, 0)
+	set_animation(self.sprite, IMPULSE)
+	self.update_function = update_jump
+
+def update_jump(self):
+	if self.sprite.is_animation_over:
+		init_jump1(self)
+
+
+def init_jump1(self):
+	set_physics(self, 1, 0, -5, 0.25)
+	set_animation(self.sprite, JUMP)
+	self.update_function = update_jump1
+
+
+def update_jump1(self):
+	common.update_jump(self, init_fall)
+
+
+def init_fall(self):
+	common.init_fall(self, FALL, update_fall)
+
+def update_fall(self):
+	common.update_fall(self, init_walk)
+
+def init_death(self):
+	common.init_death(self, DEAD, update_death)
+
+def update_death(self):
+	common.update_death(self, None)
