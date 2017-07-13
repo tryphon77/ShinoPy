@@ -3,6 +3,7 @@ from genepy import *
 from layer import *
 from camera import *
 
+
 def init_stage(stage):
 	# load background
 	GP.load_tile_data(stage.patterns, 0x40) 
@@ -12,6 +13,14 @@ def init_stage(stage):
 
 	# load collision map
 	Globs.collision_map = stage.collision_map
+	
+	# load objects_map
+	Globs.objects_map = stage._objects_map
+	Globs.objects_chunks = stage.objects_chunks
+	Globs.objects_from_left = stage.objects_from_left
+	Globs.objects_from_right = stage.objects_from_right
+	Globs.objects_from_top = stage.objects_from_top
+	Globs.objects_from_bottom = stage.objects_from_bottom
 	
 	# load tilemap
 	layer_A.plane = GP.plane_A
@@ -67,8 +76,11 @@ def init_stage(stage):
 	
 	Globs.vscroll_mode = 0
 	
-	Globs.n_objects = len(stage.objects_hlist)
-	Globs.objects_hlist = stage.objects_hlist
-	Globs.objects_hindex = 0
+	for entry in stage.objects:
+		obj_type = entry[0]
+		print (obj_type)
+		obj_type.init(entry) #[1:])
 	
-	
+	Globs.objects_hindex = 1
+	Globs.n_objects = len(stage.objects)
+

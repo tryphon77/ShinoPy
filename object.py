@@ -11,6 +11,9 @@ DISABLED = 2	# object is missing for some frames, but will reappear
 ON_SCREEN = 1
 RESPAWNABLE = 2
 
+OBJ_ACTIVE = 1
+OBJ_VIEWABLE = 2
+
 # impulsions_table = [0, -6.5, -7.5, -8.5, -9.5, -10.5, -11.5, -12.5]
 # impulsions_table = [0, -5.5, -7, -8, -9, -11.5, -12.5, -13.5]
 impulsions_table = [0, -4, -5.5, -7, -8, -9, -10, -10.5, -11.5, -12, -12.5, -13.5, -14, -14.5, -15]
@@ -27,6 +30,12 @@ class Object():
 		self.status = INACTIVE
 		self.list = None
 
+		self.trigger_x = 0
+		self.trigger_y = 0
+		self.org_x = 0
+		self.org_y = 0
+		self.floor = 0
+		
 		self.x = 0.0
 		self.y = 0.0
 		self.speed_x = 0.0
@@ -46,13 +55,19 @@ class Object():
 
 #        self.is_flipped = False
 		self.moves_to_left = False
-		self.collision_flag = False
+		# self.collision_flag = False
+
+		self.is_initialized = False
+		self.is_activated = False
+		self.is_displayable = False
 		self.is_collidable = False
-		self.is_hittable = False
+		# self.is_hittable = False
+
 		self.is_dead = False
 		self.is_collided = False
 		self.is_hit = False
 		self.has_hit = False
+
 		self.collided_object = None
 		self.hit_object = None
 		self.hitting_object = None
@@ -65,6 +80,7 @@ class Object():
 		self.ptr1 = None
 		self.ptr2 = None
 
+		self.activate_function = None
 		self.update_function = None
 		self.collision_function = None
 		self.hit_function = None
@@ -72,7 +88,10 @@ class Object():
 
 
 objects_size = 32
+temporary_objects_size = 16
 objects = [Object() for _ in range(objects_size)]
+temporary_objects = [Object() for _ in range(temporary_objects_size)]
+
 
 all_objects = Queue()
 friend_objects = Queue()
@@ -96,10 +115,23 @@ def clear_all_objects():
 
 def clear_object(obj):
 	obj.id_ = 0
-	obj.status = INACTIVE
+
+	# obj.status = INACTIVE
+	obj.status = 0
+	
+	
+	# pb ici
+	# seuls les objets temporaires doivent avoir leur initialized à False
+	obj.is_initialized = False
+	reset_object(obj)
+
+def reset_object(obj):
+	obj.is_activated = False
+	obj.is_displayable = False
+	obj.is_collidable = False
+
 	obj.update_function = None
 	obj.moves_to_left = False
-	obj.is_collidable = False
 	obj.is_collided = False
 	obj.is_dead = False
 
@@ -107,12 +139,14 @@ def clear_object(obj):
 	obj.hit_object = None
 	obj.hitting_object = None
 	
-def allocate_object():
-	for i, o in enumerate(objects):
-		if o.status == INACTIVE:
+def allocate_object(object_array):
+	# print ('allocate_object:')
+	for i, o in enumerate(object_array):
+		# if o.status == INACTIVE:
+		if not o.is_initialized:
 			o.id_ = Object.current_id_
 			Object.current_id_ += 1
-			print('init object #%d at pos: %d' % (o.id_, i))
+			# print('init object #%d at pos: %d' % (o.id_, i))
 			break
 	else:
 		return None
@@ -122,7 +156,8 @@ def allocate_object():
 	o.hit_object = None
 	o.hitting_object = None
 
-	all_objects.add(o)
+	# object must be add by activate function
+	# all_objects.add(o)
 	return o
 
 
@@ -131,7 +166,7 @@ def release_object(obj):
 		release_sprite(obj.sprite)
 		obj.sprite = None
 
-	clear_object(obj)
+	reset_object(obj)
 	
 	# print 'releasing object #%d at pos: %d' % (obj.id_, all_objects.index(obj))
 	all_objects.remove(obj)
@@ -172,9 +207,11 @@ def head_towards(self, other):
 	
 def collides_background(self, dx, dy):
 	x = int(self.x + signate(self, dx)) // 16
-	# x = int(self.x + dx) // 16
+	if x < 0:
+		return True
+	if x >= layer_A.twidth:
+		return True
 	y = int(self.y + dy) // 16
-	# print (x, y)
 	res = Globs.collision_map[y * layer_A.twidth + x]
 	# print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d -> %d (%d//%d)' % (self.x, signate(self, dx), self.y, dy, x, y, y * layer_A.twidth + x, res, res & 7, self.floor)
 	# print ('collides_background (%d, %d) : %s' % (x, y, res & 7))
@@ -191,7 +228,7 @@ def get_hijump_impulsion(self):
 	v = impulsions_table[(Globs.collision_map[i] >> 4) & 15]
 	if v and (x1 != x2):
 		v = max(v, impulsions_table[(Globs.collision_map[i + 1] >> 4) & 15])
-		print('impulsion: %s' % v)
+		# print('impulsion: %s' % v)
 	return v
 
 
@@ -205,7 +242,7 @@ def get_hijump_down_impulsion(self):
 	v = impulsions_table[(Globs.collision_map[i] >> 8) & 15]
 	if v and (x1 != x2):
 		v = max(v, impulsions_table[(Globs.collision_map[i + 1] >> 8) & 15])
-		print('impulsion: %s' % v)
+		# print('impulsion: %s' % v)
 	return v
 
 
@@ -271,26 +308,34 @@ def collision_between_boxes(box1, box2):
 	return True
 
 
-def check_entry(entry, 
+def check_entry(obj, 
 				too_far,
 				too_near,
 				viewable):
-	flags, sx, sy, init_function = entry[:4]
+	# flags, sx, sy, init_function = entry[:4]
+	sx = obj.trigger_x
+	sy = obj.trigger_y
+	
 	if too_far(sx, sy):
+		# print ('%s: too far' % entry)
 		return True
 	elif too_near(sx, sy):
+		# print ('ignoring %s: too near' % entry)
 		return False
-		# print ('ignoring %d' % i)
-	elif flags & ON_SCREEN:
-		# print('%d already on screen' % i)
+	elif obj.is_activated:
+		# print('%s already on screen' % entry)
 		return False
-	elif not (flags & RESPAWNABLE):
-		# print('%d not respawnable' % i)
-		return False
+	# elif not (flags & RESPAWNABLE):
+		# print('%s not respawnable' % entry)
+		# return False
 	elif viewable(sx, sy):
 		# print ('sx = %d, camera.left = %d' % (sx, camera.left))
-		init_function(entry)
+		obj.activate_function(obj)
 		return True
+	else:
+		print ('this shouldnt occur')
+		print (camera.virtual_top, sy, camera.virtual_bottom)
+		# exit()
 
 def too_far_left(x, y):
 	return x < camera.virtual_left
@@ -307,36 +352,69 @@ def too_near_right(x, y):
 def viewable_h(x, y):
 	return camera.virtual_top <= y <= camera.virtual_bottom
 
+
 def introduce_new_objects():
-	if camera.moves_left:
-		i = Globs.objects_hindex
-		while i > 0:
-			i -= 1
-			entry = Globs.objects_hlist[i]
-			if check_entry(entry, too_far_left, too_near_left, viewable_h):
-				break
-		Globs.objects_hindex = i + 1
+	new_object_chunk = Globs.objects_map[(int(Globs.musashi.y) >> 4) * layer_A.twidth + (int(Globs.musashi.x) >> 4)]
+	if (new_object_chunk != Globs.objects_chunk):
+		Globs.objects_chunk = new_object_chunk
+		
+		if camera.moves_right:
+			print ('entering chunk %02X from the left: %s' % (Globs.objects_chunk, Globs.objects_from_left[new_object_chunk]))
+			introduce_new_object_chunk(Globs.objects_from_left[new_object_chunk])
+		elif camera.moves_left:
+			print ('entering chunk %02X from the right: %s' % (Globs.objects_chunk, Globs.objects_from_right[new_object_chunk]))
+			introduce_new_object_chunk(Globs.objects_from_right[new_object_chunk])
+			
+		if camera.moves_up:
+			print ('entering chunk %02X from the bottom: %s' % (Globs.objects_chunk, Globs.objects_from_bottom[new_object_chunk]))
+			introduce_new_object_chunk(Globs.objects_from_bottom[new_object_chunk])
+		elif camera.moves_down:
+			print ('entering chunk %02X from the top: %s' % (Globs.objects_chunk, Globs.objects_from_top[new_object_chunk]))
+			introduce_new_object_chunk(Globs.objects_from_top[new_object_chunk])
+		
+	# if camera.moves_left:
+		# i = Globs.objects_hindex
+		# while i > 1:
+			# i -= 1
+			# obj = objects[i]
+			# if check_entry(obj, too_far_left, too_near_left, viewable_h):
+				# break
+		# Globs.objects_hindex = i + 1
 
-	elif camera.moves_right:
-		i = Globs.objects_hindex
-		while i < Globs.n_objects:
-			entry = Globs.objects_hlist[i]
-			if check_entry(entry, too_far_right, too_near_right, viewable_h):
-				break
-			i += 1
-		Globs.objects_hindex = i
+	# elif camera.moves_right:
+		# i = Globs.objects_hindex
+		# while i < Globs.n_objects:
+			# obj = objects[i]
+			# if check_entry(obj, too_far_right, too_near_right, viewable_h):
+				# break
+			# i += 1
+		# Globs.objects_hindex = i
 
+
+# def reset_objects_on_stage():
+	# for obj in Globs.objects_hlist:
+		# obj[0] = RESPAWNABLE
+	# Globs.objects_hindex = 0
+
+def introduce_new_object_chunk(chunk):
+	for i in chunk:
+		obj = objects[i]
+		if not obj.is_activated:
+			obj.activate_function(obj)
 
 def update_all_objects_on_screen():
+	print('update_all_objects_on_screen: #all = %d' % len(all_objects))
 	for obj in all_objects:
-		# print ('object %d' % obj.id_)
-		if obj.status:
+		print ('object %d (%s) : %s' % (obj.id_, obj.name, ', '.join([['', 'initialized'][obj.is_initialized], ['', 'activated'][obj.is_activated], ['', 'displayable'][obj.is_displayable], ['', 'collidable'][obj.is_collidable]])))
+		# if obj.status:
+		if obj.is_activated:
 			if camera.virtual_left <= obj.x <= camera.virtual_right\
 			and camera.virtual_top < obj.y < camera.virtual_bottom:
 				# print ('update object %d' % obj.id_)
 				update_object(obj)
 
-				if obj.status == ACTIVE:
+				# if obj.status == ACTIVE:
+				if obj.is_collidable:
 					compute_boxes(obj)
 					
 			else:
@@ -351,6 +429,11 @@ def check_collisions(source, source_box_type,
 		source_box = getattr(source, source_box_type)
 		if source_box:
 			for target in targets:
+			
+				if not target.is_collidable:
+					print (target.name)
+					exit()
+					
 				if target.floor == source_floor:
 					target_box = getattr(target, target_box_type)
 					if target_box:
@@ -371,27 +454,32 @@ def musashi_frees_hostage(musashi, hostage):
 	hostage.collision_function(hostage)
 
 def musashi_hits_ennemy(friend, ennemy):
-	print('musashi hits ennemy')
+	# print('musashi hits ennemy')
 	friend.other_object = ennemy
 	ennemy.other_object = friend
 	if ennemy.hit_function:
 		ennemy.hit_function(ennemy)
 
 def shuriken_hits_ennemy(friend, ennemy):
-	print('musashi hits ennemy')
+	if friend.speed_x > 0:
+		ennemy.speed_x = 2
+	else:
+		ennemy.speed_x = -2
+
+	friend.collision_function(friend)
+
 	ennemy.other_object = friend
 	if ennemy.hit_function:
 		ennemy.hit_function(ennemy)
-	friend.collision_function(friend)
 
 def bullet_hits_musashi(friend, ennemy):
-	print('projectile hits musashi')
+	# print('projectile hits musashi')
 	friend.other_object = ennemy
 	friend.hit_function(friend)
 	ennemy.collision_function(ennemy)
 
 def ennemy_hits_musashi(friend, ennemy):
-	print('ennemy hits musashi')
+	# print('ennemy hits musashi')
 	friend.other_object = ennemy
 	ennemy.other_object = friend
 	friend.hit_function(friend)
@@ -423,7 +511,7 @@ def update_all_objects():
 	# 1) Introduces new objects according to camera movement
 	introduce_new_objects()
 		
-	# 2) Updates visible objects, releases <invisibles
+	# 2) Updates visible objects, releases invisibles
 	update_all_objects_on_screen()
 
 	# 3) collisions between objects
@@ -433,30 +521,33 @@ def update_all_objects():
 def update_all_sprites():
 	# print "update_all_sprites"
 	Globs.link = 0
-	for obj in objects:
-		sprite = obj.sprite
-		if sprite and sprite.status:
-			# print 'sprite #%d (status = %d)' % (i, sprite.status)
-			sprite.x = int(obj.x) - Globs.camera_x
-			sprite.y = int(obj.y) - Globs.camera_y
-#            sprite.is_flipped = obj.is_flipped
-			sprite_update(sprite)
+	debug = []
+	for i, obj in enumerate(all_objects):
+		# sprite = obj.sprite
+		# if sprite:
+		if obj.is_displayable:
+			# print ('updating sprite of object #%d' % obj.id_)
+			sprite = obj.sprite
+
+			if sprite:
+				if sprite.is_dynamic:
+					debug += ['(%02dd)' % i]
+				else:
+					debug += ['(%02ds)' % i]
+				
+			if sprite and sprite.status:
+				# print 'sprite #%d (status = %d)' % (i, sprite.status)
+				sprite.x = int(obj.x) - Globs.camera_x
+				sprite.y = int(obj.y) - Globs.camera_y
+	#            sprite.is_flipped = obj.is_flipped
+				sprite_update(sprite)
+		else:
+			pass
+			# print ('object #%d is not displayable' % obj.id_)
 
 	GP.sprite_cache[Globs.link - 1].link = 0
-
-#@deprecated
-def check_box_on_objects(self, raw_box, objects):
-	floor = self.floor
-	box = compute_box(self, raw_box)
-
-	for obj in objects:
-		# print 'ennemy object #%d' % ennemy.id_
-		if obj.floor == floor:
-			other_box = obj.bbox
-			if other_box:
-				if collision_between_boxes(box, other_box):
-					return True
-	return False
+	
+	print (', '.join(debug))
 
 
 def is_near(self, dx, dy, objects):
@@ -477,20 +568,20 @@ def is_near(self, dx, dy, objects):
 				return True
 	return False
 
+# #@TODO : should be moved in common
+# def generic_collision(self):
+	# other = self.other_object
 
-def generic_collision(self):
-	other = self.other_object
-
-	if other.speed_x > 0:
-		self.speed_x = 2
-		self.moves_to_left = False
-	elif other.speed_x < 0:
-		self.speed_x = -2
-		self.moves_to_left = True
-	if self.x < other.x:
-		self.speed_x = -2
-		self.moves_to_left = True
-	else:
-		self.speed_x = 2
-		self.moves_to_left = False
+	# if other.speed_x > 0:
+		# self.speed_x = 2
+		# self.moves_to_left = False
+	# elif other.speed_x < 0:
+		# self.speed_x = -2
+		# self.moves_to_left = True
+	# elif self.x < other.x:
+		# self.speed_x = -2
+		# self.moves_to_left = True
+	# else:
+		# self.speed_x = 2
+		# self.moves_to_left = False
 

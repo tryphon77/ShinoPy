@@ -39,6 +39,9 @@ class Queue():
 
 	def __str__(self):
 		return 'Queue : [%s]' % (', '.join([str(x) for x in self.data[:self.cursor]]))
+	
+	def __len__(self):
+		return self.cursor
 
 
 if __name__ == '__main__':

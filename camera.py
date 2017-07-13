@@ -98,36 +98,36 @@ def set_camera_focus_to(obj):
 	camera_y = max(0, camera_y)
 	camera_y = min(Globs.layer_a_pheight - 223, camera_y)
 	
-	# # adjust camera_y
-	# camera_y = Globs.camera_y
-	# y = int(obj.y)
-	# sy = y - camera_y
+	# adjust camera_y
+	camera_y = Globs.camera_y
+	y = int(obj.y)
+	sy = y - camera_y
 
-	# if Globs.vscroll_mode:
-		# sy = y - camera_y
-		# if sy < 64:
-			# sy = 64
-			# camera_y = y - 64
-			# if camera_y < 0:
-				# camera_y = 0
-				# sy = y
+	if Globs.vscroll_mode:
+		sy = y - camera_y
+		if sy < 64:
+			sy = 64
+			camera_y = y - 64
+			if camera_y < 0:
+				camera_y = 0
+				sy = y
 
-		# elif sy > 208:
-			# sy = 208
-			# camera_y = y - 208
-			# if camera_y >= Globs.layer_a_pheight - 224:
-				# camera_y = Globs.layer_a_pheight - 224
-				# sy = y - camera_y
+		elif sy > 208:
+			sy = 208
+			camera_y = y - 208
+			if camera_y >= Globs.layer_a_pheight - 224:
+				camera_y = Globs.layer_a_pheight - 224
+				sy = y - camera_y
 
-	# else:
-		# if sy < 120 and camera_y > 0:
-			# camera_y -= 1
-		# elif sy > 120 and camera_y < Globs.layer_a_pheight - 224:
-			# camera_y += 1
+	else:
+		if sy < 120 and camera_y > 0:
+			camera_y -= 1
+		elif sy > 120 and camera_y < Globs.layer_a_pheight - 224:
+			camera_y += 1
 
 
-	# camera_y = max(0, camera_y)
-	# camera_y = min(Globs.layer_a_pheight - 224, camera_y)
+	camera_y = max(0, camera_y)
+	camera_y = min(Globs.layer_a_pheight - 224, camera_y)
 
 	set_camera(camera_x, camera_y)
 	# print ('camera = (%d, %d) // object = (%d, %d)' % (Globs.camera_x, Globs.camera_y, obj.x, obj.y))

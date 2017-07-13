@@ -5,6 +5,10 @@ class Globs():
 	tilemap = None
 	tilemap_A = None
 	tilemap_B = None
+
+	objects_map = None
+	objects_chunk = 0
+
 	layer_a_twidth = 0
 	layer_a_theight = 0
 	layer_a_pwidth = 0

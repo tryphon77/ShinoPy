@@ -8,21 +8,22 @@ from stage import init_stage
 from camera import set_camera_focus_to
 
 # Organization needed
-from res.levels import level_0_0
+# from res.levels import level_0_0
 from res.levels import level_1_1
-from res.levels import level_2_2
-from res.levels import level_3_3
-from res import musashi_data
-from res.states import musashi_states
-from res.states import punk_states
-from res.states import shooter_states
-from res.states import knife_states
-from res.states import sword_states
-from res.states import spidey_states
-from res.states import hostage_states
-from res import projectile_data 
+# from res.levels import level_2_2
+# from res.levels import level_3_3
+# from res import musashi_data
+# from res.states import musashi_states
+# from res.states import punk_states
+# from res.states import shooter_states
+# from res.states import knife_states
+# from res.states import sword_states
+# from res.states import spidey_states
+# from res.states import hostage_states
+from res.chars import projectile_data 
 
-stages = [level_1_1, level_2_2, level_3_3, level_0_0]
+# stages = [level_1_1, level_2_2, level_3_3, level_0_0]
+stages = [level_1_1]
 
 def init():
 	clear_all_objects()
@@ -31,17 +32,19 @@ def init():
 	print ('init stage: %d' % Globs.lvl)
 	stage = stages[Globs.lvl]
 	init_stage(stage)
-	musashi_states.init_object()
-	Globs.musashi = objects[0]
-	Globs.musashi.x, Globs.musashi.y = stage.musashi_pos
+	# musashi_states.init_object()
+	# Globs.musashi = objects[0]
+	# Globs.musashi.x, Globs.musashi.y = stage.musashi_pos
 	set_camera_focus_to(Globs.musashi)
 
 	Globs.base_id = 0
 
 	GP.load_tile_data(projectile_data.patterns, 0x300)
-	GP.load_tile_data(hostage_states.patterns, 0x400)
+	# hostage_states.allocate_tiles()	
 	
+	# reset_objects_on_stage()
 
+	
 def main():
 	init()
 

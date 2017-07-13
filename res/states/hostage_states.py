@@ -68,7 +68,7 @@ def release(self):
 def init_wait(self):
 	set_animation(self.sprite, WAIT)
 	self.collision_function = init_free
-	print ('object_entry: % s' % self.object_entry)
+	print ('hostage object_entry: % s' % self.object_entry)
 
 def init_free(self):
 	set_animation(self.sprite, FREE)
