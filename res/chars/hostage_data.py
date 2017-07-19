@@ -1,7 +1,8 @@
 from genepy import load_data_from_png
+from tsprite import TSpriteData
 
 
-patterns = load_data_from_png('res/hostage_patterns.png')
+patterns = load_data_from_png('res/chars/hostage_patterns.png')
 
 
 frames_table = [
@@ -118,3 +119,5 @@ bounding_boxes = [
 ]
 
 hitboxes = [None] * 12
+
+sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "hostage")

@@ -15,10 +15,14 @@ def init(entry):
 	
 	self.update_function = None
 
-
 def activate(self):
 	print ('[punk] activate object#%d (%s)' % (self.id_, self.name))
 	common.activate(self, update_spawn)
+
+def release(self):
+	print ('[punk] release: %s' % self.name)
+	release_object(self)
+	ennemy_objects.remove(self)
 
 
 def init_walk_towards_musashi(self):
@@ -34,20 +38,9 @@ def update_spawn(self):
 		common.appear_on_edge(self, init_walk_towards_musashi)
 
 
-def release(self):
-	print ('punk release: %s' % self.name)
-	release_object(self)
-	ennemy_objects.remove(self)
-
-
 def init_hit(self):
 	# print('punk init_hit')
-	self.is_dead = True
-
-	if collides_background(self, self.front, 1):
-		init_death(self)
-	else:
-		common.init_collision(self, HIT, update_collision)
+	common.init_hit(self, HIT, update_collision, init_death)
 
 
 def init_walk(self):
@@ -102,7 +95,6 @@ def init_jump(self):
 
 def update_jump(self):
 	common.update_jump(self, init_fall)
-
 
 def init_fall(self):
 	# print 'punk init_fall'

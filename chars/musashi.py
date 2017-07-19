@@ -108,7 +108,7 @@ def init_fire(self):
 		set_animation(self.sprite, PUNCH)
 	else:
 		set_animation(self.sprite, walk_fire_anims[self.sprite.frame])
-		throw_shuriken(self, 32, -48)
+		throw_shuriken(self, 32, -47)
 	self.update_function = update_fire
 
 
@@ -454,27 +454,6 @@ def init_collision(self):
 	# print 'musashi collided'
 	other = self.other_object
 	
-	if other.speed_x > 0:
-		self.speed_x = 2
-		self.moves_to_left = False
-		other.speed_x = -2
-		other.moves_to_left = True
-	elif other.speed_x < 0:
-		self.speed_x = -2
-		self.moves_to_left = True
-		other.speed_x = 2
-		other.moves_to_left = False
-	elif self.x < other.x:
-		self.speed_x = -2
-		self.moves_to_left = True
-		other.speed_x = 2
-		other.moves_to_left = False
-	else:
-		self.speed_x = 2
-		self.moves_to_left = False
-		other.speed_x = -2
-		other.moves_to_left = True
-
 	self.speed_y = -4
 	self.accel_y = 0.5
 
@@ -487,18 +466,23 @@ def init_death(self):
 
 	
 def update_collision(self):
+	print ('[musashi] update_collision')
 	self.x += self.speed_x
 
-	if collides_background(self, self.front, 0):
+	if collides_background(self, self.front, 0)\
+	or collides_background(self, self.back, 0):
 		# print 'before:', (self.x, self.back, self.front)
 		fix_hpos(self)
 		# print 'after:', (self.x, self.back, self.front), '\n'
-		self.speed_x = 0
+		# self.speed_x = 0
 
 	self.speed_y += self.accel_y
 	self.y += self.speed_y
 
-	if collides_background(self, self.front, 0):
+	if self.speed_y > 0 and (collides_background(self, self.front, 1) or collides_background(self, self.back, 1)):
+		print (self.speed_y)
+		print ('front = %d, back = %d' % (self.front, self.back))
+		# GP.halt()
 		fix_vpos(self)
 		init_stand(self)
 

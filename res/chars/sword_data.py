@@ -1,7 +1,8 @@
 from genepy import load_data_from_png
+from tsprite import TSpriteData
 
 
-patterns = load_data_from_png('res/sword_patterns.png')
+patterns = load_data_from_png('res/chars/sword_patterns.png')
 
 frames_table = [
         [               # frame 0
@@ -212,6 +213,8 @@ bounding_boxes = [
 
 hitboxes = [None] * 18
 
-walk_offsets = [3, 4, 2, 4]
+walk_offsets = [3, 4, 2, 4, 0]
 
 sword_box = (-8, -48, 16, 48)
+
+sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "hostage")

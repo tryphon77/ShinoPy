@@ -15,8 +15,8 @@ def init_stage(stage):
 	Globs.collision_map = stage.collision_map
 	
 	# load objects_map
-	Globs.objects_map = stage._objects_map
-	Globs.objects_chunks = stage.objects_chunks
+	Globs.objects_map = stage.objects_map
+	# Globs.objects_chunks = stage.objects_chunks
 	Globs.objects_from_left = stage.objects_from_left
 	Globs.objects_from_right = stage.objects_from_right
 	Globs.objects_from_top = stage.objects_from_top

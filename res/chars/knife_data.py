@@ -1,7 +1,7 @@
 from genepy import load_data_from_png
+from tsprite import TSpriteData
 
-
-patterns = load_data_from_png('res/knife_patterns.png')
+patterns = load_data_from_png('res/chars/knife_patterns.png')
 
 frames_table = [
     [       # frame 0
@@ -163,3 +163,5 @@ bounding_boxes = [
 ]
 
 hitboxes = [None] * 12
+
+sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "shooter")

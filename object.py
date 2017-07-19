@@ -133,7 +133,6 @@ def reset_object(obj):
 	obj.update_function = None
 	obj.moves_to_left = False
 	obj.is_collided = False
-	obj.is_dead = False
 
 	obj.collided_object = None
 	obj.hit_object = None
@@ -214,7 +213,7 @@ def collides_background(self, dx, dy):
 	y = int(self.y + dy) // 16
 	res = Globs.collision_map[y * layer_A.twidth + x]
 	# print 'collides_background at pos (%d + %d, %d + %d) on tile (%d, %d) pos = %d -> %d (%d//%d)' % (self.x, signate(self, dx), self.y, dy, x, y, y * layer_A.twidth + x, res, res & 7, self.floor)
-	# print ('collides_background (%d, %d) : %s' % (x, y, res & 7))
+	print ('(%d + %d, %d + %d) : collides_background (%d, %d) : %s' % (self.x, signate(self, dx), self.y, dy, x, y, res & 7))
 	return res & 7 == self.floor & 7
 
 
@@ -253,14 +252,31 @@ def get_hijump_down_impulsion(self):
 
 def fix_hpos(self):
 	if self.moves_to_left:
-		fixed = (int(self.x) & 0xFFF0) + self.front
+		# print ('left')
+		if self.speed_x <= 0:
+			# print ('front: %d' % self.front)
+			fixed = (int(self.x - self.front) & 0xFFF0) + self.front + 16
+		else:
+			# print ('back: %d' % self.back)
+			fixed = (int(self.x - self.back) & 0xFFF0) + self.back - 1
 		# print 'fix_hpos: %d -> %d' % (self.x, fixed)
-		self.x = fixed
 	else:
-		fixed = (int(self.x + self.front) & 0xFFF0) - self.front - 1
-		# print 'fix_hpos: %d -> %d' % (self.x, fixed)
-		self.x = fixed
+		print ('right')
+		if self.speed_x >= 0:
+			# print ('front: %d' % self.front)
+			fixed = (int(self.x + self.front) & 0xFFF0) - self.front - 1
+		else:
+			# print ('back: %d' % self.back)
+			fixed = (int(self.x + self.back) & 0xFFF0) - self.back + 16
+	# print ('fix_hpos: %d -> %d' % (self.x, fixed))
+	self.x = fixed
 
+def fix_hpos_(self, dx):
+	if self.moves_to_left:
+		fixed = ((int(self.x) - dx) & 0xFFF0) + dx
+	else:
+		fixed = ((int(self.x) + dx) & 0xFFF0) - dx
+	self.x = fixed
 
 def fix_vpos(self):
 	# print 'fix_vpos: %d -> %d' % (self.y, (int(self.y) & 0xFFF0) - 1)
@@ -399,7 +415,7 @@ def introduce_new_objects():
 def introduce_new_object_chunk(chunk):
 	for i in chunk:
 		obj = objects[i]
-		if not obj.is_activated:
+		if obj.is_initialized and not obj.is_activated:
 			obj.activate_function(obj)
 
 def update_all_objects_on_screen():
@@ -429,15 +445,17 @@ def check_collisions(source, source_box_type,
 		source_box = getattr(source, source_box_type)
 		if source_box:
 			for target in targets:
-			
-				if not target.is_collidable:
-					print (target.name)
-					exit()
+				# if not target.is_collidable:
+					# print (target.name)
+					# exit()
 					
-				if target.floor == source_floor:
+				if target.is_collidable and target.floor == source_floor:
 					target_box = getattr(target, target_box_type)
+					# print ('%s: x = %d, y = %d, box = %s' % (target.name, target.x, target.y, target_box))
+					
 					if target_box:
 						if collision_between_boxes(source_box, target_box):
+							# print ('collision between [%s] and [%s]' % (source.name, target.name))
 							do_collision(source, target)
 
 
@@ -445,6 +463,28 @@ def musashi_collides_ennemy(friend, ennemy):
 	# print('collision', friend.collision_function, ennemy.collision_function)
 	friend.other_object = ennemy
 	ennemy.other_object = friend
+	
+	if ennemy.speed_x > 0:
+		friend.speed_x = 2
+		friend.moves_to_left = False
+		ennemy.speed_x = -2
+		ennemy.moves_to_left = True
+	elif ennemy.speed_x < 0:
+		friend.speed_x = -2
+		friend.moves_to_left = True
+		ennemy.speed_x = 2
+		ennemy.moves_to_left = False
+	elif friend.x < ennemy.x:
+		friend.speed_x = -2
+		friend.moves_to_left = True
+		ennemy.speed_x = 2
+		ennemy.moves_to_left = False
+	else:
+		friend.speed_x = 2
+		friend.moves_to_left = False
+		ennemy.speed_x = -2
+		ennemy.moves_to_left = True
+	
 	if friend.collision_function:
 		friend.collision_function(friend)
 	if ennemy.collision_function:
@@ -454,6 +494,17 @@ def musashi_frees_hostage(musashi, hostage):
 	hostage.collision_function(hostage)
 
 def musashi_hits_ennemy(friend, ennemy):
+	if friend.x < ennemy.x:
+		friend.speed_x = -2
+		friend.moves_to_left = True
+		ennemy.speed_x = 2
+		ennemy.moves_to_left = False
+	else:
+		friend.speed_x = 2
+		friend.moves_to_left = False
+		ennemy.speed_x = -2
+		ennemy.moves_to_left = True
+
 	# print('musashi hits ennemy')
 	friend.other_object = ennemy
 	ennemy.other_object = friend
@@ -473,6 +524,11 @@ def shuriken_hits_ennemy(friend, ennemy):
 		ennemy.hit_function(ennemy)
 
 def bullet_hits_musashi(friend, ennemy):
+	if ennemy.speed_x > 0:
+		friend.speed_x = 2
+	else:
+		friend.speed_x = -2
+
 	# print('projectile hits musashi')
 	friend.other_object = ennemy
 	friend.hit_function(friend)

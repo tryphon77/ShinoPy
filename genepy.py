@@ -279,6 +279,7 @@ class GP():
 		GP.draw_sprites(GP.hi_sprites)
 
 		GP.frame_counter += 1
+		print ('==========================================================\nframe #%d' % GP.frame_counter)
 		
 		if GP.is_recording:
 			pygame.image.save(GP.display, '%s/%06d.png' % (GP.record_path, GP.frame_counter))

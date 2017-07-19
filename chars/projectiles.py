@@ -1,3 +1,5 @@
+import globals
+
 from object import *
 from tsprite import *
 from genepy import *
@@ -40,6 +42,8 @@ def init_object():
 		self.collision_function = init_vanish
 		self.release_function = release_shuriken
 
+		sprite.is_flipped = self.moves_to_left = Globs.musashi.moves_to_left
+		
 	return self
 
 
