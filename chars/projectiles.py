@@ -9,13 +9,14 @@ from res.chars.projectile_data import *
 def init_object():
 	# print ('init shuriken')
 	self = allocate_object(temporary_objects)
+	self.name = 'shuriken'
 	
 	self.is_initialized = True
 	self.is_activated = True
 	self.is_displayable = True
-	self.is_collidable = True
+	self.is_collidable = False
 	
-	# print 'shuriken id = %d' % self.id_
+	print ('shuriken id = %d' % self.id_)
 	all_objects.add(self)
 	friend_projectiles.add(self)
 	
@@ -54,6 +55,7 @@ def release_shuriken(self):
 
 
 def update(self):
+	self.is_collidable = True
 	self.x += self.speed_x
 	if self.hitting_object:
 		init_vanish(self)
@@ -63,6 +65,7 @@ def update(self):
 
 		
 def init_vanish(self):
+	self.is_collidable = False
 	self.speed_x = 0
 	set_animation(self.sprite, SHURIKEN_VANISH)
 	self.update_function = update_vanish

@@ -164,7 +164,8 @@ patterns_blocks = [
 
 stand1 = [(0, 6), (1, 6), (0, 6), (1, 6), (0, 6), (1, 6), (0, 6), (1, 6), (0, 6), (1, 6)]
 stand2 = [(2, 6), (3, 6), (2, 6), (3, 6), (2, 6), (3, 6), (2, 6), (3, 6), (2, 6), (3, 6)]
-walk = [(4, 6), (5, 6), (6, 6), (5, 6)]
+wait = [(4, 6)]
+walk = [(5, 6), (6, 6), (5, 6)]
 throw = [(7, 20), (8, 5), (9, 5), (10, 5), (11, 5), (12, 112), (13, 1)]
 slash = [(7, 20), (8, 3), (9, 3), (10, 3), (14, 3), (13, 30)]
 hit = [(4, 1)]
@@ -173,6 +174,7 @@ dead = [(15, 8), (16, 8), (17, 16)]
 animations_table = [
     stand1,
     stand2,
+	wait, 
     walk,
     throw,
     slash,
@@ -182,11 +184,12 @@ animations_table = [
 
 STAND1 = 0
 STAND2 = 1
-WALK = 2
-THROW = 3
-SLASH = 4
-HIT = 5
-DEAD = 6
+WAIT = 2
+WALK = 3
+THROW = 4
+SLASH = 5
+HIT = 6
+DEAD = 7
 
 rect1 = (-16, -47, 32, 48)
 
@@ -215,6 +218,6 @@ hitboxes = [None] * 18
 
 walk_offsets = [3, 4, 2, 4, 0]
 
-sword_box = (-8, -48, 16, 48)
+sword_box = (20, -48, 10, 48)
 
-sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "hostage")
+sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "guardian")

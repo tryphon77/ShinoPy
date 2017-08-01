@@ -21,6 +21,7 @@ def init(entry):
 	self.activate_function = activate
 	self.release_function = release
 	
+	self.hp_max = 1
 	self.param2 = 3
 
 

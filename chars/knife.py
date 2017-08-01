@@ -9,6 +9,8 @@ def init(entry):
 	self = common.init(entry)
 	self.name = 'knife at (%d, %d)' % (self.org_x, self.org_y)
 
+	self.hp_max = 1
+	
 	self.activate_function = activate
 	self.release_function = release
 
@@ -50,7 +52,7 @@ def update_wait(self):
 
 
 def init_turn(self):
-	flip(self)
+	common.half_turn(self)
 	set_animation(self.sprite, TURN)
 	self.update_function = update_turn
 
@@ -61,12 +63,13 @@ def update_turn(self):
 
 def init_hit(self):
 	print ('[%s] hit' % self.name)
-	self.is_dead = True
+	common.init_hit(self, HIT, update_collision, init_death)
+	# self.is_dead = True
 
-	if collides_background(self, self.front, 1):
-		init_death(self)
-	else:
-		common.init_collision(self, HIT, update_collision)
+	# if collides_background(self, self.front, 1):
+		# init_death(self)
+	# else:
+		# common.init_collision(self, HIT, update_collision)
 
 
 def init_walk(self):

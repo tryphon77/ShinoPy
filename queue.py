@@ -38,7 +38,7 @@ class Queue():
 
 
 	def __str__(self):
-		return 'Queue : [%s]' % (', '.join([str(x) for x in self.data[:self.cursor]]))
+		return 'Queue : [%s]' % (', '.join([x.name for x in self.data[:self.cursor]]))
 	
 	def __len__(self):
 		return self.cursor

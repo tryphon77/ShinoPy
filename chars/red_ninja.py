@@ -9,7 +9,7 @@ import random
 
 
 def init(entry):
-	self = ninja_common.init(entry, sprite_data_green, activate, release, init_collision, init_hit, 'green ninja')
+	self = ninja_common.init(entry, sprite_data_red, activate, release, init_collision, init_hit, 'red ninja')
 
 def activate(self):
 	ninja_common.activate(self, update_spawn)
@@ -69,7 +69,7 @@ def init_crawl(self):
 	self.hit_function = init_hit_blade_low
 
 def update_crawl(self):
-	common.update_walk_by_steps(self, crawl_offsets, init_crouch,  init_jump, init_jump, init_fall)
+	common.update_walk_by_steps(self, crawl_offsets, init_crouch, init_jump, init_jump, init_fall)
 
 	
 # walk
@@ -83,11 +83,11 @@ def attacks_musashi(self):
 	if self.moves_to_left:
 		d = self.x - Globs.musashi.x
 		if 0 < d < 48:
-			init_slash(self)
+			init_jump(self)
 	else:
 		d = Globs.musashi.x - self.x
 		if 0 < d < 48:
-			init_slash(self)
+			init_jump(self)
 
 def jump_back(self):
 	if abs(self.x - Globs.musashi.x) < 64:
@@ -98,12 +98,20 @@ def update_walk(self):
 
 
 # slash
+
+def init_turn_and_slash(self):
+	if Globs.musashi.x < self.x:
+		common.faces_left(self, 0)
+	else:
+		common.faces_right(self, 0)
+	init_slash(self)
+
 def init_slash(self):
 	self.hit_function = init_hit
 	ninja_common.init_slash(self, ATTACK, update_slash)
 	
 def update_slash(self):
-	ninja_common.update_slash(self, init_jump_back_start)
+	ninja_common.update_slash(self, init_walk)
 
 		
 # jumping back
@@ -122,7 +130,6 @@ def update_jump(self):
 	ninja_common.update_jump(self, init_fall)
 
 def init_fall(self):
-	self.hit_function = init_hit
 	ninja_common.init_fall(self, update_fall)
 
 def update_fall(self):
@@ -132,9 +139,9 @@ def init_jump_end(self):
 	ninja_common.init_jump_end(self, JUMP_END, update_jump_end)
 
 def update_jump_end(self):
-	ninja_common.update_jump_end(self, init_hijump_up_start, init_hijump_down_start, init_crawl)
+	ninja_common.update_jump_end(self, init_hijump_up_start, init_hijump_down_start, init_turn_and_slash)
 	
-
+	
 # hijump up
 
 def init_hijump_up_start(self):
@@ -166,7 +173,7 @@ def init_hijump_up_end(self):
 def update_hijump_up_end(self):
 	print ('[RED] update_hijump_up_end')
 	# GP.halt()
-	ninja_common.update_hijump_up_end(self, init_crawl)
+	ninja_common.update_hijump_up_end(self, init_crouch)
 
 # hijump down
 
@@ -199,4 +206,4 @@ def init_hijump_down_end(self):
 def update_hijump_down_end(self):
 	print ('[RED] update_hijump_down_end')
 	# GP.halt()
-	ninja_common.update_hijump_down_end(self, init_crawl)
+	ninja_common.update_hijump_down_end(self, init_crouch)

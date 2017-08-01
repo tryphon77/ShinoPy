@@ -13,6 +13,8 @@ def init(entry):
 	self.activate_function = activate
 	self.release_function = release
 	
+	self.hp_max = 1
+	
 	self.update_function = None
 
 def activate(self):
@@ -27,7 +29,9 @@ def release(self):
 
 def init_walk_towards_musashi(self):
 	if self.x > Globs.musashi.x:
-		flip(self)
+		common.faces_left(self, 0)
+	else:
+		common.faces_right(self, 0)
 	
 	init_walk(self)
 

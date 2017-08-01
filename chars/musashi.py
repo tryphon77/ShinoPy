@@ -4,6 +4,7 @@ from genepy import *
 
 from res.chars.musashi_data import *
 from chars import projectiles
+from chars import common
 
 
 def init(entry):
@@ -68,7 +69,7 @@ def init_stand(self):
 	# print 'init_stand'
 	set_animation(self.sprite, STAND)
 	set_physics(self, 0, 0, 0, 0)
-	self.moves_to_left = self.sprite.is_flipped
+	# self.moves_to_left = self.sprite.is_flipped
 
 	self.update_function = update_stand
 	self.collision_function = init_collision
@@ -85,15 +86,17 @@ def update_stand(self):
 	elif (Globs.joy_pressed & BUTTON_C):
 		init_jump(self)
 	# if FWD pressed, we have to check there's no wall 1 pixel forward
-	elif (Globs.joy & Globs.forward)\
-			and collides_background(self, self.front + 1, 0) == 0:
-		# print "x = %s, dx = %s, x_ = %s : let's walk forward!" % (self.x, self.front + 1, self.x + signate(self, self.front + 1))
-		init_walk(self)
-	elif Globs.joy & Globs.backward:
-		# print "x = %s, dx = %s : let's walk backward!" % (self.x, self.front)
-		flip_controls()
-		flip(self)
-		init_walk(self)
+
+	elif Globs.joy & BUTTON_RIGHT:
+		common.faces_right(self, 0)
+		if collides_background(self, self.front + 1, 0) == 0:
+			init_walk(self)
+
+	elif Globs.joy & BUTTON_LEFT:
+		common.faces_left(self, 0)
+		if collides_background(self, self.front + 1, 0) == 0:
+			init_walk(self)
+
 	elif Globs.joy & BUTTON_UP:
 		init_prepare_hijump_up(self)
 	elif Globs.joy & BUTTON_DOWN:
@@ -119,25 +122,40 @@ def update_fire(self):
 
 def throw_shuriken(self, dx, dy):
 	shuriken = projectiles.init_object()
-	shuriken.x = self.x + signate(self, dx)
 	shuriken.y = self.y + dy
 	shuriken.floor = self.floor
-	shuriken.speed_x = signate(self, 4)
-	shuriken.sprite.is_flipped = self.sprite.is_flipped
-	# print 'throw .x = %d, .speed = %d, .front = %d' % (shuriken.x, shuriken.speed_x, shuriken.front)
+	shuriken.attack_type = self.attack_type | 2
+	if self.moves_to_left:
+		shuriken.x = self.x - dx
+		shuriken.speed_x = -4
+		shuriken.moves_to_left = shuriken.sprite.is_flipped = True
+	else:
+		shuriken.x = self.x + dx
+		shuriken.speed_x = 4
+		shuriken.moves_to_left = shuriken.sprite.is_flipped = False
+	print ('shuriken: %s, %s' % (self.moves_to_left, shuriken.speed_x))
+	
 
 
 def init_walk(self):
-	# print 'init_walk'
+	set_physics(self, 0, 0, 0, 0)
+	if Globs.joy & BUTTON_LEFT:
+		common.faces_left(self, -2)
+	elif Globs.joy & BUTTON_RIGHT:
+		common.faces_right(self, 2)
+		
 	set_animation(self.sprite, WALK)
-	set_physics(self, 2, 0, 0, 0)
 	self.update_function = update_walk
 
 
 def update_walk(self):
 	# print 'update_walk'
-	if not (Globs.joy & Globs.forward):
+	if self.moves_to_left and not (Globs.joy & BUTTON_LEFT):
 		init_stand(self)
+
+	elif (not self.moves_to_left) and not (Globs.joy & BUTTON_RIGHT):
+		init_stand(self)
+	
 	elif (Globs.joy_pressed & BUTTON_B):
 		init_fire(self)
 	elif (Globs.joy_pressed & BUTTON_C):
@@ -221,10 +239,17 @@ def init_crouch(self):
 def update_crouch(self):
 	if not (Globs.joy & BUTTON_DOWN):
 		init_stand(self)
-	elif Globs.joy & Globs.backward:
-		flip_controls()
-		flip(self)
-		init_crawl(self)
+
+	elif Globs.joy & BUTTON_LEFT:
+		common.faces_left(self, 0)
+		if collides_background(self, self.front + 1, 0) == 0:
+			init_crawl(self)
+
+	elif Globs.joy & BUTTON_RIGHT:
+		common.faces_right(self, 0)
+		if collides_background(self, self.front + 1, 0) == 0:
+			init_crawl(self)
+
 	elif Globs.joy_pressed & BUTTON_B:
 		init_crouch_fire(self)
 	elif Globs.joy_pressed & BUTTON_C:
@@ -232,9 +257,6 @@ def update_crouch(self):
 			init_hijump_down(self)
 		else:
 			init_jump(self)
-	elif Globs.joy & Globs.forward\
-			and collides_background(self, self.front + 1, 0) == 0:
-		init_crawl(self)
 
 
 def init_crawl(self):
@@ -246,7 +268,7 @@ def init_crawl(self):
 def update_crawl(self):
 	if not (Globs.joy & BUTTON_DOWN):
 		init_stand(self)
-	elif not (Globs.joy & Globs.forward):
+	elif not (Globs.joy & (BUTTON_LEFT | BUTTON_RIGHT)):
 		init_crouch(self)
 	elif Globs.joy_pressed & BUTTON_B:
 		init_crouch_fire(self)
@@ -348,22 +370,22 @@ def clamp(val, min_, max_):
 
 def update_jump_action(self):
 	self.accel_x = 0
-	if Globs.joy & Globs.forward:
-		self.accel_x = signate(self, 0.125)
-	elif Globs.joy & Globs.backward:
-		self.accel_x = signate(self, -0.125)
+	if Globs.joy & BUTTON_LEFT:
+		ax = -0.125
+	elif Globs.joy & BUTTON_RIGHT:
+		ax = .125
+	else:
+		ax = 0
 
-	self.speed_x += self.accel_x
+	self.speed_x += ax
 	self.speed_x = clamp(self.speed_x, -2, 2)
 	self.x += self.speed_x
 
 	if self.moves_to_left:
 		if self.speed_x > 0:
-			flip_controls()
-			flip(self)
+			common.faces_right(self, 0)
 	elif self.speed_x < 0:
-			flip_controls()
-			flip(self)
+		common.faces_left(self, 0)
 
 
 def update_jump_position(self):

@@ -10,7 +10,7 @@ from camera import set_camera_focus_to
 # Organization needed
 # from res.levels import level_0_0
 from res.levels import level_1_1
-# from res.levels import level_2_2
+from res.levels import level_2_2
 # from res.levels import level_3_3
 # from res import musashi_data
 # from res.states import musashi_states

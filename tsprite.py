@@ -189,6 +189,7 @@ def set_animation(self, anim):
 		self.animation = self.data.animations_table[anim]
 		self.animation_tick = len(self.animation)
 		self.animation_index = 0
+		self.is_animation_over = False
 		load_next_frame(self)
 
 

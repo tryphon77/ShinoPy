@@ -5,33 +5,53 @@ import pygame
 # objects = [(1, 1), (22, 1), (1, 22), (22, 22)]
 # width = height = 24
 
-punk = shooter = None
+def read_object_file(path):
+	with open(path) as f:
+		lines = f.readlines()
+	
+	res = []
+	for line in lines:
+		line = line.strip()
+		if line:
+			_, _, x, y = line.strip('[]').split(',')
+			res += [(int(x) // 16, int(y) // 16)]
+	return res
+			
 
-objects = [(x // 16, y // 16) for (_, _, x, y, _) in [
-    [punk, 1, 320, 239, None],
-    [punk, 1, 368, 239, None],
-    [shooter, 1, 592, 239, None],
-    [punk, 1, 608, 239, None],
-    [shooter, 2, 672, 127, None],
-    [punk, 1, 752, 239, None],
-    [punk, 2, 896, 127, None],
-    [punk, 1, 960, 239, None],
-    [shooter, 1, 1008, 239, None],
-    [punk, 1, 1024, 239, None],
-    [shooter, 1, 1168, 239, None],
-    [punk, 1, 1264, 239, None],
-    [punk, 1, 1280, 239, None],
-    [punk, 1, 1312, 239, None],
-    [punk, 2, 1440, 127, None],
-	[shooter, 1, 1456, 207, None],
-    [punk, 1, 1520, 239, None],
-	[shooter, 1, 1712, 239, None],
-    [shooter, 2, 1728, 127, None],
-]]
+base_dir = 'C:/Users/fterr/Documents/hack/Shinobi/maps'
 
-width = 128
-height = 16
 
+punk = shooter = guardian = knife = green_ninja = blue_ninja = red_ninja = None
+
+# objects = [(x // 16, y // 16) for (_, _, x, y, _) in [
+    # [punk, 1, 320, 239, None],
+    # [punk, 1, 368, 239, None],
+    # [shooter, 1, 592, 239, None],
+    # [punk, 1, 608, 239, None],
+    # [shooter, 2, 672, 127, None],
+    # [punk, 1, 752, 239, None],
+    # [punk, 2, 896, 127, None],
+    # [punk, 1, 960, 239, None],
+    # [shooter, 1, 1008, 239, None],
+    # [punk, 1, 1024, 239, None],
+    # [shooter, 1, 1168, 239, None],
+    # [punk, 1, 1264, 239, None],
+    # [punk, 1, 1280, 239, None],
+    # [punk, 1, 1312, 239, None],
+    # [punk, 2, 1440, 127, None],
+	# [shooter, 1, 1456, 207, None],
+    # [punk, 1, 1520, 239, None],
+	# [shooter, 1, 1712, 239, None],
+    # [shooter, 2, 1728, 127, None],
+# ]]
+
+# width = 128
+# height = 16
+
+objects = read_object_file('%s/2-2/objects.txt' % base_dir)
+width = 64
+height = 64
+print (objects)
 
 def pow_print(c):
 	res = 0

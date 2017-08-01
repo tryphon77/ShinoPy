@@ -9,7 +9,7 @@ import random
 
 
 def init(entry):
-	self = ninja_common.init(entry, sprite_data_green, activate, release, init_collision, init_hit, 'green ninja')
+	self = ninja_common.init(entry, sprite_data_blue, activate, release, init_collision, init_hit, 'blue ninja')
 
 def activate(self):
 	ninja_common.activate(self, update_spawn)
@@ -41,7 +41,7 @@ def init_collision(self):
 	ninja_common.init_collision(self, HIT, update_collision)
 
 def update_collision(self):
-	ninja_common.update_collision(self, init_death, init_crawl)
+	ninja_common.update_collision(self, init_death, init_crouch)
 
 def init_death(self):
 	ninja_common.init_death(self, DEATH, update_death)
@@ -57,7 +57,7 @@ def init_crouch(self):
 	ninja_common.init_crouch(self, update_crouch)
 
 def update_crouch(self):
-	ninja_common.update_crouch(self, init_walk, init_crawl, init_jump_back_start)
+	ninja_common.update_crouch(self, init_air_attack, init_crawl, init_jump_back_start)
 
 def init_crawl(self):
 	if self.x < Globs.musashi.x:
@@ -72,39 +72,51 @@ def update_crawl(self):
 	common.update_walk_by_steps(self, crawl_offsets, init_crouch,  init_jump, init_jump, init_fall)
 
 	
-# walk
-
-def init_walk(self):
-	self.hit_function = init_hit_blade_high
-	ninja_common.init_walk(self, WALK, update_walk)
-	# GP.halt()
-
-def attacks_musashi(self):
-	if self.moves_to_left:
-		d = self.x - Globs.musashi.x
-		if 0 < d < 48:
-			init_slash(self)
+# air attack
+def init_air_attack(self):
+	if self.x < Globs.musashi.x:
+		common.faces_right(self, 0)
 	else:
-		d = Globs.musashi.x - self.x
-		if 0 < d < 48:
-			init_slash(self)
-
-def jump_back(self):
-	if abs(self.x - Globs.musashi.x) < 64:
-		init_jump_back_start(self)
-				
-def update_walk(self):
-	ninja_common.update_walk(self, attacks_musashi, jump_back, init_jump, common.half_turn, init_fall)
-
-
-# slash
-def init_slash(self):
+		common.faces_left(self, 0)
+	set_animation(self.sprite, JUMP_START)
+	self.update_function = update_air_attack_1
 	self.hit_function = init_hit
-	ninja_common.init_slash(self, ATTACK, update_slash)
-	
-def update_slash(self):
-	ninja_common.update_slash(self, init_jump_back_start)
 
+def update_air_attack_1(self):
+	if self.sprite.is_animation_over:
+		dx = (Globs.musashi.x - self.x) / 64
+		self.speed_x = dx
+		self.speed_y = -8
+		self.accel_y = 0.25
+		set_animation(self.sprite, AIR_ATTACK)
+		self.update_function = update_air_attack_2
+		# ninja_common.disable_blade(self)
+
+def update_air_attack_2(self):
+	self.x += self.speed_x
+
+	if collides_background(self, self.front, 0):
+		fix_hpos(self)
+		self.speed_x = signate(self, 1)
+
+	self.speed_y += self.accel_y
+	self.y += self.speed_y
+
+	if self.speed_y >= 0 and (collides_background(self, self.front, 0) or collides_background(self, self.back, 0)):
+		fix_vpos(self)
+		self.speed_y = 0
+		self.accel_y = 0
+		set_animation(self.sprite, JUMP_END)
+		self.update_function = update_air_attack_3
+
+def update_air_attack_3(self):
+	self.x += self.speed_x
+	if collides_background(self, self.front, 0):
+		fix_hpos(self)
+		self.speed_x = signate(self, 1)
+
+	if self.sprite.is_animation_over:
+		init_crouch(self)
 		
 # jumping back
 def init_jump_back_start(self):
@@ -122,7 +134,6 @@ def update_jump(self):
 	ninja_common.update_jump(self, init_fall)
 
 def init_fall(self):
-	self.hit_function = init_hit
 	ninja_common.init_fall(self, update_fall)
 
 def update_fall(self):
@@ -166,7 +177,7 @@ def init_hijump_up_end(self):
 def update_hijump_up_end(self):
 	print ('[RED] update_hijump_up_end')
 	# GP.halt()
-	ninja_common.update_hijump_up_end(self, init_crawl)
+	ninja_common.update_hijump_up_end(self, init_crouch)
 
 # hijump down
 
@@ -199,4 +210,4 @@ def init_hijump_down_end(self):
 def update_hijump_down_end(self):
 	print ('[RED] update_hijump_down_end')
 	# GP.halt()
-	ninja_common.update_hijump_down_end(self, init_crawl)
+	ninja_common.update_hijump_down_end(self, init_crouch)

@@ -7,8 +7,9 @@ from chars import shooter
 from chars import knife
 from chars import hostage
 from chars import guardian
-# from res.states import sword_states
-# from res.states import hostage_states
+from chars import green_ninja
+from chars import red_ninja
+from chars import blue_ninja
 
 # from res import hostage_data
 
@@ -339,13 +340,13 @@ hostages = []
 objects = [
     [musashi, 1, 64, 239, None],
     [punk, 1, 320, 239, None],
-    [guardian, 1, 368, 239, None],
+    [blue_ninja, 1, 368, 239, None],
 	[hostage, 1, 496, 239, None],
     [guardian, 2, 512, 127, 3],
     [shooter, 2, 672, 127, None],
     [punk, 1, 752, 239, None],
-    [punk, 2, 896, 127, None],
-    [punk, 1, 960, 239, None],
+    [red_ninja, 2, 896, 127, None],
+    [green_ninja, 1, 960, 239, None],
     [shooter, 1, 1008, 239, None],
     [punk, 1, 1024, 239, None],
     [shooter, 1, 1168, 239, None],
@@ -353,10 +354,10 @@ objects = [
     [knife, 1, 1280, 239, None],
     [knife, 1, 1312, 239, None],
     [punk, 2, 1440, 127, None],
-	[shooter, 1, 1456, 207, None],
+	[green_ninja, 1, 1456, 207, None],
     [punk, 1, 1520, 239, None],
-	[shooter, 1, 1712, 239, None],
-    [shooter, 2, 1728, 127, None],
+	[blue_ninja, 1, 1712, 239, None],
+    [red_ninja, 2, 1728, 127, None],
 ]
 
 
