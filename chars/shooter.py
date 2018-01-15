@@ -10,24 +10,31 @@ from res.chars.shooter_data import *
 
 # param1 = counter for stopping walk
 # param2 = number of bullets
-	
+# param3 = 
+#	0: standing shooter
+#	1: sitting shooter
+#	2: lying shooter
 
 def init(entry):
 	print('init shooter')
 
 	self = common.init(entry)
-	self.name = "shooter at (%d, %d)" % (self.x, self.y)
+	self.name = "shooter at (%d, %d)" % (self.org_x, self.org_y)
 
 	self.activate_function = activate
 	self.release_function = release
 	
 	self.hp_max = 1
 	self.param2 = 3
-
+	self.param3 = entry[5]
 
 def activate(self):
-	common.activate(self, None)
-	common.appear(self, init_walk)	
+	
+	if self.org_faces_left != Globs.musashi.moves_to_left:
+		common.activate(self, None)
+		common.appear(self, None)	
+		common.faces_object(self, Globs.musashi)
+		[init_walk, init_walk, init_laid][self.param3](self)
 
 
 def release(self):
@@ -42,6 +49,7 @@ def shoot(self, dx, dy):
 	bullet.floor = self.floor
 	bullet.speed_x = signate(self, 2)
 	bullet.sprite.is_flipped = self.sprite.is_flipped
+	bullet.sprite.vpos |= (self.sprite.vpos & 0xF800)
 	# print 'throw .x = %d, .speed = %d, .front = %d' % (bullet.x, bullet.speed_x, bullet.front)
 
 
@@ -53,10 +61,48 @@ def init_walk(self):
 	self.collision_function = init_collision
 	self.hit_function = init_hit
 
+	
+# lay
+
+def init_laid(self):
+	set_animation(self.sprite, LAID)
+	set_physics(self, 0, 0, 0, 0)
+	self.update_function = update_laid
+	self.collision_function = init_collision
+	self.hit_function = init_hit
+
+def update_laid(self):
+	if self.sprite.is_animation_over and self.floor == Globs.musashi.floor:
+		d = abs(self.x - Globs.musashi.x)
+		if d <= 80:
+			init_stand_up(self)
+		else:
+			init_shoot_laid(self)
+
+def init_stand_up(self):
+	set_animation(self.sprite, STAND_UP)
+	self.update_function = update_stand_up
+	self.param3 = 0
+
+def update_stand_up(self):
+	if self.sprite.is_animation_over:
+		init_shoot(self)
+
+def init_shoot_laid(self):
+	set_animation(self.sprite, SHOOT_LAID)
+	self.update_function = update_shoot_laid
+	shoot(self, 64, -10)
+
+def update_shoot_laid(self):
+	if self.sprite.is_animation_over:
+		init_laid(self)
+
+
 # walk
 def walk_same_level_action(self):
-	head_towards(self, Globs.musashi)
-	init_shoot(self)
+	common.faces_object(self, Globs.musashi)
+	if abs(self.x - Globs.musashi.x) < 160:
+		[init_shoot, init_shoot_sat][self.param3](self)
 
 def walk_different_level_action(self):
 	if self.sprite.is_animation_over:
@@ -65,6 +111,7 @@ def walk_different_level_action(self):
 			init_reload(self)
 
 def update_walk(self):
+	# common.update_walk(self, walk_same_level_action, walk_different_level_action, init_jump, common.half_turn, init_fall)
 	common.update_walk(self, walk_same_level_action, walk_different_level_action, init_jump, common.half_turn, init_fall)
 
 
@@ -104,8 +151,25 @@ def update_shoot1(self):
 		if self.param2 == 0:
 			init_reload(self)
 
+def init_shoot_sat(self):
+	set_physics(self, 0, 0, 0, 0)
+	set_animation(self.sprite, SHOOT_SAT)
+	self.update_function = update_shoot_sat
+
+def update_shoot_sat(self):
+	if self.sprite.total_ticks_in_animation == 4:
+		shoot(self, 40, -24)
+	elif self.sprite.is_animation_over:
+		init_shoot_sat(self)
+		self.param2 -= 1
+		print('bullets left: %d' % self.param2)
+		if self.param2 == 0:
+			init_reload(self)
+
 
 def init_collision(self):
+	if self.param3 == 2:
+		self.param3 = 0
 	common.init_collision(self, HIT, update_collision)
 
 def init_hit(self):
@@ -132,14 +196,15 @@ def init_jump1(self):
 
 
 def update_jump1(self):
-	common.update_jump(self, init_fall)
+	# common.update_jump(self, init_fall)
+	common.update_jump(self, next_state = init_walk)
 
 
 def init_fall(self):
-	common.init_fall(self, FALL, update_fall)
+	common.init_fall(self, FALL, update_jump1)
 
-def update_fall(self):
-	common.update_fall(self, init_walk)
+# def update_fall(self):
+	# common.update_fall(self, init_walk)
 
 def init_death(self):
 	common.init_death(self, DEAD, update_death)

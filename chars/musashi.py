@@ -3,13 +3,16 @@ from tsprite import *
 from genepy import *
 
 from res.chars.musashi_data import *
+from res.levels import all_levels
+
 from chars import projectiles
+from chars import more_objects
 from chars import common
 
 
 def init(entry):
 	print('init and activate musashi')
-	_, floor, x, y, _ = entry
+	_, floor, x, y, dir, _ = entry
 	self = allocate_object(objects)
 	self.name = "musashi"
 	friend_objects.add(self)
@@ -22,43 +25,37 @@ def init(entry):
 	self.is_displayable = True
 	self.is_collidable = True
 
-	# self.trigger_x = trigger_x
-	# self.trigger_y = trigger_y
 	self.org_x = x
 	self.org_y = y
 
 	self.x = x
 	self.y = y
-	self.floor = 1
+	self.floor = floor
 
 	Globs.musashi = self
+	print ('Globs.musashi = %s' % Globs.musashi)
 	all_objects.add(self)
 	
 	self.back = -10
 	self.front = 10
+	self.global_display_box = (-16, -63, 32, 64)
 
 	self.param1 = 0	# counter for hijumps
 	self.param2 = 0 # temp floor
 
-	self.sprite = sprite = allocate_dynamic_sprite()
+	sprite = allocate_dynamic_sprite()
 	sprite.name = "sprite %s" % self.name
 
-	sprite.vpos |= 0x8000
+	sprite.vpos |= Globs.stage_priority
 	sprite.status = 1
 	sprite.x = self.x
 	sprite.y = self.y
-	
 	sprite.data = sprite_data
-	# sprite.patterns = load_data_from_png('res/chars/musashi_patterns.png')
-	# sprite.frames_table = frames_table
-	# sprite.animations_table = animations_table
-	# sprite.bboxes_table = bounding_boxes
-	# sprite.hitboxes = hitboxes
 
 	sprite.frame = 76
-	# sprite.patterns_blocks = patterns_blocks
 	sprite.bbox = (-6, 0, 16, 64)
 
+	self.sprite = sprite
 	init_stand(self)
 
 def activate(self):
@@ -69,6 +66,7 @@ def init_stand(self):
 	# print 'init_stand'
 	set_animation(self.sprite, STAND)
 	set_physics(self, 0, 0, 0, 0)
+	Globs.vscroll_mode = 0
 	# self.moves_to_left = self.sprite.is_flipped
 
 	self.update_function = update_stand
@@ -77,9 +75,11 @@ def init_stand(self):
 
 
 def update_stand(self):
-	# print 'update_stand'
+	print ('update_stand')
 	if not (collides_background(self, self.front, 1) or
 			collides_background(self, self.back, 1)):
+		# print ('fall (coll = %X)' % collides_background(self, self.front, 1) or
+			# collides_background(self, self.back, 1))
 		init_fall(self)
 	elif (Globs.joy_pressed & BUTTON_B):
 		init_fire(self)
@@ -88,12 +88,12 @@ def update_stand(self):
 	# if FWD pressed, we have to check there's no wall 1 pixel forward
 
 	elif Globs.joy & BUTTON_RIGHT:
-		common.faces_right(self, 0)
+		common.faces_right(self)
 		if collides_background(self, self.front + 1, 0) == 0:
 			init_walk(self)
 
 	elif Globs.joy & BUTTON_LEFT:
-		common.faces_left(self, 0)
+		common.faces_left(self)
 		if collides_background(self, self.front + 1, 0) == 0:
 			init_walk(self)
 
@@ -103,11 +103,13 @@ def update_stand(self):
 		init_crouch(self)
 
 
+standing_close_box = (0, -48, 56, 32)
+
 def init_fire(self):
 	set_physics(self, 0, 0, 0, 0)
 	# print 'fire %d' % self.sprite.frame
 	# if check_box_on_objects(self, high_close_attack_box, ennemy_objects):
-	if is_near(self, 48, 48, ennemy_objects):
+	if is_near(self, standing_close_box, ennemy_objects):
 		set_animation(self.sprite, PUNCH)
 	else:
 		set_animation(self.sprite, walk_fire_anims[self.sprite.frame])
@@ -122,6 +124,7 @@ def update_fire(self):
 
 def throw_shuriken(self, dx, dy):
 	shuriken = projectiles.init_object()
+	shuriken.sprite.vpos |= (self.sprite.vpos & 0x8000)
 	shuriken.y = self.y + dy
 	shuriken.floor = self.floor
 	shuriken.attack_type = self.attack_type | 2
@@ -140,9 +143,9 @@ def throw_shuriken(self, dx, dy):
 def init_walk(self):
 	set_physics(self, 0, 0, 0, 0)
 	if Globs.joy & BUTTON_LEFT:
-		common.faces_left(self, -2)
+		common.moves_left(self, -2)
 	elif Globs.joy & BUTTON_RIGHT:
-		common.faces_right(self, 2)
+		common.moves_right(self, 2)
 		
 	set_animation(self.sprite, WALK)
 	self.update_function = update_walk
@@ -197,8 +200,9 @@ def init_hijump_up(self):
 	self.speed_y = self.accel_y = 0
 	set_animation(self.sprite, HIJUMP0)
 	self.update_function = update_hijump_up
+	self.is_collidable = False
 	self.collision_function = None
-	self.param2 = self.floor + 1
+	Globs.vscroll_mode = 1
 
 
 def update_hijump_up(self):
@@ -212,21 +216,22 @@ def init_hijump1_up(self):
 	self.accel_y = 0.5
 	set_animation(self.sprite, HIJUMP1)
 	self.update_function = update_hijump1_up
-	self.param1 = 8
+	self.param1 = 8 # timer before leaving lower floor
 
 
 def update_hijump1_up(self):
-	self.param1 -= 1
+	# self.param1 -= 1
 	if self.param1 > 0:
 		self.param1 -= 1
-		if self.param1 == 0:
+		if self.param1 <= 0:
 			self.floor += 1
-			self.floor |= 0x80
+			self.floor |= 0x80	# now on current_floor, but not detectable
 	
 	self.speed_y += self.accel_y
 	self.y += self.speed_y
 	if self.speed_y >= 0:
 		self.param1 = 2
+		self.sprite.vpos &= 0x7FFF
 		init_hifall(self)
 
 
@@ -241,12 +246,12 @@ def update_crouch(self):
 		init_stand(self)
 
 	elif Globs.joy & BUTTON_LEFT:
-		common.faces_left(self, 0)
+		common.faces_left(self)
 		if collides_background(self, self.front + 1, 0) == 0:
 			init_crawl(self)
 
 	elif Globs.joy & BUTTON_RIGHT:
-		common.faces_right(self, 0)
+		common.faces_right(self)
 		if collides_background(self, self.front + 1, 0) == 0:
 			init_crawl(self)
 
@@ -290,11 +295,12 @@ def update_crawl(self):
 			fix_hpos(self)
 			init_crouch(self)
 
+crouch_close_attack = (0, -24, 40, 32)
 
 def init_crouch_fire(self):
 	set_physics(self, 0, 0, 0, 0)
 	# print 'fire %d' % self.sprite.frame
-	if is_near(self, 40, 24, ennemy_objects):
+	if is_near(self, crouch_close_attack, ennemy_objects):
 		set_animation(self.sprite, KICK)
 	else:
 		set_animation(self.sprite, crouch_fire_anims[self.sprite.frame - 17])
@@ -310,6 +316,7 @@ def update_crouch_fire(self):
 def init_hijump_down(self):
 	set_animation(self.sprite, HIFALL0)
 	self.update_function = update_hijump_down
+	Globs.vscroll_mode = 1
 
 
 def update_hijump_down(self):
@@ -329,13 +336,14 @@ def update_hijump1_down(self):
 	self.y += self.speed_y
 	if self.speed_y >= 0:
 		self.floor -= 1
-		self.floor |= 0x80
-		self.param1 = 28
+		self.floor |= 0x80	# now on lower floot, but not detectable
+		self.param1 = 28	# timer before becoming detectable
+		self.sprite.vpos |= 0x8000
 		init_hifall(self)
 
 
 def init_hifall(self):
-	self.sprite.vpos ^= 0x8000
+	self.is_collidable = True
 	self.update_function = update_hifall
 	self.collision_function = init_collision
 
@@ -344,14 +352,15 @@ def update_hifall(self):
 	# print (self.param1, self.floor)
 	if self.param1 > 0:
 		self.param1 -= 1
-		if self.param1 == 0:
+		if self.param1 <= 0:
 			self.floor &= 0x7F
 
 	self.speed_y += self.accel_y
 	self.y += self.speed_y
-	if collides_background(self, self.front, 1) or\
-			collides_background(self, self.back, 1):
-		fix_vpos(self)
+	# if collides_background(self, self.front, 1) or\
+			# collides_background(self, self.back, 1):
+		# fix_vpos(self)
+	if handle_fall(self):
 		self.floor &= 0x7F
 		init_stand(self)
 
@@ -359,9 +368,10 @@ def update_hifall(self):
 def init_jump(self):
 	# print 'init_jump:',
 	set_animation(self.sprite, JUMP)
-	self.speed_y = -8.5
+	self.speed_y = -9 #-8.5
 	self.accel_y = 0.5
 	self.update_function = update_jump
+	Globs.vscroll_mode = 1
 
 
 def clamp(val, min_, max_):
@@ -383,15 +393,24 @@ def update_jump_action(self):
 
 	if self.moves_to_left:
 		if self.speed_x > 0:
-			common.faces_right(self, 0)
+			common.faces_right(self)
 	elif self.speed_x < 0:
-		common.faces_left(self, 0)
+		common.faces_left(self)
 
 
 def update_jump_position(self):
 	update_jump_action(self)
+	
+	old_y = self.y
 	self.speed_y += self.accel_y
 	self.y += self.speed_y
+	
+	if Globs.level == all_levels.LEVEL_2_3:
+		more_objects.check_splash(self.x, old_y, self.y)
+	
+	if self.y < 0:
+		self.speed_y = 0
+		self.y = 0
 
 	if collides_background(self, self.front, 0):
 		fix_hpos(self)
@@ -405,16 +424,32 @@ def update_fall_position(self):
 		fix_hpos(self)
 		self.speed_x = 0
 
+	old_y = self.y
 	self.speed_y += self.accel_y
 	self.y += self.speed_y
+	
+	# @TODO: conditionnal
+	
+	if Globs.level == all_levels.LEVEL_2_3:
+		more_objects.check_splash(self.x, old_y, self.y)
 
-	if collides_background(self, self.front, 0) or\
-			collides_background(self, self.back, 0):
-		fix_vpos(self)
+	print ('@')
+	
+	if handle_fall(self):
+		print ('FALL END')
 		init_stand(self)
+
+	
+	# coll = collides_background(self, self.front, 0) | collides_background(self, self.back, 0)
+	# print ('coll: %X' % self.coll_value)
+	# if coll:
+		# print ('!')
+		# fix_vpos(self)
+		# init_stand(self)
 
 
 def update_jump(self):
+	print ('musashi vpos = %X' % self.sprite.vpos)
 	# print 'update_jump:',
 	if self.speed_y >= 0:
 		init_fall(self)
@@ -444,6 +479,7 @@ def update_jump_fire(self):
 def init_fall(self):
 	# print 'init_fall:',
 	set_animation(self.sprite, FALL)
+	self.speed_y = 0.5
 	self.accel_y = 0.5
 	self.update_function = update_fall
 
@@ -475,6 +511,16 @@ def update_fall_fire(self):
 def init_collision(self):
 	# print 'musashi collided'
 	other = self.other_object
+
+	# commented, use impulsion instead
+	# if self.x < other.x:
+		# self.speed_x = -2
+	# else:
+		# self.speed_x = 2
+	if self.impulsion_x > 0:
+		self.speed_x = 2
+	else:
+		self.speed_x = -2
 	
 	self.speed_y = -4
 	self.accel_y = 0.5
@@ -501,12 +547,16 @@ def update_collision(self):
 	self.speed_y += self.accel_y
 	self.y += self.speed_y
 
-	if self.speed_y > 0 and (collides_background(self, self.front, 1) or collides_background(self, self.back, 1)):
-		print (self.speed_y)
-		print ('front = %d, back = %d' % (self.front, self.back))
-		# GP.halt()
-		fix_vpos(self)
-		init_stand(self)
+	if self.speed_y > 0:
+		# coll = collides_background(self, self.front, 1) | collides_background(self, self.back, 1)
+		# if coll & 7:
+			# print (self.speed_y)
+			# print ('front = %d, back = %d' % (self.front, self.back))
+			# # GP.halt()
+			# fix_vpos(self)
+		if handle_fall(self):
+			self.floor &= 0x7F	# when collided during hijump, must become detectable
+			init_stand(self)
 
 
 

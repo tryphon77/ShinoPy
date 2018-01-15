@@ -9,12 +9,14 @@ import tsprite
 def init(entry):
 	# param1 : pointer to guardian
 	
-	global hostage_tiles_pos
-	hostage_tiles_pos = tsprite.allocate_tiles(patterns)
+	if Globs.hostage_vpos is None:
+		Globs.hostage_vpos = tsprite.allocate_tiles(patterns)
 
 	self = common.init(entry)
 	self.name = "hostage at (%d, %d)" % (self.org_x, self.org_y)
 	self.param1 = entry[4]
+	
+	self.global_display_box = (-16, -31, 32, 32)
 
 	self.activate_function = activate
 	self.release_function = release
@@ -23,7 +25,8 @@ def activate(self):
 	common.activate(self, None)
 	common.appear(self, init_wait, hostage_objects, False)
 	if self.sprite:
-		self.sprite.vpos = hostage_tiles_pos
+		self.sprite.vpos &= 0xF800
+		self.sprite.vpos |= Globs.hostage_vpos
 
 		self.collision_function = init_free
 	self.release_function = release

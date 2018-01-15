@@ -1,4 +1,4 @@
-STATIC_TILES_START = 0x400
+STATIC_TILES_START = 0x580
 
 class Globs():
 	tileset = None
@@ -20,8 +20,8 @@ class Globs():
 
 	is_refresh_available = 0
 	
-	camera_x = 0
-	camera_y = 0
+	# camera_x = 0
+	# camera_y = 0
 	vscroll_mode = True
 
 	link = 0
@@ -47,4 +47,5 @@ class Globs():
 	stage = 0
 	show_mission_text = True
 
+	hostage_vpos = None
 

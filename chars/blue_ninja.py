@@ -12,19 +12,36 @@ def init(entry):
 	self = ninja_common.init(entry, sprite_data_blue, activate, release, init_collision, init_hit, 'blue ninja')
 
 def activate(self):
-	ninja_common.activate(self, update_spawn)
+	ninja_common.activate(self, init_appear)
+	# print (self.x, camera.left, camera.right)
+	# GP.halt()
 
 def release(self):
 	ninja_common.release(self)
 
-def update_spawn(self):
-	ninja_common.update_spawn(self, init_appear)
+# def update_spawn(self):
+	# ninja_common.update_spawn(self, init_appear)
 
 def init_appear(self):
+	log.write(2, '[%s] init_appear' % self.name)
 	ninja_common.init_appear(self, APPEAR, update_appear)
 
 def update_appear(self):
-	ninja_common.update_appear(self, init_crouch)
+	log.write(2, '[%s] update_appear' % self.name)
+	ninja_common.update_appear(self, after_appear)
+
+def after_appear(self):
+	self.is_collidable = True
+	if self.floor == Globs.musashi.floor:
+		init_crouch(self)
+	elif self.floor < Globs.musashi.floor and get_hijump_impulsion(self):
+		init_hijump_up_start(self)
+	elif self.floor > Globs.musashi.floor and get_hijump_down_impulsion(self):
+		init_hijump_down_start(self)
+	else:
+		# init_jump_back_start(self)
+		# for the red ninja in 2-2
+		init_crouch(self)
 
 # collision and death
 
@@ -47,40 +64,45 @@ def init_death(self):
 	ninja_common.init_death(self, DEATH, update_death)
 
 def update_death(self):
-	ninja_common.update_death(self, update_spawn)
+	ninja_common.update_death(self, None)
 
 
 # crouch and crawl
 
 def init_crouch(self):
 	self.hit_function = init_hit_blade_low
-	ninja_common.init_crouch(self, update_crouch)
+	ninja_common.init_crouch(self, init_fall, update_crouch)
 
 def update_crouch(self):
 	ninja_common.update_crouch(self, init_air_attack, init_crawl, init_jump_back_start)
 
 def init_crawl(self):
-	if self.x < Globs.musashi.x:
-		common.faces_right(self, 1)
-	else:
-		common.faces_left(self, -1)
+	print ('[%s] init_crawl' % self.name)
+	common.moves_object(self, Globs.musashi, 1)
 	set_animation(self.sprite, CRAWL)
 	self.update_function = update_crawl
 	self.hit_function = init_hit_blade_low
+	self.param2 = 0
 
+def crawl_action(self):
+	if self.sprite.is_animation_over:
+		init_crouch(self)
+		
 def update_crawl(self):
-	common.update_walk_by_steps(self, crawl_offsets, init_crouch,  init_jump, init_jump, init_fall)
+	print ('[%s] update_crawl' % self.name)
+	print (self.param2)
+	common.update_walk_by_steps(self, crawl_offsets, crawl_action,  init_jump, init_jump, init_fall)
 
 	
 # air attack
 def init_air_attack(self):
 	if self.x < Globs.musashi.x:
-		common.faces_right(self, 0)
+		common.faces_right(self)
 	else:
-		common.faces_left(self, 0)
+		common.faces_left(self)
 	set_animation(self.sprite, JUMP_START)
 	self.update_function = update_air_attack_1
-	self.hit_function = init_hit
+	self.hit_function = init_hit_blade_high
 
 def update_air_attack_1(self):
 	if self.sprite.is_animation_over:
@@ -92,22 +114,31 @@ def update_air_attack_1(self):
 		self.update_function = update_air_attack_2
 		# ninja_common.disable_blade(self)
 
+def disable_guard(self):
+	if self.sprite.total_ticks_in_animation == 8:
+		self.hit_function = init_hit
+
 def update_air_attack_2(self):
-	self.x += self.speed_x
+	# self.x += self.speed_x
 
-	if collides_background(self, self.front, 0):
-		fix_hpos(self)
-		self.speed_x = signate(self, 1)
+	# if collides_background(self, self.front, 0):
+		# fix_hpos(self)
+		# self.speed_x = signate(self, 1)
 
-	self.speed_y += self.accel_y
-	self.y += self.speed_y
+	# self.speed_y += self.accel_y
+	# self.y += self.speed_y
 
-	if self.speed_y >= 0 and (collides_background(self, self.front, 0) or collides_background(self, self.back, 0)):
-		fix_vpos(self)
-		self.speed_y = 0
-		self.accel_y = 0
-		set_animation(self.sprite, JUMP_END)
-		self.update_function = update_air_attack_3
+	# if self.speed_y >= 0 and (collides_background(self, self.front, 0) or collides_background(self, self.back, 0)):
+		# fix_vpos(self)
+		# self.speed_y = 0
+		# self.accel_y = 0
+		# set_animation(self.sprite, JUMP_END)
+		# self.update_function = update_air_attack_3
+	common.update_jump(self, next_state = init_air_attack_3, action = disable_guard)
+
+def init_air_attack_3(self):
+	set_animation(self.sprite, JUMP_END)
+	self.update_function = update_air_attack_3
 
 def update_air_attack_3(self):
 	self.x += self.speed_x
@@ -137,7 +168,7 @@ def init_fall(self):
 	ninja_common.init_fall(self, update_fall)
 
 def update_fall(self):
-	ninja_common.update_fall(self, init_jump_end)
+	ninja_common.update_jump(self, next_state =  init_jump_end)
 
 def init_jump_end(self):
 	ninja_common.init_jump_end(self, JUMP_END, update_jump_end)

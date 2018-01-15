@@ -144,6 +144,8 @@ STAB_JUMP = 7
 WAIT = 8
 DEAD = 9
 
+
+rect0 = (-24, -60, 48, 60)
 rect1 = (-8, -60, 16, 60)
 rect2 = (-8, -30, 16, 30)
 
@@ -164,4 +166,4 @@ bounding_boxes = [
 
 hitboxes = [None] * 12
 
-sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "shooter")
+sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, rect0, "knife")

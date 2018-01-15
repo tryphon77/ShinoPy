@@ -13,15 +13,18 @@ layer_A = Layer()
 layer_B = Layer()
 
 def draw_tile(plane, tile, x, y):
+	priority = tile & 0x8000
+	
+	tile &= 0x7FFF
 	x_ = (2*x) & 0x3E
 	y_ = (2*y) & 0x3E
 	tile *= 4
 
 	# print ('[draw_tile] plane: %s, tile: %X/%X, x: %d, y:%d' % (plane, tile, len(Globs.tileset), x_, y_))
-	GP.set_tilemap(plane, Globs.tileset[tile], x_, y_)
-	GP.set_tilemap(plane, Globs.tileset[tile + 1], x_ + 1, y_)
-	GP.set_tilemap(plane, Globs.tileset[tile + 2], x_, y_ + 1)
-	GP.set_tilemap(plane, Globs.tileset[tile + 3], x_ + 1, y_ + 1)
+	GP.set_tilemap(plane, priority | Globs.tileset[tile], x_, y_)
+	GP.set_tilemap(plane, priority | Globs.tileset[tile + 1], x_ + 1, y_)
+	GP.set_tilemap(plane, priority | Globs.tileset[tile + 2], x_, y_ + 1)
+	GP.set_tilemap(plane, priority | Globs.tileset[tile + 3], x_ + 1, y_ + 1)
 	
 
 def draw_rect(layer, x, y, w, h):

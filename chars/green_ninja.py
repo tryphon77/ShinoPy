@@ -12,20 +12,33 @@ def init(entry):
 	self = ninja_common.init(entry, sprite_data_green, activate, release, init_collision, init_hit, 'green ninja')
 
 def activate(self):
-	ninja_common.activate(self, update_spawn)
+	ninja_common.activate(self, init_appear)
 
 def release(self):
 	ninja_common.release(self)
 
-def update_spawn(self):
-	ninja_common.update_spawn(self, init_appear)
+# def update_spawn(self):
+	# ninja_common.update_spawn(self, init_appear)
 
 def init_appear(self):
 	ninja_common.init_appear(self, APPEAR, update_appear)
 
 def update_appear(self):
-	ninja_common.update_appear(self, init_crouch)
+	ninja_common.update_appear(self, after_appear)
 
+def after_appear(self):
+	self.is_collidable = True
+	if self.floor == Globs.musashi.floor:
+		init_crouch(self)
+	elif self.floor < Globs.musashi.floor and get_hijump_impulsion(self):
+		init_hijump_up_start(self)
+	elif self.floor > Globs.musashi.floor and get_hijump_down_impulsion(self):
+		init_hijump_down_start(self)
+	else:
+		# init_jump_back_start(self)
+		# for the red ninja in 2-2
+		init_crouch(self)
+	
 # collision and death
 
 def init_hit(self):
@@ -41,35 +54,42 @@ def init_collision(self):
 	ninja_common.init_collision(self, HIT, update_collision)
 
 def update_collision(self):
-	ninja_common.update_collision(self, init_death, init_crawl)
+	ninja_common.update_collision(self, init_death, init_crouch)
 
 def init_death(self):
 	ninja_common.init_death(self, DEATH, update_death)
 
 def update_death(self):
-	ninja_common.update_death(self, update_spawn)
+	ninja_common.update_death(self, None)
 
 
 # crouch and crawl
 
 def init_crouch(self):
+	print ('[%s] init_crouch' % self.name)
 	self.hit_function = init_hit_blade_low
-	ninja_common.init_crouch(self, update_crouch)
+	ninja_common.init_crouch(self, init_fall, update_crouch)
 
 def update_crouch(self):
+	print ('[%s] update_crouch' % self.name)
 	ninja_common.update_crouch(self, init_walk, init_crawl, init_jump_back_start)
 
 def init_crawl(self):
-	if self.x < Globs.musashi.x:
-		common.faces_right(self, 1)
-	else:
-		common.faces_left(self, -1)
+	print ('[%s] init_crawl' % self.name)
+	common.moves_object(self, Globs.musashi, 1)
 	set_animation(self.sprite, CRAWL)
 	self.update_function = update_crawl
 	self.hit_function = init_hit_blade_low
+	self.param2 = 0
 
+def crawl_action(self):
+	if self.sprite.is_animation_over:
+		init_crouch(self)
+		
 def update_crawl(self):
-	common.update_walk_by_steps(self, crawl_offsets, init_crouch,  init_jump, init_jump, init_fall)
+	print ('[%s] update_crawl' % self.name)
+	print ('floor: musashi = %d, ninja = %d' % (Globs.musashi.floor, self.floor))
+	common.update_walk_by_steps(self, crawl_offsets, crawl_action,  init_jump, init_jump, init_fall)
 
 	
 # walk

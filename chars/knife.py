@@ -8,8 +8,12 @@ from chars import common
 def init(entry):
 	self = common.init(entry)
 	self.name = 'knife at (%d, %d)' % (self.org_x, self.org_y)
+	
+	self.org_faces_left = entry[4]
 
 	self.hp_max = 1
+	self.global_display_box = (-16, -63, 32, 64)
+	self.spawn_counter = 240
 	
 	self.activate_function = activate
 	self.release_function = release
@@ -25,19 +29,31 @@ def release(self):
 
 
 def update_spawn(self):
-	# print ('update_spawn: %d' % self.tick)
+	print ('update_spawn: %d' % self.tick)
 	self.tick -= 1
 	if self.tick < 0:
-		common.appear_on_edge(self, init_wait)
+		# common.appear_on_edge(self, init_wait)
+		# if self.is_displayable:
+		# common.faces_object(self, Globs.musashi, 0)
+		if self.org_faces_left and self.x > Globs.musashi.x:
+			common.appear_on_edge(self, init_wait)
+		elif (not self.org_faces_left) and self.x < Globs.musashi.x:
+			common.appear_on_edge(self, init_wait)
+		if self.sprite:
+			common.faces_object(self, Globs.musashi)
 
 
 def init_wait(self):
 	self.is_collidable = True
 	set_physics(self, 0, 0, 0, 0)
 	set_animation(self.sprite, WAIT)
+	self.collision_function = init_collision
+	self.hit_function = init_hit
 	self.update_function = update_wait
 
 def update_wait(self):
+	print ('[%s] update_wait' % self.name)
+	print (self.floor, Globs.musashi.floor, self.moves_to_left)
 	if self.floor == Globs.musashi.floor:
 		if self.moves_to_left:
 			if Globs.musashi.x > self.x:
@@ -77,8 +93,6 @@ def init_walk(self):
 	set_physics(self, 2, 0, 0, 0)
 	set_animation(self.sprite, WALK)
 	self.update_function = update_walk
-	self.collision_function = init_collision
-	self.hit_function = init_hit
 
 
 def attacks_musashi(self):
@@ -122,16 +136,11 @@ def init_jump_main(self):
 	self.update_function = update_jump_main
 
 def update_jump_main(self):
-	common.update_jump(self, init_fall)
+	common.update_jump(self, next_state = init_jump_end)
 
 def init_fall(self):
 	# print 'punk init_fall'
-	common.init_fall(self, JUMP_MAIN, update_fall)
-
-
-def update_fall(self):
-	# print 'punk update_fall'
-	common.update_fall(self, init_jump_end)
+	common.init_fall(self, JUMP_MAIN, update_jump_main)
 
 def init_jump_end(self):
 	set_physics(self, 0, 0, 0, 0)
@@ -164,6 +173,6 @@ def update_attack(self):
 		   and collides_background(self, self.back, 1) == 0:
 			init_fall(self)
 
-		elif collides_background(self, self.front + 1, -32):
+		elif collides_background(self, self.front + 1, 0):
 			fix_hpos(self)
 			self.speed_x = 0

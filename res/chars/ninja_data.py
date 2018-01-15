@@ -300,7 +300,7 @@ patterns_blocks = [
 appear = [(0, 8), (1, 8), (2, 8), (3, 8)]
 crouch = [(4, 16)]
 walk = [(6, 8), (7, 8), (6, 8), (8, 8)]
-crawl = [(5, 32), (4, 32)]
+crawl = [(4, 32), (5, 32)]
 attack = [(8, 6), (23, 4), (24, 4), (25, 6), (26, 4), (27, 4), (28, 6), (26, 4), (23, 4), (8, 8)]
 jump_start = [(9, 4), (4, 4)]
 jump = [(10, 1)]
@@ -360,6 +360,7 @@ HIT = 17
 DEATH = 18
 
 
+rect0 = (-20, -59, 40, 60)
 rect1 = (-12, -36, 24, 37)
 rect2 = (-12, -51, 24, 52)
 rect3 = (-12, -43, 24, 44)
@@ -406,12 +407,12 @@ bounding_boxes = [
 
 hitboxes = [None] * 34
 
-sprite_data_green = TSpriteData(patterns_green, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "green ninja")
-sprite_data_blue = TSpriteData(patterns_blue, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "blue ninja")
-sprite_data_red = TSpriteData(patterns_red, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "red ninja")
-sprite_data_yellow = TSpriteData(patterns_yellow, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "yellow ninja")
+sprite_data_green = TSpriteData(patterns_green, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, rect0, "green ninja")
+sprite_data_blue = TSpriteData(patterns_blue, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, rect0, "blue ninja")
+sprite_data_red = TSpriteData(patterns_red, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, rect0, "red ninja")
+sprite_data_yellow = TSpriteData(patterns_yellow, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, rect0, "yellow ninja")
 
-crawl_offsets = [12, 12, 0]
+crawl_offsets = [12, 12]
 
 blade_high_box = (10, -61, 9, 24)
 blade_low_box = (10, -39, 9, 40)

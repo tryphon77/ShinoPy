@@ -101,6 +101,7 @@ BONUS1000 = 5
 BONUSPOW = 6
 
 
+rect0 = (-16, -31, 32, 32)
 rect1 = (-12, -28, 24, 29)
 
 bounding_boxes = [
@@ -120,4 +121,4 @@ bounding_boxes = [
 
 hitboxes = [None] * 12
 
-sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "hostage")
+sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, rect0, "hostage")

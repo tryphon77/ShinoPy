@@ -20,7 +20,8 @@ import tools.plugins.best_splitter
 
 
 def read_sheet(path):
-	psd = load_psd('%s/sheet.psd' % base_dir)
+	# psd = load_psd('%s/sheet.psd' % base_dir)
+	psd = load_psd(path)
 
 	res = []
 	for i, layer in enumerate(psd.get_layers()):
@@ -108,21 +109,19 @@ def generate_splits(data):
 				 (tools.plugins.group_splitter.splitter, []),
 				 (tools.plugins.row_splitter.splitter, [])]
 
-	ennemy_palette = Palette.from_rgb_values([
-		0x000000, 0x000100, 0xAD0001, 0xD80000, 
-		0xFF0000, 0x008400, 0x019C00, 0x00B600, 
-		0x00CE00, 0xB39463, 0x00E600, 0xB4B6B3, 
-		0x0CFF00, 0xFDC692, 0xFFD700, 0xF6F8F4
-		], id_ = 1)
+	ennemy_palette = data['palette']
 
 	splits = {}
 	res = ''
-	for i, frame in enumerate(frames):
+	for i, frame in enumerate(data['frames']):
+		print ('splitting frame #%d' % i)
 		j = frame['id']
 
 		res += 'frame: %d\n' % j
 		surf = frame['surface']
 		frame = Surface4bpp.from_pygame_surface(surf, palette = ennemy_palette)
+		
+		frame.save('%s/debug/%02d.png' % (data['path'], i), palette = ennemy_palette)
 
 		rects = tools.plugins.best_splitter.splitter(frame, splitters)
 		res += 'split: [%s]\n\n' % (' ; '.join([str(x) for x in rects]))
@@ -212,7 +211,7 @@ def generate_patterns(data):
 	patterns = []
 	for i, frame in enumerate(data['frames']):
 		j = frame['id']
-		surf = frame['surface']
+		surf = frame['surface'].copy()
 
 		# print '%d: frame %d (%s) -> %x' % (i, j, surf.get_size(), len(patterns))
 		
@@ -227,23 +226,89 @@ def generate_patterns(data):
 	print('%d patterns generated' % len(patterns))
 	make_sheet(patterns, '%s/patterns.png' % base_dir)
 
-if __name__ == '__main__':
-	# base_dir = 'C:/Users/Tryphon/Documents/hack/Shinobi/sheets/musashi2'
-	base_dir = 'C:/Users/fterr/Documents/hack/Shinobi/sheets/ninja'
+	if data['recolor']:
+		patterns_surf = pygame.image.load('%s/patterns.png' % base_dir)
+		source_path, dest_pathes = data['recolor']
+		source_sample = pygame.image.load('%s/%s' % (base_dir, source_path))
+		
+		for i, dest_path in enumerate(dest_pathes):
+			dest_sample = pygame.image.load(	'%s/%s' % (base_dir, dest_path))
+			recolored = recolor_surface(patterns_surf, source_sample, dest_sample)
+	
+			pygame.image.save(recolored, '%s/patterns-%d.png' % (base_dir, i))
+			
+			if save_recolored_frames:
+				for j, frame in enumerate(data['frames']):
+					surf = frame['surface']
+					recolored = recolor_surface(surf, source_sample, dest_sample)
+			
+					pygame.image.save(recolored, '%s/recolored%02d-frame%02d.png' % (base_dir, i, j))
 
-	# hotspot_x = 48
-	# hotspot_y = 79
+
+def load_gimp_palette(path, id_ = 1):
+	with open(path) as f:
+		lines = f.readlines()
+	
+	res = []
+	for l in lines:
+		if l.startswith('#'):
+			col = int(l.strip()[1:], 16)
+			res += [col]
+	
+	if len(res) < 16:
+		res += [0] * (16 - len(res))
+	
+	return Palette.from_rgb_values(res, id_ = id_)
+
+def recolor_surface(target, source, dest):
+	def swap_rb(col):
+		a, r, g, b = (col >> 24) & 255, (col >> 16) & 255, (col >> 8) & 255, col & 255
+		return (a << 24) + (b << 16) + (g << 8) + r
+	res = target.copy()
+	
+	target_ = pygame.surfarray.pixels2d(target)
+	source_ = pygame.surfarray.pixels2d(source)
+	dest_ = pygame.surfarray.pixels2d(dest)
+	res_ = pygame.surfarray.pixels2d(res)
+
+	print ('********')	
+	matches = {}
+	for col in numpy.unique(source_):
+		print(col)
+		# dst = swap_rb(numpy.unique(dest_[source_ == col])[0])
+		dst = numpy.unique(dest_[source_ == col])[0]
+		
+		print ('%X -> %X' % (col, dst))
+		
+		res_[target_ == col] = dst
+	
+	del res_
+	del dest_
+	del source_
+	del target_
+	
+	return res
+	
+	
+
+def generate_sprite(name, hotspot, source_sample = None, alt_samples = []):
+	base_dir = 'C:/Users/fterr/Documents/hack/Shinobi/sheets/%s' % name
 
 	frames = read_sheet('%s/sheet.psd' % base_dir)
 	anims = load_animdefs('%s/animdefs.txt' % base_dir)
-
-	hotspot = (48, 79)
+	
+	if source_sample:
+		recolor = (source_sample, alt_samples)
+	else:
+		recolor = None
 	
 	char_data = {
 		'path': base_dir,
 		'frames': frames,
 		'hotspot': hotspot,
-		'animdefs': anims
+		'animdefs': anims,
+		'palette': load_gimp_palette('%s/palette.txt' % base_dir),
+		'recolor': recolor
 	}
 
 	print_frames_table(char_data)
@@ -252,164 +317,32 @@ if __name__ == '__main__':
 	
 	exit()
 
-	if True:
-		# generate anims
-
-		anims = load_animdefs('%s/animdefs.txt' % base_dir)
-
-		# print anims
-
-		res = ''
-		res2 = 'animations_table = [\n'
-		res2_ = []
-		name_id = 0
-		name_ids = ''
-
-		for name in anims.keys():
-			anim = anims[name]
-			if not 'hflip' in anim:
-				name = name.replace('_right', '')
-				res += ('%s = %s\n' % (name, anim['steps']))
-				res2_ += ['\t' + name]
-
-				name_ids += '%s = %s\n' % (name.upper(), name_id)
-				name_id += 1
-
-		print(res)
-		res2 += ',\n'.join(res2_) + '\n]\n'
-		print(res2)
-
-		print(name_ids)
-		exit()
-
-
-	# if False:
-		# # extract frames (to speed up process)
-		# # print 'loading psd file'
-		# psd = load_psd('%s/sheet.psd' % base_dir)
-		# # print psd
-
-		# frames = {}
-		# for i, layer in enumerate(psd.get_layers()):
-			# nm = layer.get_name()
-			# if nm.startswith('frame'):
-				# nm, j_ = nm.split(' ')
-				# j = int(j_)
-				# surf = layer.get_surface()
-				# frames[j] = surf
-				# pygame.image.save(frames[j], 'frames/frame%02d.png' % j)
-		# exit()
-	# else:
-		# frames = [pygame.image.load('frames/frame%02d.png' % i) for i in range(82)]
-
-	if False:
-		# generating frames_table and patterns_blocks
-		splits = read_split_file('%s/split.txt' % base_dir)
-
-		res = 'frames_table = '
-		dp = 0
-		res_ = []
-		ptrn_blocks = []
-		for i in splits.keys():
-			# print 'frame:', i
-			split = splits[i]
-			# print split
-			res__ = []
-			dp0 = dp
-			for j, (x, y, w, h) in enumerate(split):
-				x_ = x - hotspot_x
-				y_ = y - hotspot_y
-				bx_ = -x_ - w
-				sw, sh = w // 8, h // 8
-				flags = ((sw - 1) << 2) + sh - 1
-				res__ += ['\t\t[%d, %d, %d, 0x%04X, 0x%02X]' % (x_, bx_, y_, flags, dp)]
-				dp += sw * sh
-			res_ += ['\t[\t\t# frame %d\n%s\n\t]' % (i, ',\n'.join(res__))]
-			
-			ptrn_blocks += [(dp0, dp - dp0)]
-
-		res += '[\n%s\n]\n' % ',\n'.join(res_)
-
-		print(res)
-
-		print('patterns_blocks = [\n%s\n]\n' % ',\n'.join(['\t[0x%04X, 0x%04X]' % (p, l)\
-														   for (p, l) in ptrn_blocks]))
-		
-		exit()
-
-
-	if False:
-		# generate splits if not presents
-		from tools.surface import *
-		from tools.colors import *
-		import tools.plugins.basic_splitter
-		import tools.plugins.group_splitter
-		import tools.plugins.row_splitter
-		import tools.plugins.best_splitter
-
-		splitters = [(tools.plugins.basic_splitter.splitter, []),
-					 (tools.plugins.group_splitter.splitter, []),
-					 (tools.plugins.row_splitter.splitter, [])]
-
-		# ennemy_palette = Palette.from_rgb_values([0x4CFF00, 0x000000, 0xFF0000, 0x524252,
-												  # 0x4A4A4A, 0x6B5B6B, 0x847384, 0xAD7B00,
-												  # 0xAD7B42, 0x949400, 0x9C8C9C, 0xD6A400,
-												  # 0xD69C6B, 0xB5A4B5, 0xFFC594, 0xF7F7F7], 
-												 # id_ = 1)
-		ennemy_palette = Palette.from_rgb_values([
-			0x000000, 0x000100, 0xAD0001, 0xD80000, 
-			0xFF0000, 0x008400, 0x019C00, 0x00B600, 
-			0x00CE00, 0xB39463, 0x00E600, 0xB4B6B3, 
-			0x0CFF00, 0xFDC692, 0xFFD700, 0xF6F8F4
-			], id_ = 1)
-
-		psd = load_psd('%s/sheet.psd' % base_dir)
-
-		res = ''
-		for i, layer in enumerate(psd.get_layers()):
-			nm = layer.get_name()
-			if nm.startswith('frame'):
-				print (nm)
-				nm, j_ = nm.split(' ')[:2]
-				j = int(j_)
-
-				res += 'frame: %d\n' % j
-				surf = layer.get_surface()
-				frame = Surface4bpp.from_pygame_surface(surf, palette = ennemy_palette)
-
-				rects = tools.plugins.best_splitter.splitter(frame, splitters)
-				# print rects
-				res += 'split: [%s]\n\n' % (' ; '.join([str(x) for x in rects]))
-
-		print(res)
-		exit()
-
-	if False:
-		# generating patterns    
-		psd = load_psd('%s/sheet.psd' % base_dir)
 	
-		splits = read_split_file('%s/split.txt' % base_dir)
-		patterns = []
-		for i, layer in enumerate(psd.get_layers()):
-			nm = layer.get_name()
-			if nm.startswith('frame'):
-				nm, j_ = nm.split(' ')[:2]
-				j = int(j_)
-				surf = layer.get_surface()
-	
-				# print '%d: frame %d (%s) -> %x' % (i, j, surf.get_size(), len(patterns))
-				
-				for k, rect in enumerate(splits[j]):
-					sub = get_subsurface(surf, rect)
-					patterns += get_patterns(sub)
-					pygame.image.save(sub, '%s/debug/%02d-%02d.png' % (base_dir, i, k))
-					pygame.draw.rect(surf, pygame.Color('red'), rect, 1)
-				
-				pygame.image.save(surf, '%s/debug/%02d.png' % (base_dir, i))
-		
-		print('%d patterns generated' % len(patterns))
-		make_sheet(patterns, '%s/patterns.png' % base_dir)
-	
-	
+# =================================================
 
-		
+import sys
+print (sys.argv)
+
+save_recolored_frames = 'save_recolored' in sys.argv
+
+if 'spider' in sys.argv:
+	print ('generating spider')
+	generate_sprite('spider', (64, 84), 'blue_sample.png', ['black_sample.png'])
+
+if 'guardian' in sys.argv:
+	generate_sprite('sword', (64, 95), 'green_sample.png', ['pink_sample.png', 'blue_sample.png'])
+
+if 'frogman' in sys.argv:
+	generate_sprite('frogman', (48, 95))
+
+if 'splash' in sys.argv:
+	generate_sprite('splash', (16, 31))
+
+if 'bazooka' in sys.argv:
+	generate_sprite('bazooka', (64, 127), 'blue.png', ['green.png'])
+
+if 'rocket' in sys.argv:
+	generate_sprite('rocket', (22, 18))
+
+if 'shooter' in sys.argv:
+	generate_sprite('shooter', (64, 95))

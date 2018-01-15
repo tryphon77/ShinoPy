@@ -170,39 +170,30 @@ PUNCH = 5
 HIT = 6
 DEAD = 7
 
+
+rect0 = (-16, -63, 32, 64)
+rect1 = (-7, -61, 16, 62)
+rect2 = (-7, -51, 16, 52)
+rect3 = (-7, -41, 16, 42)
+
 bounding_boxes = [
-    (-7, -61, 16, 62),    # bounding box 0,
-    (-7, -61, 16, 62),    # bounding box 1,
-    (-7, -61, 16, 62),    # bounding box 2,
-    (-7, -51, 16, 52),    # bounding box 3,
-    (-7, -61, 16, 62),    # bounding box 4,
-    (-7, -41, 16, 42),    # bounding box 5,
-    (-7, -61, 16, 62),    # bounding box 6,
-    (-7, -61, 16, 62),    # bounding box 7,
-    (-7, -61, 16, 62),    # bounding box 8,
-    (-7, -61, 16, 62),    # bounding box 9,
-    (-7, -61, 16, 62),    # bounding box 10,
-    (-7, -61, 16, 62),    # bounding box 11,
+    rect1,    # bounding box 0,
+    rect1,    # bounding box 1,
+    rect1,    # bounding box 2,
+    rect2,    # bounding box 3,
+    rect1,    # bounding box 4,
+    rect3,    # bounding box 5,
+    rect1,    # bounding box 6,
+    rect1,    # bounding box 7,
+    rect1,    # bounding box 8,
+    rect1,    # bounding box 9,
+    rect1,    # bounding box 10,
+    rect1,    # bounding box 11,
     None, # (-7, -51, 16, 52),    # bounding box 12,
     None,    # bounding box 13,
-    None,    # bounding box 14,
-    # (-9, -61, 16, 62),    # bounding box 15,
-    # (-9, -61, 16, 62),    # bounding box 16,
-    # (-9, -61, 16, 62),    # bounding box 17,
-    # (-9, -51, 16, 52),    # bounding box 18,
-    # (-9, -61, 16, 62),    # bounding box 19,
-    # (-9, -41, 16, 42),    # bounding box 20,
-    # (-9, -61, 16, 62),    # bounding box 21,
-    # (-9, -61, 16, 62),    # bounding box 22,
-    # (-9, -61, 16, 62),    # bounding box 23,
-    # (-9, -61, 16, 62),    # bounding box 24,
-    # (-9, -61, 16, 62),    # bounding box 25,
-    # (-9, -61, 16, 62),    # bounding box 26,
-    # (-9, -51, 16, 52),    # bounding box 27,
-    # None,    # bounding box 28,
-    # None    # bounding box 29
+    None,    # bounding box 14
 ]
 
 hitboxes = [None]*30
 
-sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, "punk")
+sprite_data = TSpriteData(patterns, frames_table, patterns_blocks, animations_table, bounding_boxes, hitboxes, rect0, "punk")

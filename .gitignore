@@ -3,3 +3,6 @@
 
 record/
 debug/
+*.mng
+*.avi
+*.tmx

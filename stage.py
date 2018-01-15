@@ -16,11 +16,12 @@ def init_stage(stage):
 	
 	# load objects_map
 	Globs.objects_map = stage.objects_map
-	# Globs.objects_chunks = stage.objects_chunks
+	Globs.objects_chunks = stage.objects_chunks
 	Globs.objects_from_left = stage.objects_from_left
 	Globs.objects_from_right = stage.objects_from_right
 	Globs.objects_from_top = stage.objects_from_top
 	Globs.objects_from_bottom = stage.objects_from_bottom
+	# Globs.init_chunk = stage.init_chunk
 	
 	# load tilemap
 	layer_A.plane = GP.plane_A
@@ -54,28 +55,31 @@ def init_stage(stage):
 	elif stage.drawing_method == 2:
 		layer_B.plane = GP.plane_B
 		layer_B.data = stage.tilemap_B    
-		layer_B.twidth = stage.twidth // 2 + 10
-		layer_B.theight = stage.theight // 2 + 7
+		layer_B.twidth = stage.twidth# // 2 + 10
+		layer_B.theight = stage.theight# // 2 #+ 7
 		
-		Globs.layer_b_pwidth = layer_B.twidth * 16
-		Globs.layer_b_pheight = layer_B.theight * 16
+		# Globs.layer_b_pwidth = layer_B.twidth * 16
+		# Globs.layer_b_pheight = layer_B.theight * 16
 
 	Globs.layer_B_drawing_method = stage.drawing_method
+	Globs.stage_priority = stage.priority
+
+	camera.is_initialized = False
+	# Globs.camera_x = 0
+	# Globs.camera_y = 0
 	
-	Globs.camera_x = 0
-	Globs.camera_y = 0
-	
-	camera.left = 0
-	camera.right = 319
-	camera.top = 0
-	camera.bottom = 223
+	# camera.left = 0
+	# camera.right = 319
+	# camera.top = 0
+	# camera.bottom = 223
 		
-	draw_rect(layer_A, 0, 0, 21, 15)
-	if Globs.layer_B_drawing_method:
-		draw_rect(layer_B, 0, 0, 21, 15)
+	# draw_rect(layer_A, 0, 0, 21, 15)
+	# if Globs.layer_B_drawing_method:
+		# draw_rect(layer_B, 0, 0, 21, 15)
 	
-	Globs.vscroll_mode = 0
-	
+	Globs.vscroll_mode = 1
+
+	Globs.hostage_vpos = None
 	for entry in stage.objects:
 		obj_type = entry[0]
 		print (obj_type)
