@@ -20,19 +20,23 @@ def left_to_right(w, h):
 			yield (x, y)
 
 def make_list(layer, names, order):
+	# print ('[make_list]')
 	res = []
 	w, h = layer.get_size()
 	for (x, y) in order(w, h):
 		cell = layer[y][x]
+		# if (90 <= x < 100) and (20 <= y < 30):
+			# print ((x, y, cell))
 		if cell is not None:
 			t = cell.id_
 			obj = obj_name[t]
-			# print ('\t%s: %d, %d' % (obj, x, y))
+			print ('\t%s: %d, %d' % (obj, x, y))
 			if cell.hflip:
 				dir = 'right'
 			else:
 				dir = 'left'
 			res += [(obj_name[t], dir, x, y)]
+	# print ('[/make_list]')
 	return res
 
 
@@ -162,12 +166,16 @@ def red_ninja_fun(self, params):
 
 def toad_a_fun(self, params):
 	self.update({
-		'print': lambda self_: 'None'
+		'is_monodir': True,
+		'friend': params.get('friend', None),
+		'print': lambda self_: '(%s)' % self_['friend']
 	})
 	
 def toad_b_fun(self, params):
 	self.update({
-		'print': lambda self_: 'None'
+		'is_monodir': True,
+		'friend': params.get('friend', None),
+		'print': lambda self_: '(%s)' % self_['friend']
 	})
 	
 def bird_fun(self, params):
@@ -177,7 +185,10 @@ def bird_fun(self, params):
 	
 def skeleton_fun(self, params):
 	self.update({
-		'print': lambda self_: 'None'
+		'is_monodir': True, # was False ?
+		'range': params.get('range', 128),
+		'shoots': params.get('shoots', 4),
+		'print': lambda self_: '(%s, %s)' % (self_['range'], self_['shoots'])
 	})
 	
 def frogman_fun(self, params):
@@ -192,8 +203,29 @@ def monk_fun(self, params):
 	})
 
 def rolling_fun(self, params):
+	orientation = params.get('orientation', '.')
+	vector = {\
+		'.': "0, 0",
+		'W': "-6, 0",
+		'SW': "-4.25, 4.25",
+		'SSW': "-3, 5",
+		'S': "0, 6",
+		'SE': "4.25, 4.25",
+		'SSE': '3, 5',
+		'E': "6, 0"
+	}[orientation]
+	
+	if 'W' in orientation:
+		dir = 'left'
+	else:
+		dir = 'right'
+		
 	self.update({
-		'print': lambda self_: 'None'
+		'is_monodir': True,
+		'dir': dir,
+		'vector': vector,
+		'delay': params.get('delay', '0'),
+		'print': lambda self_: '(%s, %s)' % (self_['vector'], self_['delay'])
 	})
 
 param_fun = {
@@ -243,8 +275,7 @@ bounding_boxes = {
 	'kenoh' : (-16, -64, 32, 63)
 }
 
-def get_bounding_box(obj, dir, tx, ty):
-	px, py = tx*16 + 8, ty*16 + 15
+def get_bounding_box(obj, dir, px, py):
 	x, y, w, h = bounding_boxes[obj]
 	if dir == 'left':
 		return (px + x, px + x + w, py + y, py + y + h)
@@ -273,6 +304,8 @@ def get_view(rect, focus, map_width, map_height):
 		y0 = max(t - yf, 0)
 		y1 = min(y0 + 224, map_height * 16 - 224)
 	else:
+		# y0 = 0 
+		# y1 = map_height*16 - 1 
 		y0 = max(0, t - 224)
 		y1 = min(b, map_height * 16 - 1)
 	# if y0 < 0:
@@ -305,10 +338,21 @@ def get_objects_in_layer(layer, params, i_object, collmap):
 		print ('obj: %s, %s, %d, %d i_object = %d trigger = %s' % (obj, dir, x, y, i_object, trigger)) 
 		if obj != 'cross':
 			# print (params[i_object])
+			
 			floor = int(params[i_object].get('floor', '1'))
 			obj_type = obj_name.index(obj)
-			obj_bounding_box = get_bounding_box(obj, dir, x, y)
-			hx, hy = x*16 + 8, y*16 + 15
+
+			if obj == 'frogman':
+				hx, hy = x*16 + 8, y*16 + 41
+			else:
+				hx, hy = x*16 + 8, y*16 + 15
+
+			off_x, off_y = eval(params[i_object].get('offset', '(0, 0)'))
+			hx += off_x
+			hy += off_y
+
+			obj_bounding_box = get_bounding_box(obj, dir, hx, hy)
+
 			if collmap[y][x] & 8:
 				hy -= 8
 			current_object = {
@@ -332,8 +376,10 @@ def get_objects_in_layer(layer, params, i_object, collmap):
 				trig_x, trig_y = x_ * 16, y_ * 16
 				x0_, x1_, y0_, y1_ = get_view((trig_x, trig_x + 16, trig_y - 128, trig_y + 16), (128, 120), layer.width, layer.height)
 				current_object['view'] = (x0_, x0_, y0_, y1_)
+				current_object['is_triggered'] = True
 			else:
 				current_object['view'] = get_view(current_object['bounding_box'], None, layer.width, layer.height)
+				current_object['is_triggered'] = False
 
 			objs += [current_object]
 			
@@ -364,6 +410,10 @@ def get_objects(tmx, params, collmap):
 			# chunks += [list(range(i0, i_object))]
 			# i_chunk += 1
 
+	# exit()
+	for obj in objects:
+		print(obj)
+		print ('---------------------------------------')
 	# exit()
 	return objects
 
@@ -426,13 +476,17 @@ def get_ressources(objects, w, h, debug_surf = None):
 	
 	# computing init chunk
 	init_ = []
-	print (objects[0])
-	x0, x1, y0, y1 = objects[0]['view']
+	
+	hx, hy = objects[0]['hotspot']
+	x0, y0 = max(0, (hx - 128) // 16 - 1), max(0, (hy - 120) // 16 - 1)
+	x1, y1 = min(w, x0 + 21), min(h, y0 + 15)
 	
 	i = 0
 	for obj in objects:
 		x, y = obj['pos']
-		if x0 <= x <= x1 and y0 <= y <= y1:
+		if (not obj['is_monodir']\
+		or obj['dir'] == 'left')\
+		and (x0 <= x <= x1 and y0 <= y <= y1):
 			init_ += [i]
 		i += 1
 
@@ -488,6 +542,97 @@ def get_ressources(objects, w, h, debug_surf = None):
 
 # =======================================================
 
+def get_ressources_full_rects(objects, w, h, debug_surf = None):
+	
+	# /!\ DEBUG !!!!!!!!!!!!!!!!!!!!!!!!
+	# print (objects)
+	# objects = [o for o in objects if o['name'] in ['musashi', 'hostage']]
+	# print ('***********************')
+	# print (objects)
+	# print ('***********************')
+	
+	# computing init chunk
+	init_ = []
+	
+	hx, hy = objects[0]['hotspot']
+	x0, y0 = max(0, (hx - 128) // 16 - 1), max(0, (hy - 120) // 16 - 1)
+	x1, y1 = min(w, x0 + 21), min(h, y0 + 15)
+	
+	i = 0
+	print ('init_chunk:')
+	for obj in objects:
+		x, y = obj['pos']
+		if not obj['is_triggered'] and\
+		(not obj['is_monodir']\
+		or obj['dir'] == 'left')\
+		and (x0 <= x <= x1 and y0 <= y <= y1):
+			print (obj)
+			init_ += [i]
+		i += 1
+	
+	# regular chunks
+
+	# only one map	
+	map_ = new_map(w, h)
+
+	i = 1
+	for obj in objects[1:]:
+		l, r, t, b = obj['view']
+		is_monodir = obj['is_monodir']
+		if is_monodir:
+			if obj['dir'] == 'left':
+				left = right = l
+			else:
+				left = right = r
+		else:
+			left = l
+			right = r
+
+		top = t
+		bottom = b
+	
+		print ('(%02d) %s: left = %d top = %d right = %d bottom = %d' % (obj['id_'], obj['name'], left, top, right, bottom))
+		# print ('update_map: %d, %d, %d, %d, %d, %d, %d, %d' % (x_, y_, dx, dy, tx, ty, w, h))
+		for y_ in range(top, bottom + 1):
+			for x_ in range(left, right + 1):
+				map_[y_][x_] += [i]
+		i += 1
+	# exit()
+	
+	# ===============================================
+	code_to_raw = [(), tuple(init_)]
+	code_map = []
+	for j in range(h):
+		code_line = []
+		for i in range(w):
+			cell = tuple(map_[j][i])
+			if cell not in code_to_raw:
+				code_to_raw += [cell]
+			code_line += [code_to_raw.index(cell)]
+		code_map += [code_line]
+	raw_to_code = {x: i for i, x in enumerate(code_to_raw)}
+	
+	# raw_map = zip_maps([map_])
+	# print (raw_map)
+	
+	# raw_to_code, code_to_raw, code_map = encode_map(raw_map, w, h)
+	
+	if debug_surf:
+		pygame.image.save(map_to_surf(debug_surf, code_map), 'object_map.png')
+			
+	print ('init_:', init_)
+	print ('code_to_raw:', code_to_raw)
+		
+	print ('code_map:')
+	print (code_map)
+	
+	return {
+		'map': code_map, 
+		'chunks': raw_to_code
+	}
+
+# =====================================================
+
 def make_table(listoflists):
 	header_sz = len(listoflists)
 	header = []
@@ -539,7 +684,7 @@ def fmt_transition(t, chunks):
 	return str(chunks[tuple(t_ for t_ in t)])
 
 	
-def generate_objects_ressources(tmx, objects_path, collmap):
+def generate_objects_ressources_edges(tmx, objects_path, collmap):
 	# tmx = load_tmx(tmx_path)
 	params = read_param_file(objects_path)
 	width, height = tmx.get_size()
@@ -547,7 +692,47 @@ def generate_objects_ressources(tmx, objects_path, collmap):
 	bg = tmx.get_layer_by_name('layer a').to_surface()
 	
 	objects = get_objects(tmx, params, collmap)
+	
 	ressources = get_ressources(objects, width, height, debug_surf = bg)	
+		
+	res = ''
+	
+	res += 'objects = [\n%s\n]\n\n' % (',\n'.join(['\t%s' % fmt_object(o) for o in objects]))
+	
+	object_names = list(set([obj['name'] for obj in objects]))
+	
+	res += 'objects_chunks = [\n%s\n]\n\n' % (',\n'.join(['\t%s' % fmt_chunk(c) for c in ressources['chunks']]))
+		
+	res += 'objects_map = [\n%s\n]\n\n' % (',\n'.join(['\t%s' % fmt_map_row(r) for r in ressources['map']]))
+	
+	# res += 'init_chunk = %s\n\n' % ressources['init_chunk']
+		
+	for d in ['left', 'right', 'top', 'bottom']:
+		res += 'objects_from_%s = [\n%s\n]\n\n' % (d, ',\n'.join(['\t%s' % fmt_transition(t, ressources['chunks']) for t in ressources[d]]))
+	
+	header = '\n'.join(['from chars import %s' % o for o in object_names])
+	
+	print (header)
+	print ('****************')
+	print (res)
+	return header, res
+
+# ========================================================
+
+def generate_objects_ressources_full_rects(tmx, objects_path, collmap):
+
+	def fmt_chunk(chunk):
+		return str(list(chunk))
+		
+	# tmx = load_tmx(tmx_path)
+	params = read_param_file(objects_path)
+	width, height = tmx.get_size()
+
+	bg = tmx.get_layer_by_name('layer a').to_surface()
+	
+	objects = get_objects(tmx, params, collmap)
+		
+	ressources = get_ressources_full_rects(objects, width, height, debug_surf = bg)	
 	
 	res = ''
 	
@@ -561,9 +746,6 @@ def generate_objects_ressources(tmx, objects_path, collmap):
 	
 	# res += 'init_chunk = %s\n\n' % ressources['init_chunk']
 	
-	for d in ['left', 'right', 'top', 'bottom']:
-		res += 'objects_from_%s = [\n%s\n]\n\n' % (d, ',\n'.join(['\t%s' % fmt_transition(t, ressources['chunks']) for t in ressources[d]]))
-	
 	header = '\n'.join(['from chars import %s' % o for o in object_names])
 	
 	print (header)
@@ -572,6 +754,8 @@ def generate_objects_ressources(tmx, objects_path, collmap):
 	return header, res
 
 # ========================================================
+
+generate_objects_ressources = generate_objects_ressources_full_rects
 
 if __name__ == '__main__':
 	base_dir = 'C:/Users/fterr/Documents/hack/shinobi/maps/3-2'

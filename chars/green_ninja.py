@@ -12,13 +12,15 @@ def init(entry):
 	self = ninja_common.init(entry, sprite_data_green, activate, release, init_collision, init_hit, 'green ninja')
 
 def activate(self):
-	ninja_common.activate(self, init_appear)
+	print ('[%s] green_ninja.activate' % self.name)
+	ninja_common.activate(self, update_spawn)
 
 def release(self):
 	ninja_common.release(self)
 
-# def update_spawn(self):
-	# ninja_common.update_spawn(self, init_appear)
+def update_spawn(self):
+	print ('[%s] update_spawn : %d' % (self.name, self.tick))
+	ninja_common.update_spawn(self, init_appear)
 
 def init_appear(self):
 	ninja_common.init_appear(self, APPEAR, update_appear)
@@ -60,7 +62,7 @@ def init_death(self):
 	ninja_common.init_death(self, DEATH, update_death)
 
 def update_death(self):
-	ninja_common.update_death(self, None)
+	ninja_common.update_death(self, update_spawn)
 
 
 # crouch and crawl

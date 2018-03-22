@@ -12,15 +12,16 @@ def init(entry):
 	self = ninja_common.init(entry, sprite_data_blue, activate, release, init_collision, init_hit, 'blue ninja')
 
 def activate(self):
-	ninja_common.activate(self, init_appear)
+	print ('[%s] blue_ninja.activate' % self.name)
+	ninja_common.activate(self, update_spawn)
 	# print (self.x, camera.left, camera.right)
 	# GP.halt()
 
 def release(self):
 	ninja_common.release(self)
 
-# def update_spawn(self):
-	# ninja_common.update_spawn(self, init_appear)
+def update_spawn(self):
+	ninja_common.update_spawn(self, init_appear)
 
 def init_appear(self):
 	log.write(2, '[%s] init_appear' % self.name)
@@ -64,7 +65,7 @@ def init_death(self):
 	ninja_common.init_death(self, DEATH, update_death)
 
 def update_death(self):
-	ninja_common.update_death(self, None)
+	ninja_common.update_death(self, update_spawn)
 
 
 # crouch and crawl
@@ -77,7 +78,7 @@ def update_crouch(self):
 	ninja_common.update_crouch(self, init_air_attack, init_crawl, init_jump_back_start)
 
 def init_crawl(self):
-	print ('[%s] init_crawl' % self.name)
+	# print ('[%s] init_crawl' % self.name)
 	common.moves_object(self, Globs.musashi, 1)
 	set_animation(self.sprite, CRAWL)
 	self.update_function = update_crawl
@@ -89,8 +90,8 @@ def crawl_action(self):
 		init_crouch(self)
 		
 def update_crawl(self):
-	print ('[%s] update_crawl' % self.name)
-	print (self.param2)
+	# print ('[%s] update_crawl' % self.name)
+	# print (self.param2)
 	common.update_walk_by_steps(self, crawl_offsets, crawl_action,  init_jump, init_jump, init_fall)
 
 	
@@ -180,28 +181,28 @@ def update_jump_end(self):
 # hijump up
 
 def init_hijump_up_start(self):
-	print ('[RED] init_hijump_up_start')
+	# print ('[%s] init_hijump_up_start' % self.name)
 	# GP.halt()
 	self.hit_function = init_hit
 	ninja_common.init_hijump_up_start(self, HIJUMP_UP_START, update_hijump_up_start)
 
 def update_hijump_up_start(self):
-	print ('[RED] update_hijump_up_start')
+	# print ('[%s] update_hijump_up_start' % self.name)
 	# GP.halt()
 	ninja_common.update_hijump_up_start(self, init_hijump_up_mid)
 
 def init_hijump_up_mid(self):
-	print ('[RED] init_hijump_down_mid')
+	# print ('[%s] init_hijump_down_mid' % self.name)
 	# GP.halt()
 	ninja_common.init_hijump_up_mid(self, HIJUMP_UP, update_hijump_up_mid)
 
 def update_hijump_up_mid(self):
-	print ('[RED] update_hijump_up_mid')
+	# print ('[%s] update_hijump_up_mid' % self.name)
 	# GP.halt()
 	ninja_common.update_hijump_up_mid(self, init_hijump_up_end)
 
 def init_hijump_up_end(self):
-	print ('[RED] init_hijump_up_end')
+	# print ('[RED] init_hijump_up_end' % self.name)
 	# GP.halt()
 	ninja_common.init_hijump_up_end(self, HIJUMP_UP_END, update_hijump_up_end)
 
@@ -213,32 +214,32 @@ def update_hijump_up_end(self):
 # hijump down
 
 def init_hijump_down_start(self):
-	print ('[RED] init_hijump_down_start')
+	# print ('[%s] init_hijump_down_start' % self.name)
 	# GP.halt()
 	self.hit_function = init_hit
 	ninja_common.init_hijump_down_start(self, HIJUMP_DOWN_START, update_hijump_down_start)
 
 def update_hijump_down_start(self):
-	print ('[RED] update_hijump_down_start')
+	# print ('[%s] update_hijump_down_start' % self.name)
 	# GP.halt()
 	ninja_common.update_hijump_down_start(self, init_hijump_down_mid)
 
 def init_hijump_down_mid(self):
-	print ('[RED] init_hijump_down_mid')
+	# print ('[%s] init_hijump_down_mid')
 	# GP.halt()
 	ninja_common.init_hijump_down_mid(self, HIJUMP_DOWN, update_hijump_down_mid)
 
 def update_hijump_down_mid(self):
-	print ('[RED] update_hijump_down_mid')
+	# print ('[%s] update_hijump_down_mid')
 	# GP.halt()
 	ninja_common.update_hijump_down_mid(self, init_hijump_down_end)
 
 def init_hijump_down_end(self):
-	print ('[RED] init_hijump_down_end')
+	# print ('[%s] init_hijump_down_end')
 	# GP.halt()
 	ninja_common.init_hijump_down_end(self, HIJUMP_DOWN_END, update_hijump_down_end)
 
 def update_hijump_down_end(self):
-	print ('[RED] update_hijump_down_end')
+	# print ('[%s] update_hijump_down_end')
 	# GP.halt()
 	ninja_common.update_hijump_down_end(self, init_crouch)

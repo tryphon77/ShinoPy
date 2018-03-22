@@ -332,6 +332,9 @@ if 'spider' in sys.argv:
 if 'guardian' in sys.argv:
 	generate_sprite('sword', (64, 95), 'green_sample.png', ['pink_sample.png', 'blue_sample.png'])
 
+if 'ninja' in sys.argv:
+	generate_sprite('ninja', (48, 79)) #, 'green_sample.png', ['pink_sample.png', 'blue_sample.png'])
+
 if 'frogman' in sys.argv:
 	generate_sprite('frogman', (48, 95))
 
@@ -346,3 +349,21 @@ if 'rocket' in sys.argv:
 
 if 'shooter' in sys.argv:
 	generate_sprite('shooter', (64, 95))
+
+if 'skeleton' in sys.argv:
+	generate_sprite('skeleton', (32, 79))
+
+if 'bone' in sys.argv:
+	generate_sprite('bone', (8, 4))
+
+if 'toad_a' in sys.argv:
+	generate_sprite('toadA', (48, 95))
+
+if 'toad_b' in sys.argv:
+	generate_sprite('toadB', (48, 95))
+
+if 'bird' in sys.argv:
+	generate_sprite('bird', (48, 95))
+
+if 'monk' in sys.argv:
+	generate_sprite('monk', (80, 79))

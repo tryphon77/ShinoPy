@@ -84,7 +84,7 @@ class GP():
 	joypad_state = 0
 	sprite_cache = []
 	frame_counter = 0
-	is_recording = False
+	is_recording = True
 	record_path = 'record'
 	debug_window = False
 	log_plane = None

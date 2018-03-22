@@ -17,6 +17,7 @@ def init(entry):
 	
 	self.hp_max = 1
 	self.global_bbox = (-24, -63, 48, 64)
+	self.scope = (64, 32)
 
 	self.activate_function = activate
 	self.release_function = release
@@ -55,6 +56,10 @@ def release(self):
 	common.release(self)
 
 def init_hit_shield(self):
+	# les balles continuent à donner un impact lors 
+	# de leur animation de disparition, c'est pour ça
+	# qu'elles peuvent toucher malgré la garde
+	
 	# print ('[%s] init_hit_shield' % self.name)	
 	other = self.other_object
 	if other.attack_type & 2:

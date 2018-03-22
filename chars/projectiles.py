@@ -14,6 +14,8 @@ def init_object():
 	self = allocate_object(temporary_objects)
 	self.name = 'shuriken'
 	
+	self.scope = (16, 16)
+	
 	self.is_initialized = True
 	self.is_activated = True
 	self.is_displayable = True
@@ -87,6 +89,8 @@ def update_vanish(self):
 def init_bullet():
 	# print 'init bullet'
 	self = allocate_object(temporary_objects)
+	self.name = "bullet"
+	self.scope = (16, 128)
 	
 	self.is_initialized = True
 	self.is_activated = True
@@ -166,6 +170,7 @@ def init_blade(owner):
 	
 	self.back = -4
 	self.front = 4
+	self.scope = (256, 128)
 
 	self.sprite = sprite = allocate_static_sprite()
 	if sprite:
@@ -240,7 +245,7 @@ def update_blade_back(self):
 			release_blade(self)
 		else:
 			self.x += self.speed_x
-	elif self.param2 <= 0:
+	elif self.param2 <= 0 and self.param1.is_activated:
 		green_guardian.init_throw_end(self.param1)
 		release_blade(self)
 	else:

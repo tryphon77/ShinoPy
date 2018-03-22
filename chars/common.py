@@ -16,6 +16,7 @@ def init(entry, sprite_data = None):
 	self.org_y = y
 	self.org_floor = floor
 	self.org_faces_left = dir
+	self.scope = (40, 128)
 
 	if sprite_data:
 		self.sprite_data = sprite_data
@@ -45,15 +46,16 @@ def activate(self, next_state):
 
 
 def update_spawn(self, next_state):
-	# print ('update_spawn: %d' % self.tick)
+	# print ('[%s] common.update_spawn: %d' % (self.name, self.tick))
 	self.tick -= 1
 	if self.tick < 0:
+		self.tick = self.spawn_counter # modified 2018/02/28
 		next_state(self)
 
 
 def appear_on_edge(self, next_action):
-	if (camera.right <= self.org_x < camera.virtual_right)\
-		or (camera.virtual_left < self.org_x <= camera.left):
+	if (camera.right <= self.org_x < camera.right + 32)\
+		or (camera.left - 32< self.org_x <= camera.left):
 			appear(self, next_action)
 		
 def appear(self, next_action, list_ = ennemy_objects, is_dynamic = True):
@@ -90,7 +92,9 @@ def appear(self, next_action, list_ = ennemy_objects, is_dynamic = True):
 			self.sprite.vpos |= Globs.stage_priority
 		else:
 			self.sprite.vpos &= 0x7FF
-			
+
+		self.moves_to_left = self.sprite.is_flipped = self.org_faces_left
+		
 		if next_action:
 			next_action(self)
 	else:
@@ -99,6 +103,7 @@ def appear(self, next_action, list_ = ennemy_objects, is_dynamic = True):
 
 
 def release(self):
+	respawn(self)
 	release_object(self)
 	ennemy_objects.remove(self)
 
@@ -163,7 +168,10 @@ def update_walk(self, same_level_action, different_level_action, face_obstacle_a
 	   and collides_background(self, self.back, 1) == 0:
 		hole_action(self)
 
-	elif collides_background(self, self.front + 1, -32):
+	# modified 2018/01/27
+	# can cause side effects with knives, punks, guardians...
+	# elif collides_background(self, self.front + 1, -32):
+	elif collides_background(self, self.front + 1, -64):
 		face_wall_action(self)
 
 	elif collides_background(self, self.front + 1, 0):
@@ -251,45 +259,6 @@ def update_collision(self, death_state, next_state):
 			
 	update_jump(self, next_state = at_end)
 
-def __update_collision(self, death_state, next_state):
-
-	self.x += self.speed_x
-
-	if collides_background(self, self.front, 0)\
-	or collides_background(self, self.back, 0):
-		fix_hpos(self)
-
-	self.speed_y += self.accel_y
-	self.y += self.speed_y
-
-	if handle_fall(self):
-		if self.is_dead:
-			death_state(self)
-		else:
-			self.is_collidable = True
-			next_state(self)
-
-
-def __update_jump(self, fall_state, action = do_nothing):
-	self.x += self.speed_x
-
-	if collides_background(self, self.front, 0) or collides_background(self, self.back, 0):
-		log.write(2, "fix_hpos")
-		fix_hpos(self)
-		# self.speed_x = signate(self, 1)
-
-	self.speed_y += self.accel_y
-	self.y += self.speed_y
-	
-	if self.y < 0:
-		self.speed_y = 0
-		self.y = 0
-
-	if self.speed_y >= 0:
-		fall_state(self)
-	
-	action(self)
-
 	
 def update_jump(self, fall_anim = None, action = do_nothing, next_state = do_nothing):
 	self.x += self.speed_x
@@ -347,6 +316,103 @@ def __update_fall(self, next_state, action = do_nothing):
 	else:
 		action(self)
 
+# hijumps		
+		
+def init_hijump_up_start(self, anim, next_state):
+	# print ('[%s] init_hijump_up_start' % self.name)
+	self.speed_y = self.accel_y = 0
+	set_animation(self.sprite, anim)
+	self.update_function = next_state
+
+def update_hijump_up_start(self, next_state):
+	# print ('[%s] update_hijump_up_start' % self.name)
+	if self.sprite.is_animation_over:
+		next_state(self)
+
+def init_hijump_up_mid(self, anim, next_state):
+	# print ('[%s] init_hijump_up_mid' % self.name)
+	self.speed_y = get_hijump_impulsion(self)
+	self.accel_y = 0.5
+	set_animation(self.sprite, anim)
+	self.update_function = next_state
+	# self.floor |= 0x80
+
+def update_hijump_up_mid(self, next_state):
+	# print ('[%s] update_hijump_up_mid' % self.name)
+	self.speed_y += self.accel_y
+	self.y += self.speed_y
+	if self.speed_y == 0:
+		self.floor += 1
+		# self.floor &= 0x7F
+		self.sprite.vpos &= 0x7FFF
+	elif handle_fall(self):
+		next_state(self)
+
+def init_hijump_up_end(self, anim, next_state):
+	# print ('[%s] init_hijump_up_end' % self.name)
+	self.speed_y = self.accel_y = 0
+	set_animation(self.sprite, anim)
+	self.update_function = next_state
+
+def update_hijump_up_end(self, next_state):
+	# print ('[%s] update_hijump_up_end' % self.name)
+	if self.sprite.is_animation_over:
+		next_state(self)
+
+def init_hijump_down_start(self, anim, next_state):
+	print ('[%s] init_hijump_down_start' % self.name)
+	# GP.halt()
+	self.speed_y = self.accel_y = 0
+	set_animation(self.sprite, anim)
+	self.update_function = next_state
+	# disable_blade(self)
+
+def update_hijump_down_start(self, next_state):
+	print ('[%s] update_hijump_down_start' % self.name)
+	# GP.halt()
+	if self.sprite.is_animation_over:
+		next_state(self)
+
+def init_hijump_down_mid(self, anim, next_state):
+	print ('[%s] init_hijump_down_mid' % self.name)
+	# GP.halt()
+	self.speed_y = get_hijump_down_impulsion(self)
+	self.accel_y = 0.5
+	set_animation(self.sprite, anim)
+	self.update_function = next_state
+	# self.is_collidable = False
+	# self.floor |= 0x80
+
+def update_hijump_down_mid(self, next_state):
+	print ('[%s] update_hijump_down_mid' % self.name)
+	# GP.halt()
+	self.speed_y += self.accel_y
+	self.y += self.speed_y
+	if self.speed_y == 0:
+		self.floor -= 1
+		# self.floor &= 0x7F
+		if self.floor == 1:
+			self.sprite.vpos |= 0x8000
+		else:
+			self.sprite.vpos &= 0x7FFF
+	elif handle_fall(self):
+		next_state(self)
+
+def init_hijump_down_end(self, anim, next_state):
+	print ('[%s] init_hijump_up_end' % self.name)
+	# GP.halt()
+	self.speed_y = self.accel_y = 0
+	set_animation(self.sprite, anim)
+	self.update_function = next_state
+
+def update_hijump_down_end(self, next_state):
+	print ('[%s] update_hijump_down_end' % self.name)
+	# GP.halt()
+	if self.sprite.is_animation_over:
+		next_state(self)
+
+
+# death, collision...
 
 def init_death(self, death_anim, next_state):
 	set_physics(self, 0, 0, 0, 0)
@@ -360,9 +426,12 @@ def update_death(self, next_state):
 		release_sprite(self.sprite)
 		ennemy_objects.remove(self)
 		self.sprite = None
-		self.tick = self.spawn_counter
+		respawn(self)
 		self.update_function = next_state
 
+def respawn(self):
+	print ('[%s] respawn' % self.name)
+	self.tick = self.spawn_counter
 
 
 

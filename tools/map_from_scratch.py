@@ -81,6 +81,35 @@ def get_floors_map(map_):
 	
 	exit()
 	
+# ========================================================
+# get_collmap
+
+def get_jumps_table(map_):
+	w, h = map_.get_size()
+	jumps_table = []
+	n_levels = 1
+	for x in range(w):
+		jumps = [None] * 8
+		for y in range(h):
+			t = map_[y][x]
+			if t and 8 <= t.id_ < 16:
+				j = t.id_ - 8
+				jumps[j] = y
+				n_levels = max(j + 1, n_levels)
+	
+		jumps_table += [jumps]
+	return n_levels, jumps_table
+	
+	
+	print ('nb of floors: %d' % n_levels)
+
+	# debug
+	# print ('jumps')
+	# for x in range(w):
+		# print ('%d : %s' % (x, jumps_table[x]))
+	# exit()
+
+
 def get_collmap(map_):
 	def cvt(x):
 		if x:
@@ -93,96 +122,73 @@ def get_collmap(map_):
 	impulsion = [1, 1, 2, 3, 4, 5, 5, 5, 6, 6, 7, 7, 7]
 	res = [[cvt(x) for x in row] for row in map_]
 	w, h = map_.get_size()
-	ascending_map = [[0] * w for _ in range(h)]
 
-	def get_floors(x):
-		w, h = map_.get_size()
-		floors = []
-		f = 1
-		y = h - 1
-		while y > 0:
-			tile = res[y][x] & 7
-			tile_top = res[y - 1][x] & 7
-			if 0 < tile < 8 and tile_top != tile and  tile == f:
-				floors += [y]
-				f += 1
-			else:
-				y -= 1
-		return floors
-
-	def process_ascending(x, y0, floor):
-		found = False
-		for y in range(y0 - 1, -1, -1):
-			tile = map_[y][x]
-			if tile and 8 < tile.id_ < 16:
-				f = tile.id_ - 8
-				if f == floor:
-					found = True
-					break
+	n_levels, jumps_table = get_jumps_table(map_)
 		
-		if found:
-			print ('(ascending) floor %d: from %d to %d' % (floor, y0, y))
-			# for j in range(y0 - y):
-			j = y0 - y - 1
-			y_ = y + j + 1
-
-			if (res[y_][x] & 7 == floor) \
-			or ((x > 0) and (res[y_][x - 1] & 7 == floor)) \
-			or ((x < w) and (res[y_][x + 1] & 7 == floor)):
-				if x > 0:
-					res[y + j + 1][x - 1] |= (j << 4)
-					ascending_map[y + j + 1][x - 1] = j
-					res[y + j][x - 1] |= (j - 1) << 4
-					ascending_map[y + j][x - 1] = j - 1
-
-				res[y + j + 1][x] |= (j << 4)
-				ascending_map[y + j + 1][x] = j
-				res[y + j][x] |= (j - 1) << 4
-				ascending_map[y + j][x] = j - 1
-
-				if x < w:
-					res[y + j + 1][x + 1] |= (j << 4)
-					ascending_map[y + j + 1][x + 1] = j
-					res[y + j][x + 1] |= (j - 1) << 4
-					ascending_map[y + j][x + 1] = j - 1
+	# floors = []
+	# for x in range(w):
+		# floors_x = [None]
+		# for f in range(1, n_levels + 1):
+			# for y in range(1, h):
+				# if res[y][x] & 7 in [f, 7] and res[y - 1][x] & 7 not in [f, 7]:
+					# floors_x += [y]
+					# break
+			# else:
+				# floors_x += [None]
 		
-		return y
-			
-	def process_descending(x, y0, floor):
-		found = False
-		for y in range(y0 - 1, -1, -1):
-			tile = map_[y][x]
-			if tile and 8 < tile.id_ < 16:
-				f = tile.id_ - 8
-				if f == floor - 1:
-					found = True
-					break
-		
-		if found:
-			print ('(descending) floor %d: from %d to %d' % (floor, y0, y))
-			for j in range(-1, y0 - y):
-				res[y + j + 1][x] |= (max(j, 1) << 8)
-		
-		return y
-				
-	for x in range(w):
-		print ('column: %d' % x)
-		floors_y = get_floors(x)
-		print ('%d : %s' % (x, floors_y))
-		
-		floor = 1
-		for floor_y in floors_y:
-			print ('floor: %d (at %d)' % (floor, floor_y))
-			process_ascending(x, floor_y, floor)
-			process_descending(x, floor_y, floor)
-			floor += 1
+		# floors += [floors_x]
 
-		if x == 28:
-			print ('\n'.join(['%04X' % res[y][x] for y in range(h)]))
-			exit()
+	# debug
+	# print ('floors')
+	# for x in range(w):
+		# print ('%d : %s' % (x, floors[x]))
+
 	
-	return res
+	# for x in range(w):
+		# print ('x = %d' % x)
+		# for f in range(1, n_levels):
+			# print ('f = %d' % f)
+			# jump_y = jumps_table[x][f]
+			# if jump_y:
+				# # hijump up
+				# low_y = floors[x][f]
+				# j = low_y - jump_y - 1
+				# print ('jump = %d, low = %d, j = %d' % (jump_y, low_y, j))
+				# res[low_y - 1][x] |= (j << 4)
+				
+				# for dx in [-2, -1, 1, 2]:
+					# if 0 <= x + dx < w and jumps_table[x + dx][f]:
+						# res[low_y - 1][x + dx] |= (j << 4)
+				
+				# # hijump down
+				# print (f, floors[y])
+				# high_y = floors[x][f + 1]
+				# j = high_y - jump_y - 1
+				# print ('jump = %d, high = %d, j = %d' % (jump_y, high_y, j))
+				# res[high_y - 1][x] |= (j << 8)
+				
+				# for dx in [-2, -1, 1, 2]:
+					# if 0 <= x + dx < w and jumps_table[x + dx][f]:
+						# res[high_y - 1][x + dx] |= (j << 8)
 
+		# if x == 29:
+			# print ('\n'.join(['%04X' % res[y][x] for y in range(h)]))
+			# exit()
+		
+	# for floor in range(1, 8):
+		# for x in dead_cols[floor - 1]:
+			# for y in range(h):
+				# if (res[y][x] & 7 == floor)\
+				# or (y < h - 1 and (res[y + 1][x] & 7 == floor)):
+					# res[y][x] &= 0xFF0F
+	
+	# print (dead_cols)
+	# print ('\n'.join(['%04X' % res[y][49] for y in range(h)]))
+	# print ('==============')
+	# print ('\n'.join(['%04X' % res[y][38] for y in range(h)]))
+	# exit()
+		
+	return res
 	
 	# =====================================================
 

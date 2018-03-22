@@ -32,6 +32,8 @@ def init(entry):
 	self.y = y
 	self.floor = floor
 
+	self.scope = (32, 32)
+	
 	Globs.musashi = self
 	print ('Globs.musashi = %s' % Globs.musashi)
 	all_objects.add(self)
@@ -46,7 +48,10 @@ def init(entry):
 	sprite = allocate_dynamic_sprite()
 	sprite.name = "sprite %s" % self.name
 
-	sprite.vpos |= Globs.stage_priority
+	if self.floor == 1:
+		sprite.vpos |= 0x8000
+	# sprite.vpos |= Globs.stage_priority
+
 	sprite.status = 1
 	sprite.x = self.x
 	sprite.y = self.y
@@ -75,7 +80,7 @@ def init_stand(self):
 
 
 def update_stand(self):
-	print ('update_stand')
+	# print ('update_stand')
 	if not (collides_background(self, self.front, 1) or
 			collides_background(self, self.back, 1)):
 		# print ('fall (coll = %X)' % collides_background(self, self.front, 1) or
@@ -403,6 +408,7 @@ def update_jump_position(self):
 	
 	old_y = self.y
 	self.speed_y += self.accel_y
+	self.speed_y = clamp(self.speed_y, -15.75, 15.75)
 	self.y += self.speed_y
 	
 	if Globs.level == all_levels.LEVEL_2_3:

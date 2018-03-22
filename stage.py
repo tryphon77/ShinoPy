@@ -13,15 +13,17 @@ def init_stage(stage):
 
 	# load collision map
 	Globs.collision_map = stage.collision_map
+	Globs.jumps_table = stage.jumps_table
 	
 	# load objects_map
 	Globs.objects_map = stage.objects_map
 	Globs.objects_chunks = stage.objects_chunks
-	Globs.objects_from_left = stage.objects_from_left
-	Globs.objects_from_right = stage.objects_from_right
-	Globs.objects_from_top = stage.objects_from_top
-	Globs.objects_from_bottom = stage.objects_from_bottom
-	# Globs.init_chunk = stage.init_chunk
+
+	if False:
+		Globs.objects_from_left = stage.objects_from_left
+		Globs.objects_from_right = stage.objects_from_right
+		Globs.objects_from_top = stage.objects_from_top
+		Globs.objects_from_bottom = stage.objects_from_bottom
 	
 	# load tilemap
 	layer_A.plane = GP.plane_A

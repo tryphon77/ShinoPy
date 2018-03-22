@@ -14,6 +14,7 @@ def write(flags, text):
 	
 	if state & flags != 0:
 		buffer += [text]
+		# print (text)
 
 def refresh_max_updatables(v):
 	global updatables

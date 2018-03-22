@@ -11,6 +11,7 @@ def init(entry):
 	# param4 : pointer to state before blocking
 	self = common.init(entry, pink_sprite_data)
 	self.name = 'pink guardian at (%d, %d)' % (self.org_x, self.org_y)
+	self.scope = (64, 64)
 	
 	self.hp_max = 1
 	self.global_bbox = (-24, -63, 48, 64)

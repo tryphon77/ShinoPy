@@ -18,6 +18,7 @@ def init(entry):
 	self.hp_max = 2
 	self.global_display_box = (-24, -63, 48, 64) # a modifier
 	self.spawn_counter = 240
+	self.scope = (64, 128)
 	
 	# param1: range in pixels
 	# param2: range_ticks

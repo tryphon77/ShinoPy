@@ -30,7 +30,9 @@ all_levels = [
 	level_0_0, level_0_1, level_0_2,
 	level_1_1, level_1_2, level_1_3,
 	level_2_1, level_2_2, level_2_3, level_2_4,
-	level_3_1, level_3_2, level_3_3
+	level_3_1, level_3_2, level_3_3, level_3_4,
+	level_4_1, level_4_2, level_4_3, level_4_4,
+	level_5_1, level_5_2, level_5_3
 ]
 
 LEVEL_0_0 = 0
@@ -49,5 +51,15 @@ LEVEL_2_4 = 9
 LEVEL_3_1 = 10
 LEVEL_3_2 = 11
 LEVEL_3_3 = 12
+LEVEL_3_4 = 13
+
+LEVEL_4_1 = 14
+LEVEL_4_2 = 15
+LEVEL_4_3 = 16
+LEVEL_4_4 = 17
+
+LEVEL_5_1 = 18
+LEVEL_5_2 = 19
+LEVEL_5_3 = 20
 
 

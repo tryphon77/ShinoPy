@@ -20,6 +20,7 @@ def init(entry, sprite_data, activate_fun, release_fun, collision_fun, hit_fun, 
 	self.hit_function = hit_fun
 
 	self.hp_max = 2
+	self.spawn_counter = 300
 	# self.global_display_box = (-16, -63, 32, 64)
 	
 	self.update_function = None
@@ -30,8 +31,8 @@ def init(entry, sprite_data, activate_fun, release_fun, collision_fun, hit_fun, 
 
 def activate(self, next_state):
 	# print ('[%s] activate object #%d' % (self.name, self.id_))
-	common.activate(self, None)
-	common.appear(self, next_state)
+	common.activate(self, next_state)
+	# common.appear(self, next_state)
 	# print (self.param1)
 	# common.activate_shield(self.param1)
 
@@ -41,10 +42,10 @@ def release(self):
 	common.release(self)
 
 def update_spawn(self, next_state):
-	# print ('[ninja] update_spawn: %d' % self.tick)
+	print ('[%s] ninja_common.update_spawn: %d' % (self.name, self.tick))
 	self.tick -= 1
 	if self.tick < 0:
-		common.appear_on_edge(self, next_state)
+		common.appear(self, next_state)
 
 
 def init_appear(self, anim, next_state):
@@ -75,9 +76,9 @@ def init_hit_blade_high(self, anim, next_state, death_state):
 		if (self.moves_to_left ^ other.moves_to_left) and (self.y - other.y > 32):
 			print ('shield')
 		else:
-			common.init_hit(self, anim, next_state, death_state, impulsion = -8)
+			common.init_hit(self, anim, next_state, death_state, impulsion = -8.5)
 	else:
-		common.init_hit(self, anim, next_state, death_state, impulsion = -8)
+		common.init_hit(self, anim, next_state, death_state, impulsion = -8.5)
 
 def init_hit_blade_low(self, anim, next_state, death_state):
 	other = self.other_object
@@ -89,19 +90,19 @@ def init_hit_blade_low(self, anim, next_state, death_state):
 			else:
 				self.speed_x = 1
 		else:
-			common.init_hit(self, anim, next_state, death_state, impulsion = -8)
+			common.init_hit(self, anim, next_state, death_state, impulsion = -8.5)
 	else:
-		common.init_hit(self, anim, next_state, death_state, impulsion = -8)
+		common.init_hit(self, anim, next_state, death_state, impulsion = -8.5)
 
 def init_hit(self, anim, next_state, death_state):
 	# print ('[%s] init_hit' % self.name)
-		common.init_hit(self, anim, next_state, death_state, impulsion = -8)
+		common.init_hit(self, anim, next_state, death_state, impulsion = -8.5)
 
 def init_collision(self, anim, next_state):
 	# print ('[%s] init_collision')
 	# disable_blade(self)
 	self.is_dead = False # self.is_hit
-	common.init_collision(self, anim, next_state, impulsion = -8)
+	common.init_collision(self, anim, next_state, impulsion = -8.5)
 
 def update_collision(self, death_state, next_state):
 	# print ('[green ninja] update_collision')
@@ -241,6 +242,7 @@ def update_jump_end(self, hijump_up, hijump_down, next_state):
 	
 
 # hijump up
+# todo: move to common
 
 def init_hijump_up_start(self, anim, next_state):
 	# print ('[%s] init_hijump_up_start' % self.name)

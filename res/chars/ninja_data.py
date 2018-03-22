@@ -300,7 +300,7 @@ patterns_blocks = [
 appear = [(0, 8), (1, 8), (2, 8), (3, 8)]
 crouch = [(4, 16)]
 walk = [(6, 8), (7, 8), (6, 8), (8, 8)]
-crawl = [(4, 32), (5, 32)]
+crawl = [(5, 32), (4, 48)]
 attack = [(8, 6), (23, 4), (24, 4), (25, 6), (26, 4), (27, 4), (28, 6), (26, 4), (23, 4), (8, 8)]
 jump_start = [(9, 4), (4, 4)]
 jump = [(10, 1)]
@@ -316,6 +316,7 @@ jump_back2 = [(10, 8), (14, 6), (13, 6), (12, 6), (11, 6), (29, 4), (30, 255)]
 air_attack = [(10, 8), (11, 4), (12, 4), (13, 4), (14, 4), (11, 4), (12, 4), (13, 4), (14, 4), (29, 4), (30, 255)]
 hit = [(31, 1)]
 death = [(31, 7), (32, 8), (33, 16)]
+roll = [(12, 4), (13, 4), (14, 4), (11, 4)]
 
 animations_table = [
         appear,
@@ -324,7 +325,7 @@ animations_table = [
         crawl,
         attack,
         jump_start,
-		jump,
+        jump,
         jump_end,
         hijump_up_start,
         hijump_up,
@@ -334,9 +335,10 @@ animations_table = [
         hijump_down_end,
         jump_back,
         jump_back2,
-		air_attack,
+        air_attack,
         hit,
-        death
+        death,
+        roll
 ]
 
 APPEAR = 0
@@ -358,6 +360,8 @@ JUMP_BACK2 = 15
 AIR_ATTACK = 16
 HIT = 17
 DEATH = 18
+ROLL = 19
+
 
 
 rect0 = (-20, -59, 40, 60)
@@ -365,8 +369,6 @@ rect1 = (-12, -36, 24, 37)
 rect2 = (-12, -51, 24, 52)
 rect3 = (-12, -43, 24, 44)
 rect4 = (-12, -53, 24, 27)
-
-
 
 bounding_boxes = [
 	None,

@@ -14,10 +14,10 @@ class Camera():
 		self.delta_x = 128
 		self.delta_y = 128
 
-		self.virtual_left = 0
-		self.virtual_right = 0
-		self.virtual_top = 0
-		self.virtual_bottom = 0
+		# self.virtual_left = 0
+		# self.virtual_right = 0
+		# self.virtual_top = 0
+		# self.virtual_bottom = 0
 		
 		self.moves_left = False
 		self.moves_right = False
@@ -84,13 +84,13 @@ def set_camera(camera_new_x, camera_new_y):
 	# Globs.camera_y = camera_new_y
 
 	camera.left = camera_new_x
-	camera.virtual_left = camera_new_x - camera.delta_x
+	# camera.virtual_left = camera_new_x - camera.delta_x
 	camera.right = camera_new_x + 319
-	camera.virtual_right = camera_new_x + 319 + camera.delta_x
+	# camera.virtual_right = camera_new_x + 319 + camera.delta_x
 	camera.top = camera_new_y
-	camera.virtual_top = camera_new_y - camera.delta_y
+	# camera.virtual_top = camera_new_y - camera.delta_y
 	camera.bottom = camera_new_y + 223
-	camera.virtual_bottom = camera_new_y + 223 + camera.delta_y
+	# camera.virtual_bottom = camera_new_y + 223 + camera.delta_y
 
 
 def set_camera_focus_to(obj):
@@ -121,13 +121,13 @@ def set_camera_focus_to(obj):
 	# Globs.camera_y = camera_y
 
 	camera.left = camera_x
-	camera.virtual_left = camera_x - camera.delta_x
+	# camera.virtual_left = camera_x - camera.delta_x
 	camera.right = camera_x + 319
-	camera.virtual_right = camera_x + 319 + camera.delta_x
+	# camera.virtual_right = camera_x + 319 + camera.delta_x
 	camera.top = camera_y
-	camera.virtual_top = camera_y - camera.delta_y
+	# camera.virtual_top = camera_y - camera.delta_y
 	camera.bottom = camera_y + 223
-	camera.virtual_bottom = camera_y + 223 + camera.delta_y
+	# camera.virtual_bottom = camera_y + 223 + camera.delta_y
 
 def clamp(x, a, b):
 	return min(max(a, x), b)
@@ -144,56 +144,72 @@ def update_camera():
 	y = int(obj.y)
 	sy = y - camera_y
 
-	# print ('camera: vscroll_mode = %d' % Globs.vscroll_mode)
-	if Globs.vscroll_mode == 0:
-		# when musashi walks
-		# try to have y = 128
-		# if not, move by 1 pixel
-		if sy < 120 and camera_y > 0:
-			camera_y -= 1
-		elif sy > 120 and camera_y < Globs.layer_a_pheight - 224:
-			camera_y += 1
+	if sy < 64:
+		camera_y = y - 64
+	elif sy < 120:# and camera_y > 0:
+		camera_y -= 1
+	elif sy == 120:
+		pass
+	elif sy <= 208: # and camera_y < Globs.layer_a_pheight - 224:
+		camera_y += 1
+	else:
+		camera_y = y - 208
+	# print ('y = %s, sy = %s, camera_y = %s' % (y, sy, camera_y))
+	
+	# camera_y = clamp(sy, 64, 208)
+	# if camera_y < 120:
+		# camera_y -= 1
+	# elif camera_y > 120:
+		# camera_y += 1
 		
-	elif Globs.vscroll_mode == 1:
-		if sy < 64:
-			Globs.vscroll_mode = 2
-			sy = 64
-			camera_y = y - 64
-			if camera_y < 0:
-				camera_y = 0
-				sy = y
-		elif sy > 208:
-			sy = 208
-			camera_y = y - 208
-			if camera_y >= Globs.layer_a_pheight - 224:
-				camera_y = Globs.layer_a_pheight - 224
-				sy = y - camera_y
-			GP.vscroll_mode = 2
+	# # print ('camera: vscroll_mode = %d' % Globs.vscroll_mode)
+	# if Globs.vscroll_mode == 0:
+		# # when musashi walks
+		# # try to have y = 128
+		# # if not, move by 1 pixel
+		# if sy < 120 and camera_y > 0:
+			# camera_y -= 1
+		# elif sy > 120 and camera_y < Globs.layer_a_pheight - 224:
+			# camera_y += 1
+		
+	# elif Globs.vscroll_mode == 1:
+		# if sy < 64:
+			# Globs.vscroll_mode = 2
+			# sy = 64
+			# camera_y = y - 64
+			# if camera_y < 0:
+				# camera_y = 0
+				# sy = y
+		# elif sy > 208:
+			# sy = 208
+			# camera_y = y - 208
+			# if camera_y >= Globs.layer_a_pheight - 224:
+				# camera_y = Globs.layer_a_pheight - 224
+				# sy = y - camera_y
+			# GP.vscroll_mode = 2
 				
-	elif Globs.vscroll_mode == 2:
-		if sy < 64:
-			sy = 64
-			camera_y = y - 64
-			if camera_y < 0:
-				camera_y = 0
-				sy = y
-		elif sy > 208:
-			sy = 208
-			camera_y = y - 208
-			if camera_y >= Globs.layer_a_pheight - 224:
-				camera_y = Globs.layer_a_pheight - 224
-				sy = y - camera_y
-			GP.halt()
+	# elif Globs.vscroll_mode == 2:
+		# if sy < 64:
+			# sy = 64
+			# camera_y = y - 64
+			# if camera_y < 0:
+				# camera_y = 0
+				# sy = y
+		# elif sy > 208:
+			# sy = 208
+			# camera_y = y - 208
+			# if camera_y >= Globs.layer_a_pheight - 224:
+				# camera_y = Globs.layer_a_pheight - 224
+				# sy = y - camera_y
+			# GP.halt()
 		
-		elif Globs.musashi.speed_y < 0:
-			camera_y -= 1
+		# elif Globs.musashi.speed_y < 0:
+			# camera_y -= 1
 		
-		elif Globs.musashi.speed_y > 0:
-			camera_y += 1
+		# elif Globs.musashi.speed_y > 0:
+			# camera_y += 1
 
-
-	camera_y = max(0, camera_y)
-	camera_y = min(Globs.layer_a_pheight - 224, camera_y)
+	camera_y = clamp(camera_y, 0, Globs.layer_a_pheight - 224)
 
 	set_camera(camera_x, camera_y)
 	# print ('camera = (%d, %d, %d, %d) // object = (%d, %d)' % (camera.left, camera.right, camera.top, camera.bottom, obj.x, obj.y))

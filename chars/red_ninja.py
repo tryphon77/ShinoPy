@@ -14,15 +14,15 @@ def init(entry):
 
 def activate(self):
 	log.write(2, '[%s] activate(' % self.name)
-	ninja_common.activate(self, init_appear)
+	ninja_common.activate(self, update_spawn)
 
 def release(self):
 	log.write(2, '[%s] release(' % self.name)
 	ninja_common.release(self)
 
-# def update_spawn(self):
-	# log.write(2, '[%s] update_spawn' % self.name)
-	# ninja_common.update_spawn(self, init_appear)
+def update_spawn(self):
+	log.write(2, '[%s] update_spawn' % self.name)
+	ninja_common.update_spawn(self, init_appear)
 
 def init_appear(self):
 	log.write(2, '[%s] init_appear' % self.name)

@@ -12,7 +12,7 @@ _max_dynamics = _max_viewable_dynamics = 0
 _max_statics = _max_viewable_statics = 0
 # end debug
 
-impulsions_table = [0, -4, -5.5, -7, -8, -9, -10, -10.5, -11.5, -12, -12.5, -13.5, -14, -14.5, -15]
+impulsions_table = [-4, -4, -5.5, -7, -8, -9, -10, -10.5, -11.5, -12, -12.5, -13.5, -14, -14.5, -15]
 
 
 class Object():
@@ -61,6 +61,9 @@ class Object():
 		# deprecated (to remove)
 		self.back = 0
 		self.front = 0
+		
+		# test (used by skeleton)
+		self.process_gravity = False
 		
 		# last collision value computed (useful for fix_v/h_pos)
 		self.coll_value = 0
@@ -223,21 +226,21 @@ def collides_background(self, dx, dy):
 	y = yp // 16
 	if y < 0:
 		# self.coll_value = DEFAULT
-		return DEFAULT
+		return 0 #DEFAULT
 	if y >= layer_A.theight:
 		# self.coll_value = DEFAULT
-		return DEFAULT
+		return 0 #DEFAULT
 
 	res = Globs.collision_map[y * layer_A.twidth + x] & 15
 	# self.coll_value = res
 
 	if res & 8:
-		print ('yp = %X, coll = %X' % (yp, res))
+		# print ('yp = %X, coll = %X' % (yp, res))
 		# half tile
 		# GP.halt()
 		if yp & 8 and (res & 7 == 7 or res & 7 == self.floor & 7):
 			return res
-		print ('return 0')
+		# print ('return 0')
 		return 0
 	if res == 7 or res & 7 == self.floor & 7:
 		return res
@@ -252,46 +255,48 @@ def get_hijump_impulsion(self):
 	if not(0 <= y < layer_A.theight and 0 <= x1 < layer_A.twidth):
 		return 0
 
-	# bug potentiel : x2 n'est pas forcément > x1 !!!
-	i = y * layer_A.twidth + x1
-
-	v = impulsions_table[(Globs.collision_map[i] >> 4) & 15]
-	print ('x1 = %s, v = %d' % (x1, v))
-	
-	if v:
-		if x2 != x1:
-			w = impulsions_table[(Globs.collision_map[i + x2 - x1] >> 4) & 15]
-			print ('x2 = %d, w = %s' % (x2, w))
-			GP.halt()
-			if w:
-				v = max(v, w)
-			else:
-				return 0
-	else:
+	y1 = Globs.jumps_table[x1][self.floor - 1]
+	if not y1:
 		return 0
 
-	return v
+	y2 = Globs.jumps_table[x2][self.floor - 1]
+	if not y2:
+		return 0
+		
+	v = impulsions_table[y - y1]
+	w = impulsions_table[y - y2]
+	
+	# print ('x1 = %s, v = %d' % (x1, v))
+	# print ('x2 = %d, w = %s' % (x2, w))
+	# GP.halt()	
 
+	return max(v, w)
 
 def get_hijump_down_impulsion(self):
 	x1 = int(self.x + self.back) // 16
 	x2 = int(self.x + self.front) // 16
 	y = int(self.y) // 16
-
-	i = y * layer_A.twidth + x1
-	v = impulsions_table[(Globs.collision_map[i] >> 8) & 15]
-
-	# bug potentiel : x2 n'est pas forcément > x1 !!!
-	if v:
-		if x1 != x2:
-			w = impulsions_table[(Globs.collision_map[i + x2 - x1] >> 8) & 15]
-			if w:
-				v = max(v, w)
-			else:
-				return 0
-	else:
+	
+	# if not(0 <= y < layer_A.theight and 0 <= x1 < layer_A.twidth and 0 <= x2 < layer_A.twidth):
+	if not(0 <= y < layer_A.theight and 0 <= x1 < layer_A.twidth):
 		return 0
-	return v
+
+	y1 = Globs.jumps_table[x1][self.floor - 2]
+	if not y1:
+		return 0
+
+	y2 = Globs.jumps_table[x2][self.floor - 2]
+	if not y2:
+		return 0
+		
+	v = impulsions_table[y - y1]
+	w = impulsions_table[y - y2]
+	
+	# print ('x1 = %s, v = %d' % (x1, v))
+	# print ('x2 = %d, w = %s' % (x2, w))
+	# GP.halt()	
+
+	return max(v, w)
 
 
 def fix_hpos(self):
@@ -313,7 +318,10 @@ def fix_hpos(self):
 			log.write(2, 'back: %d' % self.back)
 			fixed = (int(self.x + self.back) & 0xFFF0) - self.back + 16
 	log.write(2, 'fix_hpos: %d -> %d' % (self.x, fixed))
-	self.x = fixed
+
+	# normally useless for int16, but prevents problems with Python
+	fixed &= 0xFFFF 
+	self.x = fixed 
 
 def fix_hpos_(self, dx):
 	if self.moves_to_left:
@@ -323,34 +331,34 @@ def fix_hpos_(self, dx):
 	self.x = fixed
 
 def handle_fall(self):
-	print ('handle_fall')
+	# print ('handle_fall')
 	coll = collides_background(self, self.front, 0) | collides_background(self, self.back, 0)
 
-	print ('coll: %X' % self.coll_value)
+	# print ('coll: %X' % self.coll_value)
 	if coll:
+		self.speed_y = 0
 		old_y = self.y
-		print ('!')
 		self.y = ((int(self.y)) & 0xFFF0) - 1
 
-		print ('handle_fall: (coll_value = %X) %X -> %X' % (coll, int(old_y), int(self.y))) 
+		# print ('handle_fall: (coll_value = %X) %X -> %X' % (coll, int(old_y), int(self.y))) 
 
 		if coll & 8:
 			self.y += 8
-			print ('then %X' % self.y)
+			# print ('then %X' % self.y)
 			# GP.halt()
 		else:
 			coll = collides_background(self, self.front, 0) | collides_background(self, self.back, 0)
 			if coll & 8:
 				self.y -= 8
-				print ('then %X' % self.y)
+				# print ('then %X' % self.y)
 				# GP.halt()
 			elif coll:
 				self.y -= 16
-				print ('then %X' % self.y)
+				# print ('then %X' % self.y)
 				
-		print ('end handle_fall')
+		# print ('end handle_fall')
 		return True
-	
+
 	return False
 
 
@@ -359,11 +367,11 @@ def fix_vpos_(self):
 	
 	self.y = ((int(self.y)) & 0xFFF0) - 1
 
-	print ('fix_vpos: (coll_value = %X) %X -> %X' % (self.coll_value, int(old_y), int(self.y))) 
+	# print ('fix_vpos: (coll_value = %X) %X -> %X' % (self.coll_value, int(old_y), int(self.y))) 
 
 	if self.coll_value & 8:
 		self.y += 8
-		print ('then %X' % self.y)
+		# print ('then %X' % self.y)
 		# GP.halt()
 		
 	# self.y = ((int(self.y)) & 0xFFF0) - 1
@@ -454,27 +462,34 @@ def too_near_right(x, y):
 def viewable_h(x, y):
 	return camera.virtual_top <= y <= camera.virtual_bottom
 
+# ========================================================
+
+def introduce_new_chunk_edge(new_object_chunk):
+	# version pour ressources generees par generate_objects_ressources_edges
+	
+	Globs.objects_chunk = new_object_chunk		
+	if camera.moves_right: 
+		# print ('right')
+		introduce_new_object_chunk(Globs.objects_from_left[new_object_chunk])
+	else:
+		# print ('left')
+		introduce_new_object_chunk(Globs.objects_from_right[new_object_chunk])
+		
+	if camera.moves_up:
+		# print ('up')
+		introduce_new_object_chunk(Globs.objects_from_bottom[new_object_chunk])
+	else: 
+		# print ('down')
+		introduce_new_object_chunk(Globs.objects_from_top[new_object_chunk])
+
+def introduce_new_chunk_full_rect(new_object_chunk):
+	introduce_new_object_chunk(new_object_chunk)
 
 def introduce_new_objects():
 	new_object_chunk = Globs.objects_map[(camera.top >> 4) * layer_A.twidth + (camera.left >> 4)]
 	# print ('camera tpos = %d, %d' % (camera.left >> 4, camera.top >> 4))
 	if (new_object_chunk != Globs.objects_chunk):
-	
-		Globs.objects_chunk = new_object_chunk
-		
-		if camera.moves_right: 
-			# print ('right')
-			introduce_new_object_chunk(Globs.objects_from_left[new_object_chunk])
-		else:
-			# print ('left')
-			introduce_new_object_chunk(Globs.objects_from_right[new_object_chunk])
-			
-		if camera.moves_up:
-			# print ('up')
-			introduce_new_object_chunk(Globs.objects_from_bottom[new_object_chunk])
-		else: 
-			# print ('down')
-			introduce_new_object_chunk(Globs.objects_from_top[new_object_chunk])
+		introduce_new_chunk_full_rect(new_object_chunk)
 		
 
 def introduce_new_object_chunk(chunk):
@@ -484,7 +499,7 @@ def introduce_new_object_chunk(chunk):
 		# GP.halt()
 		
 		for i in Globs.objects_chunks[chunk]:
-			print ('object: %d' % i)
+			# print ('object: %d' % i)
 			
 			# if i == 4:
 				# print('object %d from chunk %d' % (i, chunk))
@@ -492,6 +507,8 @@ def introduce_new_object_chunk(chunk):
 			obj = objects[i]
 			if obj.is_initialized and not obj.is_activated:
 				obj.activate_function(obj)
+
+# ========================================================
 
 def update_all_objects_on_screen():
 	log.write(1, 'update_all_objects_on_screen: #all = %d' % len(all_objects))
@@ -506,9 +523,21 @@ def update_all_objects_on_screen():
 	for obj in all_objects:
 		log.write(1, 'object %d (%s) : %s, bbox = %s, hitbox = %s' % (obj.id_, obj.name, ', '.join([['', 'initialized'][obj.is_initialized], ['', 'activated'][obj.is_activated], ['', 'displayable'][obj.is_displayable], ['', 'collidable'][obj.is_collidable]]), obj.bbox, obj.hitbox))
 
+		# activation area
+		# must be object-focused (not sprite) because
+		# some non-displayable objects must be alive even
+		# if off-screen
+		
 		if obj.is_activated:
-			if camera.virtual_left <= obj.x <= camera.virtual_right\
-			and camera.virtual_top < obj.y < camera.virtual_bottom:
+			# print('[%s] scope' % obj.name)
+			hscope, vscope = obj.scope
+			
+			virtual_left = camera.left - hscope
+			virtual_right = camera.right + hscope
+			virtual_top = camera.top - vscope
+			virtual_bottom = camera.bottom + vscope
+			
+			if virtual_left <= obj.x <= virtual_right and virtual_top <= obj.y < virtual_bottom:
 				# print ('update object %d' % obj.id_)
 				update_object(obj)				
 
@@ -524,8 +553,10 @@ def update_all_objects_on_screen():
 					
 			else:
 				log.write(2, '[update_all_objects] release %s' % obj.name)
-				print('[update_all_objects] release %s (camera = %d -> %d, object = %d' % (obj.name, camera.virtual_left, camera.virtual_right, obj.x))
+				print('[update_all_objects] release %s (camera = (left: %d right: %d, top: %d, bottom: %d), (virtual = (left: %d right: %d, top: %d, bottom: %d),, object = (x: %d, y: %d)' % (obj.name, camera.left, camera.right, camera.top, camera.bottom, virtual_left, virtual_right, virtual_top, virtual_bottom, obj.x, obj.y))
 				if obj.release_function:
+					# print('[%s] is out of bounds (%d, %d) camera = (%d, %d, %d, %d), virtual = (%d, %d, %d, %d)' % (obj.name, obj.x, obj.y, camera.left, camera.right, camera.top, camera.bottom, virtual_left, virtual_right, virtual_top, virtual_bottom))
+					# GP.halt()
 					obj.release_function(obj)
 	
 	display_list[display_list_ptr] = None
@@ -698,7 +729,7 @@ def update_all_sprites():
 		if obj is None:
 			break
 		
-		# print ('updating sprite of object #%d' % obj.id_)
+		# print ('[%s] updating sprite' % obj.name)
 		sprite = obj.sprite
 
 		if sprite:			
@@ -734,6 +765,7 @@ def update_all_sprites():
 	
 	log.displayables += [len(debug)]
 	log.write(1, '%d displayables: %s' % (len(debug), ', '.join(debug)))
+	# print('%d displayables: %s' % (len(debug), ', '.join(debug)))
 	GP.log_write('dynamic sprites: %d/%d' % (_viewable_dynamics, _dynamics), 0, 16)
 	GP.log_write('static sprites: %d/%d' % (_viewable_statics, _statics), 0, 32)
 	
@@ -760,7 +792,7 @@ def is_near(self, box, objects):
 		x0 = self.x + x
 		x1 = x0 + w
 	
-	print ('is_near [moves_to_left = %s] : (%s, %s) -> (%s, %s, %s, %s)' % (self.moves_to_left, self.x, self.y, x0, x1, y0, y1))
+	# print ('is_near [moves_to_left = %s] : (%s, %s) -> (%s, %s, %s, %s)' % (self.moves_to_left, self.x, self.y, x0, x1, y0, y1))
 	
 	for obj in objects:
 		# print 'ennemy object #%d' % ennemy.id_

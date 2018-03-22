@@ -6,7 +6,7 @@ patterns = load_data_from_png('res/chars/frogman_patterns.png')
 
 frames_table = [
         [               # frame 0
-                [-15, -17, -45, 0x000C, 0x00]
+                [-15, -17, -62, 0x000C, 0x00]
         ],
         [               # frame 1
                 [-11, -5, -15, 0x0005, 0x04],

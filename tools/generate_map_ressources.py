@@ -25,7 +25,25 @@ def print_tilemap(layer, base, prioritized_tiles = []):
 	for row in layer.map:
 		printed_lines += ['\t' + (', '.join([fmt(x) for x in row]))]
 	return ',\n'.join(printed_lines)
-	
+
+def print_jumps(n_levels, table):
+	res = []
+	res_ = []
+	for floors in table:
+		r = []
+		for f in floors[1 : n_levels]:
+			if f:
+				r += [f]
+			else:
+				r += [0]
+		r += [0]
+		res_ += [str(r)]
+		if len(res_) == 8:
+			res += ['\t' + ', '.join(res_)]
+			res_ = []
+	return ',\n'.join(res)
+			
+
 def fmt_attrs(attrs):
 	i = 0
 	res = []
@@ -60,7 +78,8 @@ def generate(mission, stage, drawing_method = 0, high_priority_tiles = [], prior
 	layer_a = tmx.get_layer_by_name('layer a')
 	collision_layer = tmx.get_layer_by_name('collisions')
 	collisions = get_collmap(collision_layer)
-		
+	n_levels, jumps_table = get_jumps_table(collision_layer)
+	
 	blank_tile = pygame.Surface((8, 8))
 	blank_tile.fill(pygame.Color(0xFF, 0x00, 0xDC, 0xFF))
 	patterns = []
@@ -112,7 +131,9 @@ def generate(mission, stage, drawing_method = 0, high_priority_tiles = [], prior
 	if layer_b:
 		res += 'tilemap_B = [\n%s\n]\n\n' % print_tilemap(layer_b, base_b)
 	
-	res += 'collision_map = [\n%s\n]\n\n' % print_map(collisions, 4)
+	res += 'collision_map = [\n%s\n]\n\n' % print_map(collisions)
+	
+	res += 'jumps_table = [\n%s\n]\n\n' % print_jumps(n_levels, jumps_table)
 	
 	res += 'nb_ptrns = 0x%X\n\n' % len(patterns)
 	
@@ -198,7 +219,7 @@ if '4-4' in sys.argv:
 	generate(4, 4, drawing_method = 0, priority = True)
 
 if '5-1' in sys.argv:
-	generate(5, 1, drawing_method = 2, high_priority_tiles = [19], priority = False)
+	generate(5, 1, drawing_method = 2, high_priority_tiles = [19], priority = True)
 if '5-2' in sys.argv:
 	generate(5, 2, drawing_method = 2, high_priority_tiles = [1, 2, 6, 7, 18, 28, 35, 36, 37, 38, 39, 40, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 6, 61, 62, 63, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 800, 81, 82, 83, 84, 85, 86, 87, 88, 89] + list(range(92, 156)), priority = True)
 if '5-3' in sys.argv:

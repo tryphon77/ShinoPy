@@ -77,9 +77,11 @@ def allocate_tiles(patterns):
 def allocate_dynamic_sprite():
 	for i, s in enumerate(dynamic_sprites):
 		if s.status == 0:
-			print ('allocating dynamic sprite #%d' % i)
+			# print ('allocating dynamic sprite #%d' % i)
 			s.is_dynamic = True
 			return s
+	print ("couldn't allocate dynamic sprite")
+	GP.halt()
 	return None
 
 def allocate_static_sprite():
@@ -117,7 +119,9 @@ sizes = [1, 2, 3, 4, 2, 4, 6, 8, 3, 6, 9, 12, 4, 8, 12, 16]
 
 def update_patterns(sprite):
 	if sprite.is_viewable:
+		# print ('animation: %s frame: %s' % (sprite.animation, sprite.frame))
 		start, ln = sprite.data.patterns_blocks[sprite.frame]
+		
 		# print 'load %d, %d' % (start, ln)
 		GP.load_tile_data(sprite.data.patterns[start:start + ln], sprite.vpos & 0x7FF)
 	sprite.needs_refresh_patterns = False
@@ -191,7 +195,7 @@ def update_static_frame(sprite):
 
 
 def set_animation(self, anim):
-	# print ('[%s] set_animation: %d' % (None, anim))
+	# print ('set_animation: %d' % (anim))
 	self.total_ticks_in_animation = 0
 	if self.animation_id != anim:
 #		self.is_animation_over = False

@@ -16,6 +16,7 @@ from res.levels.all_levels import *
 from res.chars import projectile_data 
 from res.chars import splash_data 
 from res.chars import rocket_data 
+from res.chars import bone_data 
 
 
 def init():
@@ -36,11 +37,19 @@ def init():
 	# @TODO : conditionnal loading
 	if Globs.level == LEVEL_2_3:
 		GP.load_tile_data(splash_data.patterns, projectile_data.MORE_VPOS)
+
 	elif Globs.level in [LEVEL_3_1, LEVEL_3_2] :
 		GP.load_tile_data(rocket_data.patterns, projectile_data.MORE_VPOS)
+
+	elif Globs.level in [LEVEL_0_1, LEVEL_4_1, LEVEL_5_1, LEVEL_5_2, LEVEL_5_3] :
+		GP.load_tile_data(bone_data.patterns, projectile_data.MORE_VPOS)
 	
 	# init chunk (always 1)
-	introduce_new_object_chunk(1)
+	# introduce_new_object_chunk(1)
+	# print ('init_chunk')
+	introduce_new_chunk_full_rect(1)
+	print ('/init_chunk')
+	# GP.halt()
 
 	
 def main():
@@ -69,7 +78,7 @@ def main():
 if __name__ == '__main__':
 	GP.init()
 	
-	Globs.level = LEVEL_1_1
+	Globs.level = LEVEL_5_3
 	
 	while True:
 		main()

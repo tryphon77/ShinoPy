@@ -20,6 +20,7 @@ def release_more_object(self):
 
 def init(x, y):
 	self = allocate_object(temporary_objects)
+	self.name = 'splash'
 	
 	self.is_initialized = True
 	self.is_activated = True
@@ -28,6 +29,7 @@ def init(x, y):
 	
 	self.x = x
 	self.y = y
+	self.scope = (40, 128)
 	
 	all_objects.add(self)
 	
@@ -38,7 +40,7 @@ def init(x, y):
 
 	self.sprite = sprite = allocate_static_sprite()
 	if sprite:
-		sprite.vpos = 0x392
+		sprite.vpos = 0x512 # MORE_VPOS
 		sprite.status = 1
 		sprite.x = self.x
 		sprite.y = self.y

@@ -14,8 +14,9 @@ def init(entry):
 
 	self = common.init(entry)
 	self.name = "hostage at (%d, %d)" % (self.org_x, self.org_y)
-	self.param1 = entry[4]
+	self.param1 = entry[5]
 	
+	self.scope = (40, 32)
 	self.global_display_box = (-16, -31, 32, 32)
 
 	self.activate_function = activate
@@ -30,11 +31,13 @@ def activate(self):
 
 		self.collision_function = init_free
 	self.release_function = release
+	# GP.halt()
 	
 
 def release(self):
 	release_object(self)
 	hostage_objects.remove(self)
+	# GP.halt()
 
 
 def init_wait(self):

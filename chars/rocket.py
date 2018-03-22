@@ -11,6 +11,8 @@ from chars import common
 
 def init_rocket():
 	self = allocate_object(temporary_objects)
+	self.name = 'rocket'
+	self.scope = (16, 64)
 	
 	self.is_initialized = True
 	self.is_activated = True

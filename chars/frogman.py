@@ -17,10 +17,11 @@ def init(entry):
 	self.hp_max = 1
 	self.global_display_box = (-16, -63, 32, 64)
 	self.spawn_counter = 300
+	self.scope = (40, 128)
 
 	# param1 : delay before jumping
 	# param2 : tick
-	self.param1 = self.param2 = entry[4]	
+	self.param1 = self.param2 = entry[5]	
 	
 	self.activate_function = activate
 	self.release_function = release

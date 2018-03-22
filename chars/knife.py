@@ -8,6 +8,7 @@ from chars import common
 def init(entry):
 	self = common.init(entry)
 	self.name = 'knife at (%d, %d)' % (self.org_x, self.org_y)
+	self.scope = (40, 128)
 	
 	self.org_faces_left = entry[4]
 
